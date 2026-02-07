@@ -15,5 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-dev-tools \
   && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install --no-cache-dir --break-system-packages \
+    ultralytics==8.4.12 \
+    ncnn==1.0.20260114
 # rosdep (idempotent)
 RUN rosdep init || true && rosdep update
