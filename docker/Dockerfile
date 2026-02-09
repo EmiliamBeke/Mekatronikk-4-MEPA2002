@@ -7,9 +7,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     build-essential \
     git \
-    libcamera0 \
+    libcamera-dev \
+    libcamera-ipa \
+    libcamera0.2 \
     nano \
-    ros-jazzy-libcamera-ros \
+    ros-jazzy-cv-bridge \
     sudo \
     v4l-utils \
     python3-opencv \

@@ -1,0 +1,5 @@
+repositories:
+  libcamera_ros:
+    type: git
+    url: https://github.com/ros-perception/libcamera_ros.git
+    version: main
