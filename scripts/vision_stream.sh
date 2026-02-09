@@ -35,8 +35,16 @@ CAM_PID=$!
 PIPELINE="udpsrc port=${PORT} caps=application/x-rtp,media=video,encoding-name=H264,payload=96,clock-rate=90000 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false"
 
 X11_ARGS=()
-if [[ -n "${DISPLAY:-}" && -d /tmp/.X11-unix ]]; then
-  X11_ARGS+=("-e" "DISPLAY=${DISPLAY}" "-v" "/tmp/.X11-unix:/tmp/.X11-unix:rw")
+if [[ -n "${DISPLAY:-}" ]]; then
+  X11_ARGS+=("-e" "DISPLAY=${DISPLAY}")
+  if [[ -n "${XAUTHORITY:-}" && -f "${XAUTHORITY}" ]]; then
+    X11_ARGS+=("-e" "XAUTHORITY=/tmp/.Xauthority" "-v" "${XAUTHORITY}:/tmp/.Xauthority:ro")
+  elif [[ -f "${HOME}/.Xauthority" ]]; then
+    X11_ARGS+=("-e" "XAUTHORITY=/tmp/.Xauthority" "-v" "${HOME}/.Xauthority:/tmp/.Xauthority:ro")
+  fi
+  if [[ -d /tmp/.X11-unix ]]; then
+    X11_ARGS+=("-v" "/tmp/.X11-unix:/tmp/.X11-unix:rw")
+  fi
 fi
 
 docker compose run --rm \
