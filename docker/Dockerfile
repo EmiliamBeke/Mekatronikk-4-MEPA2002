@@ -7,7 +7,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     build-essential \
     git \
+    libcamera0 \
     nano \
+    ros-jazzy-libcamera-ros \
     sudo \
     v4l-utils \
     python3-opencv \

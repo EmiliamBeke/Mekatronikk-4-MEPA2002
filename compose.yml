@@ -16,6 +16,10 @@ services:
       - /dev/media1:/dev/media1
       - /dev/media2:/dev/media2
       - /dev/media3:/dev/media3
+      - /dev/v4l-subdev0:/dev/v4l-subdev0
+      - /dev/v4l-subdev1:/dev/v4l-subdev1
+      - /dev/v4l-subdev2:/dev/v4l-subdev2
+      - /dev/v4l-subdev3:/dev/v4l-subdev3
     group_add:
       - "${VIDEO_GID:-44}"
 
