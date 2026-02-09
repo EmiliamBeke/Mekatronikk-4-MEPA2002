@@ -1,6 +1,7 @@
 import os
 import shlex
 import subprocess
+import threading
 import time
 
 import numpy as np
@@ -29,14 +30,15 @@ class TeddyDetector(Node):
         self.proc = None
         self.frame_bytes = self.width * self.height * 3
         self._last_warn = 0.0
+        self._stop = False
 
         if not self.gst_source:
             self.get_logger().error("MEKK4_CAM_SOURCE_GST is required for UDP input")
-            self._start_timer()
             return
 
         self.get_logger().info(f"GStreamer source: {self.gst_source}")
-        self._start_timer()
+        self.worker = threading.Thread(target=self._gst_loop, daemon=True)
+        self.worker.start()
 
         self.get_logger().info(
             "conf={conf} imgsz={imgsz}".format(
@@ -45,30 +47,32 @@ class TeddyDetector(Node):
             )
         )
 
-    def _start_timer(self):
-        period = 0.0
-        self.create_timer(period, self.on_timer)
-
     def _warn_throttled(self, message: str, interval_sec: float = 5.0):
         now = time.monotonic()
         if now - self._last_warn >= interval_sec:
             self.get_logger().warning(message)
             self._last_warn = now
 
-    def on_timer(self):
-        if self.proc is None or self.proc.poll() is not None:
-            self.proc = self._start_gst_process()
-            if self.proc is None:
-                self._warn_throttled("gstreamer source not available")
-                return
+    def _gst_loop(self):
+        while not self._stop:
+            if self.proc is None or self.proc.poll() is not None:
+                self.proc = self._start_gst_process()
+                if self.proc is None:
+                    self._warn_throttled("gstreamer source not available")
+                    time.sleep(1.0)
+                    continue
 
-        data = self.proc.stdout.read(self.frame_bytes) if self.proc.stdout else b""
-        if len(data) != self.frame_bytes:
-            self._warn_throttled("failed to read frame")
-            return
+            data = self.proc.stdout.read(self.frame_bytes) if self.proc.stdout else b""
+            if len(data) != self.frame_bytes:
+                self._warn_throttled("failed to read frame")
+                if self.proc is not None:
+                    self.proc.terminate()
+                self.proc = None
+                time.sleep(0.1)
+                continue
 
-        frame = np.frombuffer(data, dtype=np.uint8).reshape((self.height, self.width, 3))
-        self._infer_frame(frame)
+            frame = np.frombuffer(data, dtype=np.uint8).reshape((self.height, self.width, 3))
+            self._infer_frame(frame)
 
     def _infer_frame(self, frame):
         results = self.model.predict(
@@ -92,6 +96,7 @@ class TeddyDetector(Node):
             self.last = msg.data
 
     def destroy_node(self):
+        self._stop = True
         if self.proc is not None:
             self.proc.terminate()
         super().destroy_node()
