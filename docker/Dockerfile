@@ -14,11 +14,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nano \
     libgl1 \
     libx11-6 \
+    libx11-xcb1 \
     libxext6 \
     libxrender1 \
     libsm6 \
     libxfixes3 \
     libxcb1 \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-randr0 \
+    libxcb-render-util0 \
+    libxcb-shape0 \
+    libxcb-sync1 \
+    libxcb-xfixes0 \
+    libxcb-xinerama0 \
+    libxcb-xkb1 \
     libxkbcommon-x11-0 \
     ros-jazzy-cv-bridge \
     ros-dev-tools \
