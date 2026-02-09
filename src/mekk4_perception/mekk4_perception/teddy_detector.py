@@ -2,7 +2,6 @@ import os
 import threading
 import time
 
-import cv2
 import rclpy
 from cv_bridge import CvBridge
 from rclpy.node import Node
@@ -18,7 +17,6 @@ class TeddyDetector(Node):
 
         self.model_path = os.environ.get("MEKK4_NCNN_MODEL", "/ws/models/yolo26n_ncnn_model")
         self.source = os.environ.get("MEKK4_CAM_SOURCE", "").strip()
-        self.gst_source = os.environ.get("MEKK4_CAM_SOURCE_GST", "").strip()
         self.image_topic = os.environ.get("MEKK4_CAM_TOPIC", "/camera/image_raw")
         self.conf = float(os.environ.get("MEKK4_CONF", "0.25"))
         self.imgsz = int(os.environ.get("MEKK4_IMGSZ", "640"))
@@ -26,9 +24,7 @@ class TeddyDetector(Node):
         self.max_fps = float(os.environ.get("MEKK4_MAX_FPS", "0"))
 
         self.get_logger().info(f"Model:  {self.model_path}")
-        if self.gst_source:
-            self.get_logger().info(f"GStreamer source: {self.gst_source}")
-        elif self.source:
+        if self.source:
             self.get_logger().info(f"Source: {self.source}")
         else:
             self.get_logger().info(f"Image topic: {self.image_topic}")
@@ -51,14 +47,11 @@ class TeddyDetector(Node):
         self._stop = False
         self._frame_count = 0
         self._last_process_time = 0.0
-        self._last_warn = 0.0
         self._lock = threading.Lock()
         self._latest = None
         self._event = threading.Event()
 
-        if self.gst_source:
-            self.worker = threading.Thread(target=self.stream_gst_loop, daemon=True)
-        elif self.source:
+        if self.source:
             self.worker = threading.Thread(target=self.stream_loop, daemon=True)
         else:
             self.sub = self.create_subscription(Image, self.image_topic, self.on_image, 10)
@@ -98,12 +91,6 @@ class TeddyDetector(Node):
         if msg.data != self.last:
             self.get_logger().info(msg.data)
             self.last = msg.data
-
-    def _warn_throttled(self, message: str, interval_sec: float = 5.0):
-        now = time.monotonic()
-        if now - self._last_warn >= interval_sec:
-            self.get_logger().warning(message)
-            self._last_warn = now
 
     def image_loop(self):
         try:
@@ -155,46 +142,6 @@ class TeddyDetector(Node):
                 self._publish_count(count)
         except Exception as e:
             self.get_logger().error(f"inference loop crashed: {e}")
-
-    def stream_gst_loop(self):
-        cap = None
-        try:
-            while not self._stop:
-                if cap is None or not cap.isOpened():
-                    cap = cv2.VideoCapture(self.gst_source, cv2.CAP_GSTREAMER)
-                    if not cap.isOpened():
-                        self._warn_throttled("gstreamer source not available")
-                        time.sleep(1.0)
-                        continue
-
-                ok, frame = cap.read()
-                if not ok:
-                    self._warn_throttled("failed to read gstreamer frame")
-                    cap.release()
-                    cap = None
-                    continue
-
-                if not self._should_process():
-                    continue
-
-                results = self.model.predict(
-                    source=frame,
-                    imgsz=self.imgsz,
-                    conf=self.conf,
-                    classes=[TEDDY_CLASS_ID],
-                    verbose=False,
-                )
-                if results:
-                    r = results[0]
-                    count = 0 if r.boxes is None else len(r.boxes)
-                else:
-                    count = 0
-                self._publish_count(count)
-        except Exception as e:
-            self.get_logger().error(f"inference loop crashed: {e}")
-        finally:
-            if cap is not None:
-                cap.release()
 
     def destroy_node(self):
         self._stop = True

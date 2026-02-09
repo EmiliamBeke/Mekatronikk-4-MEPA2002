@@ -5,26 +5,10 @@ services:
       dockerfile: docker/Dockerfile
     image: mekk4/ros2-jazzy-dev:local
     container_name: mekk4_ros
-    privileged: true
     network_mode: host
     ipc: host
     tty: true
     stdin_open: true
-    devices:
-      - /dev/video0:/dev/video0
-      - /dev/video1:/dev/video1
-      - /dev/media0:/dev/media0
-      - /dev/media1:/dev/media1
-      - /dev/media2:/dev/media2
-      - /dev/media3:/dev/media3
-      - /dev/v4l-subdev0:/dev/v4l-subdev0
-      - /dev/v4l-subdev1:/dev/v4l-subdev1
-      - /dev/v4l-subdev2:/dev/v4l-subdev2
-      - /dev/dri:/dev/dri
-      - /dev/vchiq:/dev/vchiq
-    group_add:
-      - "${VIDEO_GID:-44}"
-      - "${RENDER_GID:-992}"
 
     # Kjør som samme UID/GID som host for å unngå root-eide build-filer i workspace
     user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
@@ -36,8 +20,6 @@ services:
     volumes:
       - ./:/ws:rw
       - /etc/localtime:/etc/localtime:ro
-      - /run/udev:/run/udev:ro
-      - /sys:/sys:ro
 
     working_dir: /ws
     command: bash -lc "source /opt/ros/jazzy/setup.bash && exec bash"

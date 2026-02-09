@@ -5,12 +5,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Basic dev tooling for ROS 2 workspaces
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    gstreamer1.0-libav \
-    gstreamer1.0-plugins-bad \
-    gstreamer1.0-plugins-base \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-ugly \
-    gstreamer1.0-tools \
     nano \
     ros-jazzy-cv-bridge \
     ros-dev-tools \
