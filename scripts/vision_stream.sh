@@ -32,7 +32,7 @@ rpicam-vid -t 0 --width "${WIDTH}" --height "${HEIGHT}" --framerate "${FPS}" \
     ! udpsink host="${HOST}" port="${PORT}" &
 CAM_PID=$!
 
-PIPELINE="udpsrc port=${PORT} caps=application/x-rtp, media=video, encoding-name=H264, payload=96, clock-rate=90000 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false"
+PIPELINE="udpsrc port=${PORT} caps=application/x-rtp, media=video, encoding-name=H264, payload=96, clock-rate=90000 ! rtph264depay ! h264parse ! v4l2h264dec ! videoconvert ! appsink drop=true max-buffers=1 sync=false"
 
 docker compose run --rm \
   -e MEKK4_CAM_SOURCE_GST="${PIPELINE}" \

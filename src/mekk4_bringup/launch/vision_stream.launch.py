@@ -13,8 +13,8 @@ def generate_launch_description():
             default_value=(
                 "udpsrc port=5600 caps=application/x-rtp, media=video, "
                 "encoding-name=H264, payload=96, clock-rate=90000 "
-                "! rtph264depay ! h264parse ! avdec_h264 ! videoconvert "
-                "! appsink drop=true max-buffers=1 sync=false"
+                "! rtph264depay ! h264parse ! v4l2h264dec "
+                "! videoconvert ! appsink drop=true max-buffers=1 sync=false"
             ),
         ),
         SetEnvironmentVariable("MEKK4_CAM_SOURCE_GST", gst_pipeline),
