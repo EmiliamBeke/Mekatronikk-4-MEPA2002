@@ -25,7 +25,7 @@ cleanup() {
 trap cleanup EXIT
 
 rpicam-vid -t 0 --width "${WIDTH}" --height "${HEIGHT}" --framerate "${FPS}" \
-  --codec h264 --inline -o - \
+  --codec h264 --inline --libav-format h264 -o - \
   | gst-launch-1.0 -q fdsrc \
     ! h264parse \
     ! rtph264pay pt=96 config-interval=1 \
