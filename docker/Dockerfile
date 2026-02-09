@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcamera-ipa \
     libcamera0.2 \
     nano \
+    ros-jazzy-camera-ros \
     ros-jazzy-cv-bridge \
     sudo \
     v4l-utils \
