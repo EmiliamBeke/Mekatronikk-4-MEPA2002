@@ -25,14 +25,14 @@ cleanup() {
 trap cleanup EXIT
 
 rpicam-vid -t 0 --width "${WIDTH}" --height "${HEIGHT}" --framerate "${FPS}" \
-  --codec h264 --inline --libav-format h264 -o - \
+  --codec h264 --inline --libav-format h264 -n -o - \
   | gst-launch-1.0 -q fdsrc \
     ! h264parse \
     ! rtph264pay pt=96 config-interval=1 \
     ! udpsink host="${HOST}" port="${PORT}" &
 CAM_PID=$!
 
-PIPELINE="udpsrc port=${PORT} caps=application/x-rtp, media=video, encoding-name=H264, payload=96, clock-rate=90000 ! rtph264depay ! h264parse ! v4l2h264dec ! videoconvert ! appsink drop=true max-buffers=1 sync=false"
+PIPELINE="udpsrc port=${PORT} caps=application/x-rtp, media=video, encoding-name=H264, payload=96, clock-rate=90000 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false"
 
 docker compose run --rm \
   -e MEKK4_CAM_SOURCE_GST="${PIPELINE}" \

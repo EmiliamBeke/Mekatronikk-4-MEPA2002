@@ -47,7 +47,7 @@ class TeddyDetector(Node):
         period = 1.0 / self.max_fps if self.max_fps > 0 else 0.1
         self.create_timer(period, self.on_timer)
 
-    def _warn_throttled(self, message: str, interval_sec: float = 2.0):
+    def _warn_throttled(self, message: str, interval_sec: float = 5.0):
         now = time.monotonic()
         if now - self._last_warn >= interval_sec:
             self.get_logger().warning(message)
