@@ -20,6 +20,9 @@ services:
     devices:
       - /dev/ttyAMA0:/dev/ttyAMA0
 
+    group_add:
+      - dialout
+
     volumes:
       - ./:/ws:rw
       - /etc/localtime:/etc/localtime:ro
