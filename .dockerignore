@@ -1,0 +1,31 @@
+# Git
+.git
+
+# ROS build output (workspace er mount-et inn, ikke kopiert)
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Ultralytics / YOLO runtime-cache
+.ultralytics/
+runs/
+
+# Modellvekter (store binfiler, ikke del av imaget)
+models/
+yolo*_model/
+
+# ROS bag / opptak
+*.bag
+*.db3
+*.mcap
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

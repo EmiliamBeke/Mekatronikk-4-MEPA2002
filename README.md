@@ -1,77 +1,127 @@
-# ros_gz_project_template
-A template project integrating ROS 2 and Gazebo simulator.
+# Mekatronikk-4-MEPA2002
 
-## Included packages
+## Komme i gang
 
-* `ros_gz_example_description` - holds the sdf description of the simulated system and any other assets.
+### 1. Koble til Pi-en
 
-* `ros_gz_example_gazebo` - holds gazebo specific code and configurations. Namely this is where systems end up.
+```bash
+ssh gruppe5@gruppe5pi5
+passord: qwerty
+cd ~/Mekatronikk-4-MEPA2002
+```
 
-* `ros_gz_example_application` - holds ros2 specific code and configurations.
+### 2. Bygg Docker-imaget
 
-* `ros_gz_example_bringup` - holds launch files and high level utilities.
+Dette gjøres kun første gang, eller når `docker/Dockerfile` er endret.
 
+```bash
+docker compose build
+```
 
-## Install
+### 3. Bygg ROS-workspace
 
-For using the template with Gazebo Fortress switch to the `fortress` branch of this repository, otherwise use the default branch `main` for Gazebo Harmonic onwards.
+Dette gjøres første gang og etter kodeendringer i `src/`.
 
-### Requirements
+```bash
+docker compose run --rm ros bash -lc '/ws/scripts/ws_build.sh'
+```
 
-1. Choose a ROS and Gazebo combination https://gazebosim.org/docs/latest/ros_installation
+### 4. Start containeren
 
-   Note: If you're using a specific and unsupported Gazebo version with ROS 2, you might need to set the `GZ_VERSION` environment variable, for example:
+```bash
+docker compose up -d
+```
 
-    ```bash
-    export GZ_VERSION=harmonic
-    ```
-    Also need to build [`ros_gz`](https://github.com/gazebosim/ros_gz) and [`sdformat_urdf`](https://github.com/ros/sdformat_urdf) from source if binaries are not available for your chosen combination.
+### 5. Åpne shell i containeren
 
-1. Install necessary tools
+```bash
+docker compose run --rm ros
+```
 
-    ```bash
-    sudo apt install python3-vcstool python3-colcon-common-extensions git wget
-    ```
+### 6. Stopp containeren
 
-### Use as template
-Directly `Use this template` and create your project repository on Github.
+```bash
+docker compose down
+```
 
-Or start by creating a workspace and cloning the template repository:
+## Vision-stream
 
-   ```bash
-   mkdir -p ~/template_ws/src
-   cd ~/template_ws/src
-   git clone https://github.com/gazebosim/ros_gz_project_template.git
-   ```
+Startes fra host (krever `rpicam-apps` og `gstreamer1.0-tools` på Pi-en):
 
-## Usage
+```bash
+make vision
+```
 
-1. Install dependencies
+Dette starter kameraet og launcher `teddy_detector`-noden inni containeren.
 
-    ```bash
-    cd ~/template_ws
-    source /opt/ros/$ROS_DISTRO/setup.bash
-    sudo rosdep init
-    rosdep update
-    rosdep install --from-paths src --ignore-src -r -i -y --rosdistro <ROS_DISTRO>
-    ```
+## Når må jeg kjøre `docker compose build`?
 
-1. Build the project
+| Endring | Hva du trenger |
+|---|---|
+| Kode i `src/` | Bare `ws_build.sh` |
+| Ny ROS-pakke eller avhengighet i `package.xml` | Bare `ws_build.sh` |
+| Endring i `docker/Dockerfile` | `docker compose build` |
+| Ny `pip`/`apt`-avhengighet | `docker compose build` |
 
-    ```bash
-    colcon build --cmake-args -DBUILD_TESTING=ON
-    ```
+Koden mountes inn i containeren fra hosten, så endringer i `src/` krever aldri rebuild av Docker-imaget.
 
-1. Source the workspace
+## YOLO-modell
 
-    ```bash
-    . ~/template_ws/install/setup.sh
-    ```
+Prosjektet bruker `yolo26n_ncnn_model` — nano-varianten, som er den minste og raskeste. For brukstilfellet (finne teddybjørn og beregne senter) er dette riktig valg på Pi.
 
-1. Launch the simulation
+Modellen legges i én av disse plasseringene (prioritert rekkefølge):
 
-    ```bash
-    ros2 launch ros_gz_example_bringup diff_drive.launch.py
-    ```
+1. Satt via miljøvariabelen `MEKK4_NCNN_MODEL`
+2. `/ws/models/yolo26n_ncnn_model`
+3. `/ws/yolo26n_ncnn_model`
 
-For a more detailed guide on using this template see [documentation](https://gazebosim.org/docs/latest/ros_gz_project_template_guide).
+## Spare plass på Pi-en
+
+Docker kan fort spise opp diskplass. Sjekk hva som brukes:
+
+```bash
+docker system df
+```
+
+**Fjern stoppede containere, ubrukte images og build-cache i én kommando:**
+```bash
+docker system prune
+```
+
+Legg til `-a` for å også fjerne images som ikke er i bruk (inkludert det dere har bygget):
+```bash
+docker system prune -a
+```
+
+**Fjern bare build-cache (vanligvis den største synderen):**
+```bash
+docker builder prune
+```
+
+**Fjern ROS build-output fra workspace:**
+```bash
+rm -rf build/ install/ log/
+```
+Disse regenereres av `ws_build.sh` og trenger ikke lagres.
+
+**Sjekk hva som tar plass generelt:**
+```bash
+df -h          # diskbruk totalt
+du -sh ~/*     # hva i hjemmemappa som er størst
+```
+
+> Kjør `docker compose down` før du sletter images, ellers er imaget i bruk.
+
+## Feilsøking
+
+**Docker-tjenesten kjører ikke:**
+```bash
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+**Permission denied på Docker:**
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```

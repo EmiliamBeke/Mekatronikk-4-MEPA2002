@@ -1,0 +1,31 @@
+services:
+  ros:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: mekk4/ros2-jazzy-dev:local
+    container_name: mekk4_ros
+    network_mode: host
+    ipc: host
+    tty: true
+    stdin_open: true
+
+    # Kjør som samme UID/GID som host for å unngå root-eide build-filer i workspace
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+
+    environment:
+      - YOLO_CONFIG_DIR=${YOLO_CONFIG_DIR:-/ws/.ultralytics}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+
+    devices:
+      - /dev/ttyAMA0:/dev/ttyAMA0
+
+    group_add:
+      - dialout
+
+    volumes:
+      - ./:/ws:rw
+      - /etc/localtime:/etc/localtime:ro
+
+    working_dir: /ws
+    command: bash -lc "source /opt/ros/jazzy/setup.bash && exec bash"
