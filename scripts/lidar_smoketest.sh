@@ -6,8 +6,17 @@ PRODUCT_NAME="${PRODUCT_NAME:-LDLiDAR_STL27L}"
 TOPIC_NAME="${TOPIC_NAME:-/lidar}"
 STARTUP_WAIT_SECS="${STARTUP_WAIT_SECS:-5}"
 
+# setup.bash scripts may reference unset vars; source with nounset temporarily disabled.
+set +u
 source /opt/ros/jazzy/setup.bash
+
+if [[ ! -f /ws/install/setup.bash ]]; then
+  echo "[lidar-test] Missing /ws/install/setup.bash. Build workspace first (make lidar-setup or make ws)."
+  exit 1
+fi
+
 source /ws/install/setup.bash
+set -u
 
 if [[ ! -e "${PORT_NAME}" ]]; then
   echo "[lidar-test] Serial device not found: ${PORT_NAME}"
