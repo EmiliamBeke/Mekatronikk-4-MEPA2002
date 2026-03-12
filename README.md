@@ -125,27 +125,3 @@ sudo systemctl enable docker
 sudo usermod -aG docker $USER
 newgrp docker
 ```
-
-## LIDAR inn i Nav2
-
-Nav2- og SLAM-parametrene i dette repoet forventer LaserScan pa topic `/lidar`.
-
-Start LIDAR-driveren med kompatibel topic/frame fra bringup-pakken:
-
-```bash
-ros2 launch robot_bringup lidar_nav2_compat.launch.py
-```
-
-Hvis du bruker en annen port eller modell, overstyr launch-argumentene:
-
-```bash
-ros2 launch robot_bringup lidar_nav2_compat.launch.py \
-	product_name:=LDLiDAR_STL27L \
-	port_name:=/dev/ttyUSB0 \
-	port_baudrate:=230400 \
-	topic_name:=/lidar \
-	frame_id:=base_laser \
-	base_frame:=chassis
-```
-
-Hvis Nav2 klager pa transform mellom base og laser, juster `tf_x/tf_y/tf_z/tf_roll/tf_pitch/tf_yaw` i samme launch-kommando.
