@@ -55,7 +55,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument('product_name', default_value='LDLiDAR_STL27L'),
+        DeclareLaunchArgument('product_name', default_value='LDLiDAR_LD06'),
         DeclareLaunchArgument('port_name', default_value='/dev/ttyAMA0'),
         DeclareLaunchArgument('port_baudrate', default_value='230400'),
         DeclareLaunchArgument('topic_name', default_value='/lidar'),

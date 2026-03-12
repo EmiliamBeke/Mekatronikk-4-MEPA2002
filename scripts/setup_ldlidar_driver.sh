@@ -26,6 +26,13 @@ else
   git clone --depth 1 --branch "${REPO_TAG}" "${REPO_URL}" "${PKG_DIR}"
 fi
 
+# Upstream v3.0.3 misses <pthread.h> include in logger module on some toolchains.
+LOG_CPP="${PKG_DIR}/ldlidar_driver/src/logger/log_module.cpp"
+if [[ -f "${LOG_CPP}" ]] && ! grep -q '^#include <pthread.h>$' "${LOG_CPP}"; then
+  echo "[lidar-setup] Patching missing pthread include in log_module.cpp"
+  sed -i '1i#include <pthread.h>' "${LOG_CPP}"
+fi
+
 echo "[lidar-setup] Building workspace..."
 "${WS_ROOT}/scripts/ws_build.sh"
 

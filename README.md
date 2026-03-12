@@ -90,7 +90,7 @@ The smoke test launches `robot_bringup/lidar_nav2_compat.launch.py`, waits a few
 and checks if one `sensor_msgs/LaserScan` arrives on `/lidar`.
 
 Defaults in smoke test:
-1. `PRODUCT_NAME=LDLiDAR_STL27L`
+1. `PRODUCT_NAME=LDLiDAR_LD06`
 2. `PORT_NAME=/dev/ttyAMA0`
 
 Override as needed (for example LD19 on serial0):
