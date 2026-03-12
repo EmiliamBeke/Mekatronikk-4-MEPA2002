@@ -17,6 +17,9 @@ services:
       - YOLO_CONFIG_DIR=${YOLO_CONFIG_DIR:-/ws/.ultralytics}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
 
+    devices:
+      - /dev/ttyAMA0:/dev/ttyAMA0
+
     volumes:
       - ./:/ws:rw
       - /etc/localtime:/etc/localtime:ro
