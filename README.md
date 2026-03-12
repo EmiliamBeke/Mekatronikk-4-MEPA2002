@@ -6,6 +6,7 @@
 
 ```bash
 ssh gruppe5@gruppe5pi5
+passord: qwerty
 cd ~/Mekatronikk-4-MEPA2002
 ```
 
