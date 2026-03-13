@@ -40,4 +40,4 @@ sim-topics:
 	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 topic list | grep -E "/clock|/odom|/lidar|/cmd_vel"'
 
 sim-nav2:
-	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && mkdir -p /tmp/roslogs && ROS_LOG_DIR=/tmp/roslogs ros2 launch nav2_bringup bringup_launch.py use_sim_time:=true map:=$(CURDIR)/maps/my_map.yaml params_file:=$(CURDIR)/config/nav2_params.yaml'
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && mkdir -p /tmp/roslogs && ROS_LOG_DIR=/tmp/roslogs ros2 launch robot_bringup nav2_stack.launch.py use_sim_time:=true map:=$(CURDIR)/maps/my_map.yaml params_file:=$(CURDIR)/config/nav2_params.yaml'

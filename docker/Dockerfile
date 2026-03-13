@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gstreamer1.0-tools \
     nano \
     libgl1 \
+    ros-jazzy-navigation2 \
     ros-jazzy-cv-bridge \
     ros-dev-tools \
     v4l-utils \
