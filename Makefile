@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics
+.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics sim-nav2
 
 build:
 	docker compose build
@@ -34,8 +34,10 @@ sim:
 	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py'
 
 sim-headless:
-	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py headless:=true'
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py headless:=true rviz:=false'
 
 sim-topics:
 	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 topic list | grep -E "/clock|/odom|/lidar|/cmd_vel"'
 
+sim-nav2:
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && mkdir -p /tmp/roslogs && ROS_LOG_DIR=/tmp/roslogs ros2 launch nav2_bringup bringup_launch.py use_sim_time:=true map:=$(CURDIR)/maps/my_map.yaml params_file:=$(CURDIR)/config/nav2_params.yaml'

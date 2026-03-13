@@ -9,6 +9,7 @@ import os
 def generate_launch_description():
     headless = LaunchConfiguration('headless')
     autostart = LaunchConfiguration('autostart')
+    rviz_enabled = LaunchConfiguration('rviz')
 
     world = os.path.join(
         get_package_share_directory('robot_gz'),
@@ -35,6 +36,7 @@ def generate_launch_description():
         output='screen',
         arguments=['-d', rviz_config],
         parameters=[{'use_sim_time': True}],
+        condition=IfCondition(rviz_enabled),
     )
 
 
@@ -130,6 +132,11 @@ def generate_launch_description():
             'autostart',
             default_value='true',
             description='Automatically unpause Gazebo after startup.'
+        ),
+        DeclareLaunchArgument(
+            'rviz',
+            default_value='true',
+            description='Run RViz visualizer.'
         ),
         SetEnvironmentVariable('ROS_USE_SIM_TIME', 'true'),
         gz_gui,
