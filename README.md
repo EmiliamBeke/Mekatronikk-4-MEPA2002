@@ -73,13 +73,63 @@ Kjør Nav2 inne i container-shell:
 | `make lidar-setup` | Henter/bygger LiDAR-driver i workspace. |
 | `make lidar-test` | Kjører enkel LiDAR-smoketest. |
 
+## Pi ytelse (host, ikke Docker)
+
+| Kommando | Hva den gjør |
+|---|---|
+| `cpupower frequency-info` | Viser tilgjengelige governors og aktiv policy. |
+| `sudo cpupower frequency-set -g performance` | Setter CPU i maks ytelse-modus. |
+| `sudo cpupower frequency-set -g ondemand` | Setter CPU tilbake til dynamisk modus. |
+| `cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor` | Verifiserer aktiv governor. |
+| `watch -n1 'vcgencmd measure_temp; vcgencmd measure_clock arm; vcgencmd get_throttled'` | Overvåker temperatur, klokke og throttling live. |
+
+Gjør `performance` permanent etter reboot:
+
+| Kommando | Hva den gjør |
+|---|---|
+| `sudo nano /etc/systemd/system/cpu-governor-performance.service` | Oppretter systemd-service for governor ved boot. |
+| `sudo systemctl daemon-reload` | Leser inn ny servicefil. |
+| `sudo systemctl enable --now cpu-governor-performance.service` | Aktiverer service nå og ved neste reboot. |
+| `sudo systemctl status cpu-governor-performance.service --no-pager` | Sjekker at service kjører uten feil. |
+| `cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor` | Verifiserer at governor fortsatt er `performance`. |
+
+Service-innhold:
+
+```ini
+[Unit]
+Description=Set CPU governor to performance
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/cpupower frequency-set -g performance
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Tilbake til `ondemand` permanent:
+
+| Kommando | Hva den gjør |
+|---|---|
+| `sudo systemctl disable --now cpu-governor-performance.service` | Skrur av permanent `performance`-service. |
+| `sudo cpupower frequency-set -g ondemand` | Setter governor tilbake med en gang. |
+
+Valgfritt (mer aktiv viftekurve):
+
+| Kommando | Hva den gjør |
+|---|---|
+| `sudo nano /boot/firmware/config.txt` | Åpner Pi-bootconfig for vifteparametre. |
+| `sudo reboot` | Rebooter Pi etter endringer i `config.txt`. |
+
 ## Rydd lagring på Pi
 
 | Kommando | Hva den gjør |
 |---|---|
 | `df -h` | Viser total diskbruk på Pi. |
 | `docker system df` | Viser hvor mye plass Docker bruker. |
-| `du -h --max-depth=1 ~/Mekatronikk-4-MEPA2002 | sort -h` | Viser store mapper i repoet. |
+| `du -h --max-depth=1 ~/Mekatronikk-4-MEPA2002` | Viser store mapper i repoet. |
 | `docker system prune -af` | Fjerner ubrukte containere/nettverk/images. |
 | `docker builder prune -af` | Fjerner docker build-cache. |
 | `sudo apt clean` | Fjerner apt-pakke-cache. |
