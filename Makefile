@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws vision lidar-setup lidar-test
+.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics
 
 build:
 	docker compose build
@@ -25,4 +25,17 @@ lidar-setup:
 
 lidar-test:
 	docker compose run --rm ros bash -lc '/ws/scripts/lidar_smoketest.sh'
+
+# Native (non-Docker) simulation helpers for developer machines
+sim-build:
+	bash -lc 'source /opt/ros/jazzy/setup.bash && colcon build --symlink-install'
+
+sim:
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py'
+
+sim-headless:
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py headless:=true'
+
+sim-topics:
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 topic list | grep -E "/clock|/odom|/lidar|/cmd_vel"'
 

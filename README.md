@@ -1,6 +1,13 @@
 # Mekatronikk-4-MEPA2002
 
-## Komme i gang
+Dette repoet brukes til to parallelle utviklingsspor:
+
+1. **Robot (Pi5 + Docker + ROS 2)** for ekte hardware, sensorer og runtime på roboten.
+2. **Simulering (PC + ROS 2 + Gazebo)** for rask testing og utvikling i simulator.
+
+Begge spor peker til samme kodebase slik at dere kan utvikle sammen uten separate repo.
+
+## Workflow A: Robot (Pi5 + Docker)
 
 ### 1. Koble til Pi-en
 
@@ -43,6 +50,59 @@ docker compose run --rm ros
 ```bash
 docker compose down
 ```
+
+## Workflow B: Simulering (PC + native ROS/Gazebo)
+
+Bruk denne når du kjører Gazebo direkte på utviklingsmaskinen (ikke i Docker).
+
+### 1. Bygg workspace
+
+```bash
+source /opt/ros/jazzy/setup.bash
+cd ~/Mekatronikk-4-MEPA2002
+colcon build --symlink-install
+source install/setup.bash
+```
+
+### 2. Start Gazebo + bridge + RViz
+
+```bash
+source /opt/ros/jazzy/setup.bash
+cd ~/Mekatronikk-4-MEPA2002
+source install/setup.bash
+ros2 launch robot_bringup minimal_all.launch.py
+```
+
+Headless variant:
+
+```bash
+ros2 launch robot_bringup minimal_all.launch.py headless:=true
+```
+
+### 3. Verifiser topics
+
+```bash
+source /opt/ros/jazzy/setup.bash
+cd ~/Mekatronikk-4-MEPA2002
+source install/setup.bash
+ros2 topic list | grep -E '/clock|/odom|/lidar|/cmd_vel'
+```
+
+Hvis du mangler pakker på host:
+
+```bash
+sudo apt update
+sudo apt install ros-jazzy-ros-gz ros-jazzy-ros-gz-bridge ros-jazzy-rviz2 \
+	ros-jazzy-joint-state-publisher ros-jazzy-robot-state-publisher ros-jazzy-tf2-ros
+```
+
+## Samarbeidsmodus (Robot + Sim)
+
+Når dere utvikler parallelt (Pi på robot + Gazebo på PC):
+
+1. Hold topic-navn og message-typer like mellom sim og robot (`/cmd_vel`, `/odom`, `/lidar`, `/tf`, `/clock`).
+2. Bruk samme `ROS_DOMAIN_ID` på maskinene som skal snakke sammen.
+3. Kjør i samme nettverk ved distribuert testing.
 
 ## Vision-stream
 
@@ -124,7 +184,13 @@ docker compose run --rm ros bash -lc \
 	 ros2 topic hz /lidar'
 ```
 
-Dette starter kameraet og launcher `teddy_detector`-noden inni containeren.
+Dette starter LiDAR-node og publiserer scan på `/lidar`.
+
+## Hva kjører hvor?
+
+1. **Pi5 (Docker)**: hardware-nær runtime, kamera og fysisk LiDAR.
+2. **PC (native ROS/Gazebo)**: simulator og rask utvikling av logikk/oppførsel.
+3. **Felles**: pakker, launch-filer og topic-kontrakter i dette repoet.
 
 ## Når må jeg kjøre `docker compose build`?
 
