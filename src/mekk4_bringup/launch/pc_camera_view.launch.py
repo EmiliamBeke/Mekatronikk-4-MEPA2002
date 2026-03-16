@@ -9,6 +9,7 @@ def generate_launch_description():
     port = LaunchConfiguration("port")
     width = LaunchConfiguration("width")
     height = LaunchConfiguration("height")
+    jitter_ms = LaunchConfiguration("jitter_ms")
     topic_name = LaunchConfiguration("topic_name")
     frame_id = LaunchConfiguration("frame_id")
 
@@ -16,6 +17,7 @@ def generate_launch_description():
         DeclareLaunchArgument("port", default_value="5601"),
         DeclareLaunchArgument("width", default_value="1296"),
         DeclareLaunchArgument("height", default_value="972"),
+        DeclareLaunchArgument("jitter_ms", default_value="40"),
         DeclareLaunchArgument("topic_name", default_value="/camera"),
         DeclareLaunchArgument("frame_id", default_value="camera_link"),
         SetEnvironmentVariable(
@@ -24,7 +26,9 @@ def generate_launch_description():
                 "udpsrc port=",
                 port,
                 " caps=application/x-rtp,media=video,encoding-name=H264,payload=96,clock-rate=90000 ",
-                "! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink drop=true max-buffers=1 sync=false",
+                "! rtpjitterbuffer latency=",
+                jitter_ms,
+                " drop-on-latency=true ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink drop=true max-buffers=1 sync=false",
             ],
         ),
         SetEnvironmentVariable("MEKK4_CAM_WIDTH", width),

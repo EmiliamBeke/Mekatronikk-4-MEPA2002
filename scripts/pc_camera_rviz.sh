@@ -11,6 +11,7 @@ PI_HOST="${1:-${PI_HOST:-gruppe5pi5}}"
 PORT="${PORT:-5601}"
 WIDTH="${WIDTH:-1296}"
 HEIGHT="${HEIGHT:-972}"
+PC_JITTER_MS="${PC_JITTER_MS:-40}"
 RVIZ_CONFIG="${RVIZ_CONFIG:-${REPO_ROOT}/src/robot_bringup/rviz/pre_odom_lidar.rviz}"
 
 if [[ ! -f "${REPO_ROOT}/install/setup.bash" ]]; then
@@ -56,6 +57,7 @@ ros2 launch mekk4_bringup pc_camera_view.launch.py \
   port:="${PORT}" \
   width:="${WIDTH}" \
   height:="${HEIGHT}" \
+  jitter_ms:="${PC_JITTER_MS}" \
   >/tmp/mekk4_pc_camera.log 2>&1 &
 camera_pid=$!
 

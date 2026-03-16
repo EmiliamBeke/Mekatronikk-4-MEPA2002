@@ -21,11 +21,18 @@ camera_stream:
   # Optional I-frame interval in frames.
   # Lower values recover faster from UDP packet loss, but use more bitrate.
   # A good starting point is around the same as FPS, e.g. 10 at 10 FPS.
-  intra: 10
+  # Leave empty for the encoder default if the stream becomes choppy.
+  intra: ""
 
   # Try to reduce encoder delay on newer Pi camera stacks.
   # If your rpicam build is too old, the script will ignore this and warn once.
-  low_latency: true
+  # This can make the stream less stable on marginal Wi-Fi links, so default is false.
+  low_latency: false
+
+  # Small RTP jitter buffer on the PC side, in milliseconds.
+  # Higher smooths Wi-Fi jitter and reduces artifacts, but adds delay.
+  # Lower reduces delay, but can increase choppiness.
+  pc_jitter_ms: 40
 
   # Local UDP port used by teddy_detector on the Pi.
   local_udp_port: 5600
