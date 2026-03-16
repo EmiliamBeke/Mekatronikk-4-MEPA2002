@@ -196,6 +196,50 @@ Hvis auto-detection bommer:
 MEGA_PORT=/dev/ttyACM0 make mega-test
 ```
 
+### Arduino Mega + DFR0601 motor test
+
+Det finnes også en enkel motor-test for en Arduino Mega koblet til DFR0601 med denne pin-mappingen:
+
+1. `INA1 = 22`
+2. `INB1 = 23`
+3. `INA2 = 24`
+4. `INB2 = 25`
+5. `PWM1 = 5`
+6. `PWM2 = 4`
+
+Last opp [mega_dfr0601_test.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_dfr0601_test/mega_dfr0601_test.ino) til Mega, løft roboten opp fra gulvet, og kjør:
+
+```bash
+make mega-motor-test
+```
+
+Dette gjør en kort sekvens:
+
+1. `M1` fremover
+2. `M1` bakover
+3. `M2` fremover
+4. `M2` bakover
+5. begge fremover
+6. begge bakover
+7. `STOP` mellom hvert steg
+
+Standardverdier:
+
+1. `PWM_VALUE=80`
+2. `STEP_DURATION=0.8`
+
+Du kan overstyre dem:
+
+```bash
+PWM_VALUE=60 STEP_DURATION=0.5 make mega-motor-test
+```
+
+Hvis auto-detection bommer:
+
+```bash
+MEGA_PORT=/dev/ttyACM0 make mega-motor-test
+```
+
 Praktisk:
 
 1. Etter endring av farger, eksponering, bitrate, intra eller denoise i `camera_stream.*`, prøv `make camera-reload` på Pi.
