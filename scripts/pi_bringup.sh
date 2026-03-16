@@ -74,15 +74,17 @@ if [[ "${WITH_TEDDY}" == "1" || -n "${CAMERA_REMOTE_HOST}" ]]; then
     ENABLE_LOCAL=1
   fi
   WIDTH="${WIDTH}" HEIGHT="${HEIGHT}" FPS="${FPS}" \
+    CAM_PORT="${CAM_PORT}" CAMERA_REMOTE_PORT="${CAMERA_REMOTE_PORT}" \
     LOCAL_PORT="${CAM_PORT}" ENABLE_LOCAL="${ENABLE_LOCAL}" \
     REMOTE_HOST="${CAMERA_REMOTE_HOST}" REMOTE_PORT="${CAMERA_REMOTE_PORT}" \
-    bash "${SCRIPT_DIR}/camera_udp_stream.sh" &
+    bash "${SCRIPT_DIR}/camera_stream_supervisor.sh" &
   camera_pid=$!
   sleep 1
   if ! kill -0 "${camera_pid}" 2>/dev/null; then
     echo "[pi-bringup] Camera UDP stream exited early. Check camera logs above." >&2
     exit 1
   fi
+  echo "[pi-bringup] Camera color/exposure settings can be reloaded with: make camera-reload" >&2
 fi
 
 echo "[pi-bringup] Launching robot stack in Docker..." >&2

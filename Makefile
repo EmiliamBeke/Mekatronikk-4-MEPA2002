@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz camera-stop
+.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz camera-stop camera-reload
 
 build:
 	docker compose build
@@ -50,3 +50,6 @@ pc-camera-rviz:
 
 camera-stop:
 	bash ./scripts/camera_stop.sh
+
+camera-reload:
+	bash ./scripts/camera_reload.sh

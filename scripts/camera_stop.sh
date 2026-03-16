@@ -2,6 +2,7 @@
 set -euo pipefail
 
 patterns=(
+  "/scripts/camera_stream_supervisor.sh"
   "/scripts/camera_udp_stream.sh"
   "rpicam-vid.*--libav-format h264"
   "gst-launch-1.0 -q fdsrc .*rtph264pay"
