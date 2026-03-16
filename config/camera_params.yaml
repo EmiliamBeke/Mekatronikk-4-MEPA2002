@@ -32,7 +32,7 @@ camera_stream:
   # Small RTP jitter buffer on the PC side, in milliseconds.
   # Higher smooths Wi-Fi jitter and reduces artifacts, but adds delay.
   # Lower reduces delay, but can increase choppiness.
-  pc_jitter_ms: 30
+  pc_jitter_ms: 10
 
   # Local UDP port used by teddy_detector on the Pi.
   local_udp_port: 5600
