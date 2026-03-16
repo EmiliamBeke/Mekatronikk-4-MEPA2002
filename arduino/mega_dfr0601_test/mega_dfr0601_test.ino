@@ -12,13 +12,56 @@ constexpr int kIna2Pin = 24;
 constexpr int kInb2Pin = 25;
 constexpr int kPwm1Pin = 5;
 constexpr int kPwm2Pin = 4;
+constexpr int kHallA1Pin = 3;
+constexpr int kHallB1Pin = 2;
+
+volatile long encoder1_count = 0;
+volatile uint8_t encoder1_state = 0;
 
 char command_buffer[kMaxCommandLength + 1];
 size_t command_length = 0;
 
+constexpr int8_t kQuadratureDelta[16] = {
+  0, -1,  1,  0,
+  1,  0,  0, -1,
+ -1,  0,  0,  1,
+  0,  1, -1,  0
+};
+
 void reset_command_buffer() {
   command_length = 0;
   command_buffer[0] = '\0';
+}
+
+uint8_t read_encoder1_state() {
+  const uint8_t a = static_cast<uint8_t>(digitalRead(kHallA1Pin));
+  const uint8_t b = static_cast<uint8_t>(digitalRead(kHallB1Pin));
+  return static_cast<uint8_t>((a << 1) | b);
+}
+
+void update_encoder1() {
+  const uint8_t new_state = read_encoder1_state();
+  const uint8_t transition = static_cast<uint8_t>((encoder1_state << 2) | new_state);
+  encoder1_count += kQuadratureDelta[transition];
+  encoder1_state = new_state;
+}
+
+void on_encoder1_change() {
+  update_encoder1();
+}
+
+long read_encoder1_count() {
+  noInterrupts();
+  const long count = encoder1_count;
+  interrupts();
+  return count;
+}
+
+void reset_encoder1_count() {
+  noInterrupts();
+  encoder1_count = 0;
+  encoder1_state = read_encoder1_state();
+  interrupts();
 }
 
 void set_motor(int ina_pin, int inb_pin, int pwm_pin, int speed) {
@@ -63,6 +106,28 @@ void handle_command(const char *command) {
     return;
   }
 
+  if (strcmp(command, "ENC1") == 0) {
+    Serial.print("ENC1 ");
+    Serial.println(read_encoder1_count());
+    return;
+  }
+
+  if (strcmp(command, "RESET ENC1") == 0) {
+    reset_encoder1_count();
+    Serial.println("OK RESET ENC1");
+    return;
+  }
+
+  if (strcmp(command, "STATE") == 0) {
+    Serial.print("STATE ENC1=");
+    Serial.print(read_encoder1_count());
+    Serial.print(" HALLA=");
+    Serial.print(digitalRead(kHallA1Pin));
+    Serial.print(" HALLB=");
+    Serial.println(digitalRead(kHallB1Pin));
+    return;
+  }
+
   int speed = 0;
   if (sscanf(command, "M1 %d", &speed) == 1) {
     set_motor(kIna1Pin, kInb1Pin, kPwm1Pin, speed);
@@ -102,8 +167,13 @@ void setup() {
   pinMode(kInb2Pin, OUTPUT);
   pinMode(kPwm1Pin, OUTPUT);
   pinMode(kPwm2Pin, OUTPUT);
+  pinMode(kHallA1Pin, INPUT_PULLUP);
+  pinMode(kHallB1Pin, INPUT_PULLUP);
 
   stop_all();
+  reset_encoder1_count();
+  attachInterrupt(digitalPinToInterrupt(kHallA1Pin), on_encoder1_change, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(kHallB1Pin), on_encoder1_change, CHANGE);
 
   Serial.begin(kBaudrate);
   while (!Serial && millis() < 3000) {

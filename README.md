@@ -206,6 +206,10 @@ Det finnes også en enkel motor-test for en Arduino Mega koblet til DFR0601 med 
 4. `INB2 = 25`
 5. `PWM1 = 5`
 6. `PWM2 = 4`
+7. `Hall sensor A = 3`
+8. `Hall sensor B = 2`
+
+Hall-sensoren er foreløpig koblet inn som encoder på motor 1 i test-firmwaren.
 
 Last opp [mega_dfr0601_test.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_dfr0601_test/mega_dfr0601_test.ino) til Mega, løft roboten opp fra gulvet, og kjør:
 
@@ -222,6 +226,7 @@ Dette gjør en kort sekvens:
 5. begge fremover
 6. begge bakover
 7. `STOP` mellom hvert steg
+8. leser `ENC1` før og etter `M1`-steppene for å verifisere at hall-sensoren teller
 
 Standardverdier:
 

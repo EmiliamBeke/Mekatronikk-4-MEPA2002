@@ -37,6 +37,14 @@ def expect_reply(ser: serial.Serial, command: str, expected_prefix: str, timeout
     return reply
 
 
+def read_encoder_count(ser: serial.Serial, timeout: float) -> int:
+    reply = expect_reply(ser, "ENC1", "ENC1 ", timeout)
+    try:
+        return int(reply.split()[1])
+    except (IndexError, ValueError) as exc:
+        raise RuntimeError(f"failed to parse encoder reply: {reply!r}") from exc
+
+
 def run_step(ser: serial.Serial, command: str, timeout: float, duration: float) -> None:
     expect_reply(ser, command, "OK", timeout)
     time.sleep(max(0.0, duration))
@@ -71,12 +79,25 @@ def main() -> int:
             expect_reply(ser, "ID", "MEGA_DFR0601_TEST", args.reply_timeout)
             expect_reply(ser, "PING", "PONG", args.reply_timeout)
             expect_reply(ser, "STOP", "OK STOP", args.reply_timeout)
+            expect_reply(ser, "RESET ENC1", "OK RESET ENC1", args.reply_timeout)
+            initial_enc = read_encoder_count(ser, args.reply_timeout)
+            print(f"[mega-motor-test] Initial ENC1={initial_enc}")
 
             print("[mega-motor-test] Step 1: M1 forward")
             run_step(ser, f"M1 {pwm}", args.reply_timeout, args.step_duration)
+            enc_after_m1_forward = read_encoder_count(ser, args.reply_timeout)
+            delta_forward = enc_after_m1_forward - initial_enc
+            print(f"[mega-motor-test] ENC1 delta after M1 forward: {delta_forward}")
+            if delta_forward == 0:
+                raise RuntimeError("encoder count did not change during M1 forward step")
 
             print("[mega-motor-test] Step 2: M1 reverse")
             run_step(ser, f"M1 {-pwm}", args.reply_timeout, args.step_duration)
+            enc_after_m1_reverse = read_encoder_count(ser, args.reply_timeout)
+            delta_reverse = enc_after_m1_reverse - enc_after_m1_forward
+            print(f"[mega-motor-test] ENC1 delta after M1 reverse: {delta_reverse}")
+            if delta_reverse == 0:
+                raise RuntimeError("encoder count did not change during M1 reverse step")
 
             print("[mega-motor-test] Step 3: M2 forward")
             run_step(ser, f"M2 {pwm}", args.reply_timeout, args.step_duration)
