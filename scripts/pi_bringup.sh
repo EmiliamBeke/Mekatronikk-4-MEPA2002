@@ -71,7 +71,6 @@ fi
 echo "[pi-bringup] Launching robot stack in Docker..." >&2
 docker compose run --rm \
   -e ROS_DOMAIN_ID="${ROS_DOMAIN_ID}" \
-  -e ROS_LOCALHOST_ONLY="${ROS_LOCALHOST_ONLY}" \
   -e ROS_AUTOMATIC_DISCOVERY_RANGE="${ROS_AUTOMATIC_DISCOVERY_RANGE}" \
   -e ROS_STATIC_PEERS="${ROS_STATIC_PEERS}" \
   -e MEKK4_CAM_SOURCE_GST="udpsrc port=${CAM_PORT} caps=application/x-rtp,media=video,encoding-name=H264,payload=96,clock-rate=90000 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false" \

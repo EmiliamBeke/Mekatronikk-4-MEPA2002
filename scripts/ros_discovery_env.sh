@@ -108,7 +108,6 @@ esac
 
 cat <<EOF
 export ROS_DOMAIN_ID=${domain_id}
-export ROS_LOCALHOST_ONLY=0
 export ROS_AUTOMATIC_DISCOVERY_RANGE=${discovery_range}
 export ROS_STATIC_PEERS=${peer_value}
 EOF
