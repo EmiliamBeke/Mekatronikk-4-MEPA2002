@@ -11,12 +11,12 @@ camera_stream:
 
   # Capture framerate.
   # Lower FPS usually reduces delay and makes the stream easier to keep stable.
-  fps: 12
+  fps: 15
 
   # Optional H.264 bitrate in bits/sec.
   # Leave empty to use the rpicam default.
   # Lower bitrate reduces bandwidth, but can increase compression artifacts.
-  bitrate_bps: 1000000
+  bitrate_bps: 1200000
 
   # Optional I-frame interval in frames.
   # Lower values recover faster from UDP packet loss, but use more bitrate.
@@ -99,7 +99,7 @@ teddy_detector:
 
   # Publish an annotated raw ROS image from the Pi.
   # Keep this false unless you explicitly need the image over DDS.
-  publish_debug_image: true
+  publish_debug_image: false
 
   # Topic used for the annotated debug image.
   debug_image_topic: /teddy_detector/debug_image
@@ -110,7 +110,7 @@ teddy_detector:
 
   # Max publish rate for the debug image topic.
   # Keep this low so the debug overlay does not flood the network.
-  debug_image_fps: 5.0
+  debug_image_fps: 1.0
 
   # Stream annotated YOLO output as H264/UDP from the Pi.
   # This is the recommended way to view detections on the PC.
