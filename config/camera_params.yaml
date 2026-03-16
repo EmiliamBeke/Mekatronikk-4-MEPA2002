@@ -6,7 +6,7 @@
 camera_stream:
   # Output resolution from the Pi camera.
   # Higher values improve detail, but increase CPU load, bandwidth, and delay.
-  width: 960
+  width: 1440
   height: 720
 
   # Capture framerate.
@@ -121,7 +121,7 @@ teddy_detector:
 
   # Scale factor before H264 encoding the annotated stream.
   # 1.0 keeps full input size, 0.5 halves width and height.
-  debug_stream_scale: 1.0
+  debug_stream_scale: 0.5
 
   # Output FPS for the annotated YOLO stream.
   # This is a max rate, not a guaranteed rate.
