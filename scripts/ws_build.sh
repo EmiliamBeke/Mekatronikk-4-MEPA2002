@@ -3,8 +3,16 @@ set -euo pipefail
 
 cd /ws
 
-# Clear stale setuptools metadata from previous builds. This avoids cases where
-# deleted launch/data files still linger in old SOURCES.txt manifests.
+# Clear stale Python package build/install state before colcon build.
+# ament_python packages copy setup.py/launch data into /ws/build/<pkg>, and a
+# deleted launch/data file can remain referenced there even after source files
+# are removed from /ws/src.
+while IFS= read -r pkg_dir; do
+  pkg_name="$(basename "${pkg_dir}")"
+  rm -rf "/ws/build/${pkg_name}" "/ws/install/${pkg_name}"
+done < <(find /ws/src -maxdepth 2 -name setup.py -printf '%h\n')
+
+# Also clear any lingering setuptools metadata just in case.
 find /ws/build -type d -name '*.egg-info' -prune -exec rm -rf {} +
 
 colcon build --symlink-install
