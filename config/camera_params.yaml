@@ -6,7 +6,7 @@ camera_stream:
   fps: 10
   local_udp_port: 5600
   remote_udp_port: 5601
-  awb: auto
+  awb: indoor
   awb_gains: ""
   brightness: 0.0
   contrast: 1.0
