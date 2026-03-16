@@ -12,6 +12,8 @@ PORT="${PORT:-5601}"
 WIDTH="${WIDTH:-1296}"
 HEIGHT="${HEIGHT:-972}"
 PC_JITTER_MS="${PC_JITTER_MS:-40}"
+TOPIC_NAME="${TOPIC_NAME:-/camera}"
+FRAME_ID="${FRAME_ID:-camera_link}"
 RVIZ_CONFIG="${RVIZ_CONFIG:-${REPO_ROOT}/src/robot_bringup/rviz/pre_odom_lidar.rviz}"
 
 if [[ ! -f "${REPO_ROOT}/install/setup.bash" ]]; then
@@ -58,6 +60,8 @@ ros2 launch mekk4_bringup pc_camera_view.launch.py \
   width:="${WIDTH}" \
   height:="${HEIGHT}" \
   jitter_ms:="${PC_JITTER_MS}" \
+  topic_name:="${TOPIC_NAME}" \
+  frame_id:="${FRAME_ID}" \
   >/tmp/mekk4_pc_camera.log 2>&1 &
 camera_pid=$!
 

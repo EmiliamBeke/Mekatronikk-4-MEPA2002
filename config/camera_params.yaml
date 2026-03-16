@@ -97,8 +97,9 @@ teddy_detector:
   # Debug GUI on the Pi host. Keep false for headless SSH use.
   show_gui: false
 
-  # Publish an annotated ROS image with YOLO boxes for RViz on the PC.
-  publish_debug_image: true
+  # Publish an annotated raw ROS image from the Pi.
+  # Keep this false unless you explicitly need the image over DDS.
+  publish_debug_image: false
 
   # Topic used for the annotated debug image.
   debug_image_topic: /teddy_detector/debug_image
@@ -110,3 +111,21 @@ teddy_detector:
   # Max publish rate for the debug image topic.
   # Keep this low so the debug overlay does not flood the network.
   debug_image_fps: 5.0
+
+  # Stream annotated YOLO output as H264/UDP from the Pi.
+  # This is the recommended way to view detections on the PC.
+  stream_debug_video: true
+
+  # UDP port for the annotated YOLO stream.
+  debug_stream_port: 5602
+
+  # Scale factor before H264 encoding the annotated stream.
+  # 1.0 keeps full input size, 0.5 halves width and height.
+  debug_stream_scale: 1.0
+
+  # Output FPS for the annotated YOLO stream.
+  # Set this close to the detector's actual Hz; higher just duplicates work.
+  debug_stream_fps: 10.0
+
+  # H264 bitrate for the annotated YOLO stream.
+  debug_stream_bitrate_bps: 800000

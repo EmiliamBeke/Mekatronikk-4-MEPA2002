@@ -14,6 +14,7 @@ FLUSH_OUTPUT=${FLUSH_OUTPUT:-1}
 LOCAL_PORT=${LOCAL_PORT:-5600}
 LOCAL_HOST=${LOCAL_HOST:-127.0.0.1}
 ENABLE_LOCAL=${ENABLE_LOCAL:-1}
+ENABLE_REMOTE=${ENABLE_REMOTE:-1}
 REMOTE_HOST=${REMOTE_HOST:-}
 REMOTE_PORT=${REMOTE_PORT:-5601}
 
@@ -37,7 +38,7 @@ if rpicam-vid --help 2>&1 | grep -q -- '--flush'; then
   supports_flush=1
 fi
 
-if [[ "${ENABLE_LOCAL}" != "1" && -z "${REMOTE_HOST}" ]]; then
+if [[ "${ENABLE_LOCAL}" != "1" && ! ( "${ENABLE_REMOTE}" == "1" && -n "${REMOTE_HOST}" ) ]]; then
   echo "[camera-stream] Nothing to do. Enable local streaming or set REMOTE_HOST." >&2
   exit 1
 fi
@@ -70,7 +71,7 @@ if [[ "${ENABLE_LOCAL}" == "1" ]]; then
   )
 fi
 
-if [[ -n "${REMOTE_HOST}" ]]; then
+if [[ "${ENABLE_REMOTE}" == "1" && -n "${REMOTE_HOST}" ]]; then
   gst_cmd+=(
     t. '!' queue '!' rtph264pay pt=96 config-interval=1 '!'
     udpsink "host=${REMOTE_HOST}" "port=${REMOTE_PORT}" sync=false async=false
@@ -81,7 +82,7 @@ echo "[camera-stream] width=${WIDTH} height=${HEIGHT} fps=${FPS}" >&2
 if [[ "${ENABLE_LOCAL}" == "1" ]]; then
   echo "[camera-stream] local udp -> ${LOCAL_HOST}:${LOCAL_PORT}" >&2
 fi
-if [[ -n "${REMOTE_HOST}" ]]; then
+if [[ "${ENABLE_REMOTE}" == "1" && -n "${REMOTE_HOST}" ]]; then
   echo "[camera-stream] remote udp -> ${REMOTE_HOST}:${REMOTE_PORT}" >&2
 fi
 

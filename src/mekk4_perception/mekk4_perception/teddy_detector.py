@@ -34,6 +34,12 @@ class TeddyDetector(Node):
         self.debug_image_topic = os.environ.get("MEKK4_DEBUG_IMAGE_TOPIC", "/teddy_detector/debug_image").strip()
         self.debug_image_scale = float(os.environ.get("MEKK4_DEBUG_IMAGE_SCALE", "0.5"))
         self.debug_image_fps = float(os.environ.get("MEKK4_DEBUG_IMAGE_FPS", "5.0"))
+        self.stream_debug_video = os.environ.get("MEKK4_DEBUG_STREAM", "0").strip() == "1"
+        self.debug_stream_host = os.environ.get("MEKK4_DEBUG_STREAM_HOST", "").strip()
+        self.debug_stream_port = int(os.environ.get("MEKK4_DEBUG_STREAM_PORT", "5602"))
+        self.debug_stream_scale = float(os.environ.get("MEKK4_DEBUG_STREAM_SCALE", "1.0"))
+        self.debug_stream_fps = float(os.environ.get("MEKK4_DEBUG_STREAM_FPS", "10.0"))
+        self.debug_stream_bitrate_bps = int(os.environ.get("MEKK4_DEBUG_STREAM_BITRATE", "800000"))
 
         self.model = YOLO(self.model_path, task="detect")
         self.pub = self.create_publisher(String, "/teddy_detector/status", 10)
@@ -41,10 +47,12 @@ class TeddyDetector(Node):
         self.debug_pub = self.create_publisher(Image, self.debug_image_topic, 5) if self.publish_debug_image else None
         self.last = None
         self.proc = None
+        self.debug_stream_proc = None
         self.frame_bytes = self.width * self.height * 3
         self._buf = bytearray()
         self._last_warn = 0.0
         self._last_debug_image = 0.0
+        self._last_debug_stream = 0.0
         self._stop = False
 
         if not self.gst_source:
@@ -67,6 +75,16 @@ class TeddyDetector(Node):
                     topic=self.debug_image_topic,
                     scale=self.debug_image_scale,
                     fps=self.debug_image_fps,
+                )
+            )
+        if self.stream_debug_video and self.debug_stream_host:
+            self.get_logger().info(
+                "debug stream -> udp://{host}:{port} scale={scale} fps={fps} bitrate={bitrate}".format(
+                    host=self.debug_stream_host,
+                    port=self.debug_stream_port,
+                    scale=self.debug_stream_scale,
+                    fps=self.debug_stream_fps,
+                    bitrate=self.debug_stream_bitrate_bps,
                 )
             )
         if self.show_gui:
@@ -170,6 +188,8 @@ class TeddyDetector(Node):
 
         if self.publish_debug_image and annotated is not None:
             self._publish_debug_image(annotated)
+        if self.stream_debug_video and annotated is not None:
+            self._stream_debug_video(annotated)
 
         if self.show_gui:
             cv2.imshow("teddy_detector", annotated)
@@ -221,6 +241,80 @@ class TeddyDetector(Node):
         except _rclpy.RCLError:
             return
 
+    def _stream_debug_video(self, annotated):
+        if not self.debug_stream_host:
+            return
+        if self.debug_stream_fps > 0.0:
+            min_period = 1.0 / self.debug_stream_fps
+            now = time.monotonic()
+            if now - self._last_debug_stream < min_period:
+                return
+            self._last_debug_stream = now
+
+        frame = annotated
+        if self.debug_stream_scale > 0.0 and self.debug_stream_scale != 1.0:
+            new_width = max(1, int(round(self.width * self.debug_stream_scale)))
+            new_height = max(1, int(round(self.height * self.debug_stream_scale)))
+            frame = cv2.resize(annotated, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
+        proc = self._ensure_debug_stream_process(frame.shape[1], frame.shape[0])
+        if proc is None or proc.stdin is None:
+            return
+        try:
+            proc.stdin.write(frame.tobytes())
+            proc.stdin.flush()
+        except Exception:
+            self._stop_debug_stream()
+
+    def _ensure_debug_stream_process(self, width, height):
+        if not self.debug_stream_host:
+            return None
+        if self.debug_stream_proc is not None and self.debug_stream_proc.poll() is None:
+            return self.debug_stream_proc
+
+        self._stop_debug_stream()
+        fps = max(1, int(round(self.debug_stream_fps))) if self.debug_stream_fps > 0 else 1
+        bitrate_kbps = max(100, int(round(self.debug_stream_bitrate_bps / 1000.0)))
+        key_int = max(1, fps)
+        pipeline = (
+            "fdsrc ! "
+            f"videoparse format=bgr width={width} height={height} framerate={fps}/1 ! "
+            "queue leaky=downstream max-size-buffers=1 ! "
+            "videoconvert ! "
+            f"x264enc tune=zerolatency speed-preset=ultrafast bitrate={bitrate_kbps} key-int-max={key_int} ! "
+            "h264parse ! "
+            "rtph264pay pt=96 config-interval=1 ! "
+            f"udpsink host={self.debug_stream_host} port={self.debug_stream_port} sync=false async=false"
+        )
+        cmd = ["gst-launch-1.0", "-q"] + shlex.split(pipeline)
+        try:
+            self.debug_stream_proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                bufsize=0,
+            )
+        except Exception:
+            self.debug_stream_proc = None
+            return None
+        return self.debug_stream_proc
+
+    def _stop_debug_stream(self):
+        if self.debug_stream_proc is None:
+            return
+        try:
+            if self.debug_stream_proc.stdin is not None:
+                self.debug_stream_proc.stdin.close()
+        except Exception:
+            pass
+        self.debug_stream_proc.terminate()
+        try:
+            self.debug_stream_proc.wait(timeout=1.0)
+        except Exception:
+            pass
+        self.debug_stream_proc = None
+
     def destroy_node(self):
         self._stop = True
         if self.proc is not None:
@@ -230,6 +324,7 @@ class TeddyDetector(Node):
             except Exception:
                 pass
             self.proc = None
+        self._stop_debug_stream()
         worker = getattr(self, "worker", None)
         if worker is not None and worker.is_alive():
             worker.join(timeout=1.0)

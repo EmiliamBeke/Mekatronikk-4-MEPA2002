@@ -40,6 +40,15 @@ def normalize_choice(value, *, false_value=None, true_value=None):
     return value
 
 
+def scaled_size(size_value, scale_value):
+    try:
+        size = int(size_value)
+        scale = float(scale_value)
+    except Exception:
+        return size_value
+    return max(1, int(round(size * scale)))
+
+
 def main():
     config_path = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("CAMERA_CONFIG_FILE", DEFAULT_CONFIG)
     if not os.path.exists(config_path):
@@ -54,6 +63,8 @@ def main():
     detector = data.get("teddy_detector", {})
 
     denoise = normalize_choice(stream.get("denoise", "auto"), false_value="off", true_value="auto")
+    debug_image_scale = detector.get("debug_image_scale", 0.5)
+    debug_stream_scale = detector.get("debug_stream_scale", 1.0)
 
     values = {
         "CAMERA_CONFIG_FILE": config_path,
@@ -85,10 +96,17 @@ def main():
         "MEKK4_IMGSZ": pick("MEKK4_IMGSZ", detector.get("imgsz", 640)),
         "MEKK4_CENTER_TOL": pick("MEKK4_CENTER_TOL", detector.get("center_tol", 0.10)),
         "MEKK4_SHOW": pick("MEKK4_SHOW", to_shell(detector.get("show_gui", False))),
-        "MEKK4_DEBUG_IMAGE": pick("MEKK4_DEBUG_IMAGE", to_shell(detector.get("publish_debug_image", True))),
+        "MEKK4_DEBUG_IMAGE": pick("MEKK4_DEBUG_IMAGE", to_shell(detector.get("publish_debug_image", False))),
         "MEKK4_DEBUG_IMAGE_TOPIC": pick("MEKK4_DEBUG_IMAGE_TOPIC", detector.get("debug_image_topic", "/teddy_detector/debug_image")),
-        "MEKK4_DEBUG_IMAGE_SCALE": pick("MEKK4_DEBUG_IMAGE_SCALE", detector.get("debug_image_scale", 0.5)),
+        "MEKK4_DEBUG_IMAGE_SCALE": pick("MEKK4_DEBUG_IMAGE_SCALE", debug_image_scale),
         "MEKK4_DEBUG_IMAGE_FPS": pick("MEKK4_DEBUG_IMAGE_FPS", detector.get("debug_image_fps", 5.0)),
+        "MEKK4_DEBUG_STREAM": pick("MEKK4_DEBUG_STREAM", to_shell(detector.get("stream_debug_video", True))),
+        "MEKK4_DEBUG_STREAM_PORT": pick("MEKK4_DEBUG_STREAM_PORT", detector.get("debug_stream_port", 5602)),
+        "MEKK4_DEBUG_STREAM_SCALE": pick("MEKK4_DEBUG_STREAM_SCALE", debug_stream_scale),
+        "MEKK4_DEBUG_STREAM_FPS": pick("MEKK4_DEBUG_STREAM_FPS", detector.get("debug_stream_fps", stream.get("fps", 15))),
+        "MEKK4_DEBUG_STREAM_BITRATE": pick("MEKK4_DEBUG_STREAM_BITRATE", detector.get("debug_stream_bitrate_bps", 800000)),
+        "MEKK4_DEBUG_STREAM_WIDTH": pick("MEKK4_DEBUG_STREAM_WIDTH", scaled_size(stream.get("width", 1296), debug_stream_scale)),
+        "MEKK4_DEBUG_STREAM_HEIGHT": pick("MEKK4_DEBUG_STREAM_HEIGHT", scaled_size(stream.get("height", 972), debug_stream_scale)),
     }
 
     for key, value in values.items():

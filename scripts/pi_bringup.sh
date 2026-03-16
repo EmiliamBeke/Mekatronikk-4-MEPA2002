@@ -57,6 +57,10 @@ if [[ "${WITH_CAMERA_RVIZ}" == "1" && -z "${CAMERA_REMOTE_HOST}" ]]; then
   CAMERA_REMOTE_HOST="${ROS_STATIC_PEERS}"
 fi
 
+if [[ "${MEKK4_DEBUG_STREAM:-0}" == "1" && -z "${CAMERA_REMOTE_HOST}" ]]; then
+  CAMERA_REMOTE_HOST="${ROS_STATIC_PEERS}"
+fi
+
 if [[ "${WITH_TEDDY}" == "1" || -n "${CAMERA_REMOTE_HOST}" ]]; then
   if ! command -v rpicam-vid >/dev/null 2>&1; then
     echo "[pi-bringup] Camera streaming requires rpicam-vid on the Pi host." >&2
@@ -70,12 +74,16 @@ if [[ "${WITH_TEDDY}" == "1" || -n "${CAMERA_REMOTE_HOST}" ]]; then
   bash "${SCRIPT_DIR}/camera_stop.sh" >/dev/null 2>&1 || true
   echo "[pi-bringup] Starting camera UDP stream..." >&2
   ENABLE_LOCAL=0
+  ENABLE_REMOTE=0
   if [[ "${WITH_TEDDY}" == "1" ]]; then
     ENABLE_LOCAL=1
   fi
+  if [[ "${WITH_CAMERA_RVIZ}" == "1" ]]; then
+    ENABLE_REMOTE=1
+  fi
   WIDTH="${WIDTH}" HEIGHT="${HEIGHT}" FPS="${FPS}" \
     CAM_PORT="${CAM_PORT}" CAMERA_REMOTE_PORT="${CAMERA_REMOTE_PORT}" \
-    LOCAL_PORT="${CAM_PORT}" ENABLE_LOCAL="${ENABLE_LOCAL}" \
+    LOCAL_PORT="${CAM_PORT}" ENABLE_LOCAL="${ENABLE_LOCAL}" ENABLE_REMOTE="${ENABLE_REMOTE}" \
     REMOTE_HOST="${CAMERA_REMOTE_HOST}" REMOTE_PORT="${CAMERA_REMOTE_PORT}" \
     bash "${SCRIPT_DIR}/camera_stream_supervisor.sh" &
   camera_pid=$!
@@ -104,4 +112,10 @@ docker compose run --rm \
   -e MEKK4_DEBUG_IMAGE_TOPIC="${MEKK4_DEBUG_IMAGE_TOPIC}" \
   -e MEKK4_DEBUG_IMAGE_SCALE="${MEKK4_DEBUG_IMAGE_SCALE}" \
   -e MEKK4_DEBUG_IMAGE_FPS="${MEKK4_DEBUG_IMAGE_FPS}" \
+  -e MEKK4_DEBUG_STREAM="${MEKK4_DEBUG_STREAM}" \
+  -e MEKK4_DEBUG_STREAM_HOST="${CAMERA_REMOTE_HOST}" \
+  -e MEKK4_DEBUG_STREAM_PORT="${MEKK4_DEBUG_STREAM_PORT}" \
+  -e MEKK4_DEBUG_STREAM_SCALE="${MEKK4_DEBUG_STREAM_SCALE}" \
+  -e MEKK4_DEBUG_STREAM_FPS="${MEKK4_DEBUG_STREAM_FPS}" \
+  -e MEKK4_DEBUG_STREAM_BITRATE="${MEKK4_DEBUG_STREAM_BITRATE}" \
   ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} map:=${MAP_FILE} params_file:=${PARAMS_FILE}"
