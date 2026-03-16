@@ -22,6 +22,19 @@ if ! command -v gst-launch-1.0 >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v gst-inspect-1.0 >/dev/null 2>&1; then
+  echo "[pc-camera-rviz] gst-inspect-1.0 not found. Install gstreamer1.0-tools on the PC." >&2
+  exit 1
+fi
+
+for plugin in h264parse rtph264depay decodebin videoconvert; do
+  if ! gst-inspect-1.0 "${plugin}" >/dev/null 2>&1; then
+    echo "[pc-camera-rviz] Missing GStreamer plugin: ${plugin}" >&2
+    echo "[pc-camera-rviz] Install at least: gstreamer1.0-plugins-bad gstreamer1.0-libav" >&2
+    exit 1
+  fi
+done
+
 set +u
 source /opt/ros/jazzy/setup.bash
 source "${REPO_ROOT}/install/setup.bash"

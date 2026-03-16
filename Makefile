@@ -46,4 +46,4 @@ pi-bringup:
 	bash ./scripts/pi_bringup.sh
 
 pc-camera-rviz:
-	bash ./scripts/pc_camera_rviz.sh "${PI_HOST:-gruppe5pi5}"
+	bash ./scripts/pc_camera_rviz.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"
