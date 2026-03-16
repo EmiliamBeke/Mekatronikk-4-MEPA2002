@@ -28,6 +28,25 @@ if [[ "${ENABLE_LOCAL}" != "1" && -z "${REMOTE_HOST}" ]]; then
   exit 1
 fi
 
+rpicam_pid=""
+gst_pid=""
+fifo_path="$(mktemp -u /tmp/mekk4_camera_fifo.XXXXXX)"
+
+cleanup() {
+  if [[ -n "${rpicam_pid}" ]]; then
+    kill "${rpicam_pid}" 2>/dev/null || true
+    wait "${rpicam_pid}" 2>/dev/null || true
+  fi
+  if [[ -n "${gst_pid}" ]]; then
+    kill "${gst_pid}" 2>/dev/null || true
+    wait "${gst_pid}" 2>/dev/null || true
+  fi
+  rm -f "${fifo_path}"
+}
+trap cleanup EXIT INT TERM
+
+mkfifo "${fifo_path}"
+
 gst_cmd=(gst-launch-1.0 -q fdsrc '!' h264parse '!' tee name=t)
 
 if [[ "${ENABLE_LOCAL}" == "1" ]]; then
@@ -80,5 +99,22 @@ if [[ -n "${TUNING_FILE}" ]]; then
   RPICAM_ARGS+=(--tuning-file "${TUNING_FILE}")
 fi
 
-rpicam-vid "${RPICAM_ARGS[@]}" \
-  | "${gst_cmd[@]}"
+"${gst_cmd[@]}" < "${fifo_path}" &
+gst_pid=$!
+
+rpicam-vid "${RPICAM_ARGS[@]}" -o "${fifo_path}" &
+rpicam_pid=$!
+
+wait -n "${rpicam_pid}" "${gst_pid}"
+status=$?
+
+if kill -0 "${rpicam_pid}" 2>/dev/null; then
+  kill "${rpicam_pid}" 2>/dev/null || true
+fi
+if kill -0 "${gst_pid}" 2>/dev/null; then
+  kill "${gst_pid}" 2>/dev/null || true
+fi
+wait "${rpicam_pid}" 2>/dev/null || true
+wait "${gst_pid}" 2>/dev/null || true
+
+exit "${status}"

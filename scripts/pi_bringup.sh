@@ -67,6 +67,7 @@ if [[ "${WITH_TEDDY}" == "1" || -n "${CAMERA_REMOTE_HOST}" ]]; then
     exit 1
   fi
 
+  bash "${SCRIPT_DIR}/camera_stop.sh" >/dev/null 2>&1 || true
   echo "[pi-bringup] Starting camera UDP stream..." >&2
   ENABLE_LOCAL=0
   if [[ "${WITH_TEDDY}" == "1" ]]; then
@@ -77,6 +78,11 @@ if [[ "${WITH_TEDDY}" == "1" || -n "${CAMERA_REMOTE_HOST}" ]]; then
     REMOTE_HOST="${CAMERA_REMOTE_HOST}" REMOTE_PORT="${CAMERA_REMOTE_PORT}" \
     bash "${SCRIPT_DIR}/camera_udp_stream.sh" &
   camera_pid=$!
+  sleep 1
+  if ! kill -0 "${camera_pid}" 2>/dev/null; then
+    echo "[pi-bringup] Camera UDP stream exited early. Check camera logs above." >&2
+    exit 1
+  fi
 fi
 
 echo "[pi-bringup] Launching robot stack in Docker..." >&2

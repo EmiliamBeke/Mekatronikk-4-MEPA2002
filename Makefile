@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz
+.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz camera-stop
 
 build:
 	docker compose build
@@ -47,3 +47,6 @@ pi-bringup:
 
 pc-camera-rviz:
 	bash ./scripts/pc_camera_rviz.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"
+
+camera-stop:
+	bash ./scripts/camera_stop.sh
