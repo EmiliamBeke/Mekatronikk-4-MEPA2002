@@ -59,7 +59,7 @@ camera_stream:
   # Denoise mode.
   # Quote values like "off" or "on" so YAML does not treat them as booleans.
   # Valid practical values here: "auto", "off", "cdn_off", "cdn_fast", "cdn_hq", "on".
-  denoise: "on"
+  denoise: "auto"
 
   # Exposure metering mode. "centre" is a safe default for robot driving indoors.
   metering: centre
