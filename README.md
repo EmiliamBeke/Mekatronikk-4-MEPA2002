@@ -44,83 +44,126 @@ Merk:
 1. `Timed out waiting for transform ... chassis to map` er normalt til `2D Pose Estimate` er satt.
 2. Alle terminaler må ha samme `ROS_DOMAIN_ID`.
 
-## Robot (Pi5 + Docker)
+## Fysisk robot (Pi + PC)
+
+Målet er at Pi-en kjører roboten autonomt, mens PC-en bare kobler seg på for RViz og debugging.
+
+### Første gangs oppsett
+
+Pi:
 
 | Kommando | Hva den gjør |
 |---|---|
 | `ssh gruppe5@gruppe5pi5` | Logger inn på Pi. |
 | `cd ~/Mekatronikk-4-MEPA2002` | Går til repoet på Pi. |
-| `make build` | Bygger Docker-image (kun ved behov). |
-| `make ws` | Bygger ROS-workspace i container. |
-| `make up` | Starter ROS-container i bakgrunnen. |
-| `make shell` | Åpner shell inne i containeren. |
+| `make build` | Bygger Docker-image (kun ved første gang eller etter Docker-endringer). |
+| `make ws` | Bygger ROS-workspace i container. Kjør igjen hvis ROS-kode er endret. |
 
-Kjør Nav2 inne i container-shell:
+PC:
 
 | Kommando | Hva den gjør |
 |---|---|
-| `source /opt/ros/jazzy/setup.bash` | Laster ROS i container-shell. |
-| `source /ws/install/setup.bash` | Laster workspace i container-shell. |
-| `ros2 launch robot_bringup nav2_stack.launch.py use_sim_time:=false map:=/ws/maps/my_map.yaml params_file:=/ws/config/nav2_params.yaml` | Starter Nav2 på fysisk robotoppsett. |
+| `source /opt/ros/jazzy/setup.bash` | Laster ROS 2 Jazzy-miljø. |
+| `cd ~/Mekatronikk-4-MEPA2002` | Går til repoet på PC. |
+| `colcon build --symlink-install` | Bygger PC-workspace. Kjør igjen hvis lokal ROS-kode er endret. |
+| `source install/setup.bash` | Laster de bygde pakkene i shellen. |
 
-`make down` stopper container.
+### Standard workflow nå
 
-## Enkel Pi <-> PC ROS-bruk
+Dette er den anbefalte oppskriften før dere har odometri og aktiv Nav2-bruk.
 
-Maalet her er at Pi-en er autonom, mens PC-en bare kobler seg paa for RViz og debugging.
-
-Pi-side, via SSH:
-
-| Kommando | Hva den gjør |
-|---|---|
-| `ssh gruppe5@gruppe5pi5` | Logger inn på Pi. |
-| `cd ~/Mekatronikk-4-MEPA2002` | Går til repoet på Pi. |
-| `make pi-bringup` | Finner PC-IP fra SSH-sesjonen, setter ROS discovery, og starter samlet robot-bringup i Docker. |
-
-Nyttige valg paa Pi:
-
-| Kommando | Hva den gjør |
-|---|---|
-| `WITH_NAV2=0 make pi-bringup` | Starter bare robotmodell + LiDAR (uten Nav2). |
-| `WITH_TEDDY=1 make pi-bringup` | Starter også teddy-detektor på Pi. |
-| `PC_HOST=192.168.10.42 make pi-bringup` | Overstyr automatisk valgt PC-IP. |
-
-PC-side:
+Pi, via SSH fra samme PC som skal bruke RViz:
 
 ```bash
 cd ~/Mekatronikk-4-MEPA2002
-source /opt/ros/jazzy/setup.bash
-eval "$(bash scripts/ros_discovery_env.sh pc gruppe5pi5)"
-rviz2
+WITH_NAV2=0 WITH_TEDDY=1 make pi-bringup
 ```
 
-Hvis Pi-hostnavnet ikke løses fra PC-en, bruk IP i stedet:
+PC:
 
 ```bash
-eval "$(bash scripts/ros_discovery_env.sh pc 192.168.10.55)"
+cd ~/Mekatronikk-4-MEPA2002
+make pc-teddy-rviz
 ```
+
+Dette skjer automatisk:
+
+1. Pi finner PC-IP fra SSH-sesjonen.
+2. Pi setter `ROS_DOMAIN_ID`, `ROS_AUTOMATIC_DISCOVERY_RANGE` og `ROS_STATIC_PEERS`.
+3. Pi starter samlet bringup i Docker med `robot_state_publisher`, LiDAR og teddy-detektor.
+4. Pi sender annotert YOLO-video over UDP til PC hvis `teddy_detector.stream_debug_video: true` i [config/camera_params.yaml](/home/emiliam/Mekatronikk-4-MEPA2002/config/camera_params.yaml).
+5. PC setter ROS discovery mot Pi automatisk, starter lokal UDP->ROS bridge for YOLO-debugbildet og åpner RViz med [pre_odom_lidar.rviz](/home/emiliam/Mekatronikk-4-MEPA2002/src/robot_bringup/rviz/pre_odom_lidar.rviz).
+
+I denne RViz-konfigen er standarden:
+
+1. `Fixed Frame = chassis`
+2. `/lidar` vises som LaserScan
+3. `/teddy_detector/debug_image` vises som Image
+4. `TF` er dempet for å unngå støy før dere har odom
+
+### Nyttige varianter
+
+Pi:
+
+| Kommando | Hva den gjør |
+|---|---|
+| `make pi-bringup` | Standard bringup med default-verdier i scriptet. |
+| `WITH_NAV2=0 make pi-bringup` | Starter uten Nav2. Dette er anbefalt før dere har odometri. |
+| `WITH_TEDDY=1 make pi-bringup` | Starter teddy-detektor på Pi. |
+| `WITH_TEDDY=1 WITH_CAMERA_RVIZ=1 make pi-bringup` | Starter teddy på Pi og sender også rå H264-kamerastrøm til PC på port `5601`. |
+| `PC_HOST=192.168.10.42 make pi-bringup` | Overstyr automatisk valgt PC-IP for ROS discovery og debug-stream. |
+
+PC:
+
+| Kommando | Hva den gjør |
+|---|---|
+| `make pc-teddy-rviz` | Standard: viser LiDAR + annotert YOLO-bilde i RViz. |
+| `make pc-camera-rviz` | Valgfritt: viser rå `/camera` i RViz via lokal UDP->ROS bridge på PC. |
+| `make pc-teddy-rviz PI_HOST=192.168.10.55` | Bruk Pi-IP direkte hvis `gruppe5pi5` ikke løses på PC. |
+
+### ROS discovery og IP
+
+I normal bruk trenger du ikke å kjøre `scripts/ros_discovery_env.sh` manuelt.
+
+Det er bare nyttig hvis du vil feilsøke:
+
+```bash
+bash scripts/ros_discovery_env.sh pi
+bash scripts/ros_discovery_env.sh pc gruppe5pi5
+```
+
+Automatikken fungerer best når:
+
+1. du SSH-er inn på Pi fra samme PC som skal bruke RViz
+2. Pi og PC faktisk når hverandre på samme nett
+3. PC kan løse `gruppe5pi5`, eller du overstyrer med IP
 
 ## Vision og LiDAR
 
 | Kommando | Hva den gjør |
 |---|---|
-| `make vision` | Starter vision-stream/oppsett. |
-| `WITH_TEDDY=1 WITH_CAMERA_RVIZ=1 make pi-bringup` | Starter teddy på Pi og sender kamera over UDP til PC-IP-en fra SSH-sesjonen. |
-| `make pc-camera-rviz PI_HOST=gruppe5pi5` | Starter lokal UDP->ROS camera-bridge på PC og åpner RViz med `/camera` og `/lidar`. |
 | `make lidar-setup` | Henter/bygger LiDAR-driver i workspace. |
 | `make lidar-test` | Kjører enkel LiDAR-smoketest. |
 
 Guide for LiDAR i RViz: [docs/lidar_rviz.md](/home/emiliam/Mekatronikk-4-MEPA2002/docs/lidar_rviz.md)
 
+### Kamera- og YOLO-parametre
+
 Kamera- og YOLO-parametre styres fra [config/camera_params.yaml](/home/emiliam/Mekatronikk-4-MEPA2002/config/camera_params.yaml).
 
-Merk:
+Kort oppdeling:
 
-1. `camera_stream.width/height/fps` gjelder samme stream som brukes baade til teddy-detektor og RViz.
-2. `camera_stream.awb/awb_gains/brightness/contrast/saturation/sharpness/ev/denoise/metering` brukes direkte av `rpicam-vid` paa Pi og er stedet aa tune farger/bilde.
-3. `camera_stream.tuning_file` kan brukes hvis tredjepartsmodulen trenger en egen `libcamera` tuning file.
-4. `teddy_detector.conf/imgsz/center_tol` paavirker bare YOLO-delen paa Pi.
-5. Du kan fortsatt overstyre midlertidig med env vars, for eksempel `WIDTH=640 FPS=10 SATURATION=1.2 make pi-bringup`.
+1. `camera_stream.*` påvirker signalet som går inn til teddy-detektor på Pi.
+2. `camera_stream.width/height/fps/bitrate_bps/intra/low_latency/denoise/...` er stedet å tune bildekvalitet og artifacts for YOLO-inputen.
+3. `teddy_detector.*` påvirker YOLO-parametre og den annoterte debug-videoen som sendes til PC.
+4. `teddy_detector.debug_stream_*` påvirker bare debug-visningen på PC, ikke hva YOLO faktisk ser.
+
+Praktisk:
+
+1. Etter endring av farger, eksponering, bitrate, intra eller denoise i `camera_stream.*`, prøv `make camera-reload` på Pi.
+2. Hvis du endrer `camera_stream.width/height`, porter eller `teddy_detector.*`, gjør full restart av `make pi-bringup`.
+3. `make camera-stop` er bare en recovery-knapp hvis gamle kameraprosesser henger igjen.
+4. Du kan fortsatt overstyre midlertidig med env vars, for eksempel `WIDTH=640 FPS=10 SATURATION=1.2 make pi-bringup`.
 
 ## Pi ytelse (host, ikke Docker)
 

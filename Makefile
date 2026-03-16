@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws vision lidar-setup lidar-test sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz pc-teddy-rviz camera-stop camera-reload
+.PHONY: build shell up down ws lidar-setup lidar-test sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz pc-teddy-rviz camera-stop camera-reload
 
 build:
 	docker compose build
@@ -16,9 +16,6 @@ down:
 # Build ROS workspace + fix console_script shebang to venv python (PEP668-safe)
 ws:
 	docker compose run --rm ros bash -lc '/ws/scripts/ws_build.sh'
-
-vision:
-	./scripts/vision_stream.sh
 
 lidar-setup:
 	docker compose run --rm ros bash -lc '/ws/scripts/setup_ldlidar_driver.sh'
