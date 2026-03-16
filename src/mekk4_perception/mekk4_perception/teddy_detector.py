@@ -7,6 +7,7 @@ import time
 import cv2
 import numpy as np
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from std_msgs.msg import String
 from ultralytics import YOLO
@@ -72,6 +73,8 @@ class TeddyDetector(Node):
 
             chunk = self.proc.stdout.read(4096) if self.proc.stdout else b""
             if not chunk:
+                if self._stop:
+                    break
                 self._warn_throttled("failed to read frame")
                 if self.proc is not None:
                     self.proc.terminate()
@@ -146,6 +149,14 @@ class TeddyDetector(Node):
         self._stop = True
         if self.proc is not None:
             self.proc.terminate()
+            try:
+                self.proc.wait(timeout=1.0)
+            except Exception:
+                pass
+            self.proc = None
+        worker = getattr(self, "worker", None)
+        if worker is not None and worker.is_alive():
+            worker.join(timeout=1.0)
         if self.show_gui:
             cv2.destroyAllWindows()
         super().destroy_node()
@@ -175,7 +186,9 @@ def main():
     node = TeddyDetector()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):
         pass
-    node.destroy_node()
-    rclpy.shutdown()
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()

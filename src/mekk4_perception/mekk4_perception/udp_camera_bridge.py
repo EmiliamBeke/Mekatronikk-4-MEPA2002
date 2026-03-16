@@ -8,6 +8,7 @@ from collections import deque
 import numpy as np
 import rclpy
 from cv_bridge import CvBridge
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 
@@ -67,6 +68,8 @@ class UdpCameraBridge(Node):
 
             chunk = self.proc.stdout.read(4096) if self.proc.stdout else b""
             if not chunk:
+                if self._stop:
+                    break
                 if self.proc is not None and self.proc.poll() is not None:
                     self._log_gst_failure()
                 else:
@@ -116,6 +119,14 @@ class UdpCameraBridge(Node):
         self._stop = True
         if self.proc is not None:
             self.proc.terminate()
+            try:
+                self.proc.wait(timeout=1.0)
+            except Exception:
+                pass
+            self.proc = None
+        worker = getattr(self, "worker", None)
+        if worker is not None and worker.is_alive():
+            worker.join(timeout=1.0)
         super().destroy_node()
 
     def _start_gst_process(self):
@@ -144,7 +155,9 @@ def main():
     node = UdpCameraBridge()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):
         pass
-    node.destroy_node()
-    rclpy.shutdown()
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
