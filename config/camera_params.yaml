@@ -16,7 +16,7 @@ camera_stream:
   # Optional H.264 bitrate in bits/sec.
   # Leave empty to use the rpicam default.
   # Lower bitrate reduces bandwidth, but can increase compression artifacts.
-  bitrate_bps: 1200000
+  bitrate_bps: 500000
 
   # Optional I-frame interval in frames.
   # Lower values recover faster from UDP packet loss, but use more bitrate.
