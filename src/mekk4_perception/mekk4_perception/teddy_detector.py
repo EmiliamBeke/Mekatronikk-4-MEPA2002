@@ -53,6 +53,7 @@ class TeddyDetector(Node):
         self._last_warn = 0.0
         self._last_debug_image = 0.0
         self._last_debug_stream = 0.0
+        self._last_debug_stream_warn = 0.0
         self._stop = False
 
         if not self.gst_source:
@@ -87,6 +88,8 @@ class TeddyDetector(Node):
                     bitrate=self.debug_stream_bitrate_bps,
                 )
             )
+        elif self.stream_debug_video:
+            self.get_logger().warning("debug stream enabled, but no MEKK4_DEBUG_STREAM_HOST is set")
         if self.show_gui:
             self.get_logger().info("GUI enabled (MEKK4_SHOW=1)")
 
@@ -268,9 +271,18 @@ class TeddyDetector(Node):
 
     def _ensure_debug_stream_process(self, width, height):
         if not self.debug_stream_host:
+            now = time.monotonic()
+            if now - self._last_debug_stream_warn >= 5.0:
+                self.get_logger().warning("debug stream host is empty, not streaming annotated video")
+                self._last_debug_stream_warn = now
             return None
         if self.debug_stream_proc is not None and self.debug_stream_proc.poll() is None:
             return self.debug_stream_proc
+
+        if self.debug_stream_proc is not None and self.debug_stream_proc.poll() is not None:
+            self.get_logger().warning(
+                f"debug stream pipeline exited with code {self.debug_stream_proc.poll()}, restarting"
+            )
 
         self._stop_debug_stream()
         fps = max(1, int(round(self.debug_stream_fps))) if self.debug_stream_fps > 0 else 1
@@ -292,7 +304,7 @@ class TeddyDetector(Node):
                 cmd,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
                 bufsize=0,
             )
         except Exception:
