@@ -47,6 +47,10 @@ fi
 echo "[mega-test] Using ${MEGA_PORT} @ ${MEGA_BAUDRATE}" >&2
 echo "[mega-test] Opening the serial port may reset the Mega for a second or two." >&2
 
-docker compose run --rm \
-  --device "${MEGA_PORT}:${MEGA_PORT}" \
-  ros bash -lc "/opt/venv/bin/python /ws/scripts/mega_smoketest.py --port '${MEGA_PORT}' --baudrate '${MEGA_BAUDRATE}'"
+if ! python3 -c 'import serial' >/dev/null 2>&1; then
+  echo "[mega-test] Missing python3 serial support on host." >&2
+  echo "[mega-test] Install it with: sudo apt install python3-serial" >&2
+  exit 1
+fi
+
+python3 "${SCRIPT_DIR}/mega_smoketest.py" --port "${MEGA_PORT}" --baudrate "${MEGA_BAUDRATE}"

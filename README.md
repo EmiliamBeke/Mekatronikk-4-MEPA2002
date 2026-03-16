@@ -170,12 +170,7 @@ Kort oppdeling:
 Hvis du vil verifisere at Pi-en faktisk kan snakke med en Arduino Mega over USB, finnes det nå en enkel smoke test.
 
 1. Last opp [mega_smoketest.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_smoketest/mega_smoketest.ino) til Mega.
-2. Rebuild Docker-imaget én gang, siden testen bruker `pyserial` i containeren:
-
-```bash
-make build
-```
-
+2. Sørg for at Pi-host har `python3-serial` tilgjengelig.
 3. Kjør testen på Pi:
 
 ```bash
@@ -185,9 +180,15 @@ make mega-test
 Dette gjør:
 
 1. finner `Mega`-porten automatisk (`/dev/serial/by-id`, `/dev/ttyACM*` eller `/dev/ttyUSB*`)
-2. åpner USB-serial til Mega i containeren
+2. åpner USB-serial direkte på Pi-host
 3. sender `ID`, `PING`, `LED ON`, `LED OFF`
 4. forventer svar tilbake fra Mega og bekrefter at link fungerer
+
+Hvis `python3-serial` mangler på Pi-host:
+
+```bash
+sudo apt install python3-serial
+```
 
 Hvis auto-detection bommer:
 
