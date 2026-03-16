@@ -3,7 +3,7 @@
 camera_stream:
   width: 1280
   height: 720
-  fps: 1
+  fps: 10
   local_udp_port: 5600
   remote_udp_port: 5601
   awb: indoor
@@ -11,7 +11,7 @@ camera_stream:
   brightness: 0.0
   contrast: 1.0
   saturation: 1.0
-  sharpness: 1.0
+  sharpness: 0.0
   ev: 0.0
   denoise: auto
   metering: centre
