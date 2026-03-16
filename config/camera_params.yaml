@@ -29,6 +29,10 @@ camera_stream:
   # This can make the stream less stable on marginal Wi-Fi links, so default is false.
   low_latency: True
 
+  # Flush encoded output as frames are written.
+  # This is useful when piping H.264 through a FIFO to GStreamer.
+  flush_output: true
+
   # Small RTP jitter buffer on the PC side, in milliseconds.
   # Higher smooths Wi-Fi jitter and reduces artifacts, but adds delay.
   # Lower reduces delay, but can increase choppiness.

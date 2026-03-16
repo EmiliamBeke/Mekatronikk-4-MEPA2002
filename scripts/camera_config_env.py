@@ -63,6 +63,7 @@ def main():
         "BITRATE": pick("BITRATE", stream.get("bitrate_bps", "")),
         "INTRA": pick("INTRA", stream.get("intra", "")),
         "LOW_LATENCY": pick("LOW_LATENCY", to_shell(stream.get("low_latency", False))),
+        "FLUSH_OUTPUT": pick("FLUSH_OUTPUT", to_shell(stream.get("flush_output", True))),
         "PC_JITTER_MS": pick("PC_JITTER_MS", stream.get("pc_jitter_ms", 40)),
         "CAM_PORT": pick("CAM_PORT", stream.get("local_udp_port", 5600)),
         "CAMERA_REMOTE_PORT": pick("CAMERA_REMOTE_PORT", stream.get("remote_udp_port", 5601)),

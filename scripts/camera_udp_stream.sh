@@ -10,6 +10,7 @@ FPS=${FPS:-15}
 BITRATE=${BITRATE:-}
 INTRA=${INTRA:-}
 LOW_LATENCY=${LOW_LATENCY:-0}
+FLUSH_OUTPUT=${FLUSH_OUTPUT:-1}
 LOCAL_PORT=${LOCAL_PORT:-5600}
 LOCAL_HOST=${LOCAL_HOST:-127.0.0.1}
 ENABLE_LOCAL=${ENABLE_LOCAL:-1}
@@ -29,6 +30,11 @@ fi
 supports_low_latency=0
 if rpicam-vid --help 2>&1 | grep -q -- '--low-latency'; then
   supports_low_latency=1
+fi
+
+supports_flush=0
+if rpicam-vid --help 2>&1 | grep -q -- '--flush'; then
+  supports_flush=1
 fi
 
 if [[ "${ENABLE_LOCAL}" != "1" && -z "${REMOTE_HOST}" ]]; then
@@ -111,6 +117,14 @@ if [[ "${LOW_LATENCY}" == "1" ]]; then
     RPICAM_ARGS+=(--low-latency)
   else
     echo "[camera-stream] LOW_LATENCY requested, but this rpicam-vid build does not support --low-latency." >&2
+  fi
+fi
+
+if [[ "${FLUSH_OUTPUT}" == "1" ]]; then
+  if [[ "${supports_flush}" == "1" ]]; then
+    RPICAM_ARGS+=(--flush)
+  else
+    echo "[camera-stream] FLUSH_OUTPUT requested, but this rpicam-vid build does not support --flush." >&2
   fi
 fi
 
