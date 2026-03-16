@@ -117,9 +117,10 @@ Kamera- og YOLO-parametre styres fra [config/camera_params.yaml](/home/emiliam/M
 Merk:
 
 1. `camera_stream.width/height/fps` gjelder samme stream som brukes baade til teddy-detektor og RViz.
-2. `camera_stream.awb/brightness/contrast/saturation/sharpness/ev` brukes direkte av `rpicam-vid` paa Pi og er stedet aa tune farger/bilde.
-3. `teddy_detector.conf/imgsz/center_tol` paavirker bare YOLO-delen paa Pi.
-4. Du kan fortsatt overstyre midlertidig med env vars, for eksempel `WIDTH=640 FPS=10 SATURATION=1.2 make pi-bringup`.
+2. `camera_stream.awb/awb_gains/brightness/contrast/saturation/sharpness/ev/denoise/metering` brukes direkte av `rpicam-vid` paa Pi og er stedet aa tune farger/bilde.
+3. `camera_stream.tuning_file` kan brukes hvis tredjepartsmodulen trenger en egen `libcamera` tuning file.
+4. `teddy_detector.conf/imgsz/center_tol` paavirker bare YOLO-delen paa Pi.
+5. Du kan fortsatt overstyre midlertidig med env vars, for eksempel `WIDTH=640 FPS=10 SATURATION=1.2 make pi-bringup`.
 
 ## Pi ytelse (host, ikke Docker)
 

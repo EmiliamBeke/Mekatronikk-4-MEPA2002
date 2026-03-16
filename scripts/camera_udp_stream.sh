@@ -52,13 +52,33 @@ if [[ -n "${REMOTE_HOST}" ]]; then
   echo "[camera-stream] remote udp -> ${REMOTE_HOST}:${REMOTE_PORT}" >&2
 fi
 
-rpicam-vid -t 0 --width "${WIDTH}" --height "${HEIGHT}" --framerate "${FPS}" \
-  --codec h264 --inline --libav-format h264 -n \
-  --awb "${AWB}" \
-  --brightness "${BRIGHTNESS}" \
-  --contrast "${CONTRAST}" \
-  --saturation "${SATURATION}" \
-  --sharpness "${SHARPNESS}" \
-  --ev "${EV}" \
-  -o - \
+RPICAM_ARGS=(
+  -t 0
+  --width "${WIDTH}"
+  --height "${HEIGHT}"
+  --framerate "${FPS}"
+  --codec h264
+  --inline
+  --libav-format h264
+  -n
+  --awb "${AWB}"
+  --brightness "${BRIGHTNESS}"
+  --contrast "${CONTRAST}"
+  --saturation "${SATURATION}"
+  --sharpness "${SHARPNESS}"
+  --ev "${EV}"
+  --denoise "${DENOISE}"
+  --metering "${METERING}"
+  -o -
+)
+
+if [[ -n "${AWB_GAINS}" ]]; then
+  RPICAM_ARGS+=(--awbgains "${AWB_GAINS}")
+fi
+
+if [[ -n "${TUNING_FILE}" ]]; then
+  RPICAM_ARGS+=(--tuning-file "${TUNING_FILE}")
+fi
+
+rpicam-vid "${RPICAM_ARGS[@]}" \
   | "${gst_cmd[@]}"
