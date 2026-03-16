@@ -7,6 +7,9 @@ eval "$(python3 "${SCRIPT_DIR}/camera_config_env.py")"
 WIDTH=${WIDTH:-1296}
 HEIGHT=${HEIGHT:-972}
 FPS=${FPS:-15}
+BITRATE=${BITRATE:-}
+INTRA=${INTRA:-}
+LOW_LATENCY=${LOW_LATENCY:-0}
 LOCAL_PORT=${LOCAL_PORT:-5600}
 LOCAL_HOST=${LOCAL_HOST:-127.0.0.1}
 ENABLE_LOCAL=${ENABLE_LOCAL:-1}
@@ -21,6 +24,11 @@ fi
 if ! command -v gst-launch-1.0 >/dev/null 2>&1; then
   echo "[camera-stream] gst-launch-1.0 not found. Install gstreamer1.0-tools on the Pi host." >&2
   exit 1
+fi
+
+supports_low_latency=0
+if rpicam-vid --help 2>&1 | grep -q -- '--low-latency'; then
+  supports_low_latency=1
 fi
 
 if [[ "${ENABLE_LOCAL}" != "1" && -z "${REMOTE_HOST}" ]]; then
@@ -89,6 +97,22 @@ RPICAM_ARGS=(
   --denoise "${DENOISE}"
   --metering "${METERING}"
 )
+
+if [[ -n "${BITRATE}" ]]; then
+  RPICAM_ARGS+=(--bitrate "${BITRATE}")
+fi
+
+if [[ -n "${INTRA}" ]]; then
+  RPICAM_ARGS+=(--intra "${INTRA}")
+fi
+
+if [[ "${LOW_LATENCY}" == "1" ]]; then
+  if [[ "${supports_low_latency}" == "1" ]]; then
+    RPICAM_ARGS+=(--low-latency)
+  else
+    echo "[camera-stream] LOW_LATENCY requested, but this rpicam-vid build does not support --low-latency." >&2
+  fi
+fi
 
 if [[ -n "${AWB_GAINS}" ]]; then
   RPICAM_ARGS+=(--awbgains "${AWB_GAINS}")

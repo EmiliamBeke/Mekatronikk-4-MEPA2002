@@ -1,26 +1,87 @@
 # Camera capture settings on the Pi host.
 # These affect the encoded stream that is sent to both teddy_detector and RViz.
+# After changing this file:
+# - use `make camera-reload` for color/exposure/FPS/encoder tuning
+# - do a full Pi restart for width/height/UDP port changes
 camera_stream:
+  # Output resolution from the Pi camera.
+  # Higher values improve detail, but increase CPU load, bandwidth, and delay.
   width: 640
   height: 480
+
+  # Capture framerate.
+  # Lower FPS usually reduces delay and makes the stream easier to keep stable.
   fps: 10
+
+  # Optional H.264 bitrate in bits/sec.
+  # Leave empty to use the rpicam default.
+  # Lower bitrate reduces bandwidth, but can increase compression artifacts.
+  bitrate_bps: ""
+
+  # Optional I-frame interval in frames.
+  # Lower values recover faster from UDP packet loss, but use more bitrate.
+  # A good starting point is around the same as FPS, e.g. 10 at 10 FPS.
+  intra: 10
+
+  # Try to reduce encoder delay on newer Pi camera stacks.
+  # If your rpicam build is too old, the script will ignore this and warn once.
+  low_latency: true
+
+  # Local UDP port used by teddy_detector on the Pi.
   local_udp_port: 5600
+
+  # Remote UDP port used by the PC camera bridge / RViz.
   remote_udp_port: 5601
+
+  # Auto white balance mode.
+  # Common values: auto, indoor, daylight, cloudy.
   awb: indoor
+
+  # Fixed white-balance gains as "red_gain,blue_gain".
+  # Leave empty to keep automatic AWB behaviour.
   awb_gains: ""
+
+  # Global brightness offset. Keep near 0.0 unless the whole image is too dark/bright.
   brightness: 0.0
+
+  # Contrast multiplier. Slightly above 1.0 can make the image feel less flat.
   contrast: 1.0
+
+  # Color intensity multiplier. 1.0 is neutral.
   saturation: 1.0
+
+  # Edge enhancement. Too high can make noise and ringing more visible.
   sharpness: 0.8
+
+  # Exposure compensation. Useful if auto exposure is consistently too dark/bright.
   ev: 0.0
+
+  # Denoise mode.
+  # Quote values like "off" or "on" so YAML does not treat them as booleans.
+  # Valid practical values here: "auto", "off", "cdn_off", "cdn_fast", "cdn_hq", "on".
   denoise: "on"
+
+  # Exposure metering mode. "centre" is a safe default for robot driving indoors.
   metering: centre
+
+  # Optional custom libcamera tuning JSON.
+  # Leave empty unless you have a known-good tuning file for this sensor.
   tuning_file: ""
 
 # YOLO / teddy detector tuning on the Pi.
 teddy_detector:
+  # NCNN model path inside the Docker workspace on the Pi.
   model_path: /ws/models/yolo26n_ncnn_model
+
+  # Detection confidence threshold.
+  # Lower catches more teddy detections, but increases false positives.
   conf: 0.25
+
+  # YOLO inference size. Higher can improve detection quality, but costs latency/CPU.
   imgsz: 640
+
+  # Allowed center error before reporting centered=true.
   center_tol: 0.10
+
+  # Debug GUI on the Pi host. Keep false for headless SSH use.
   show_gui: false
