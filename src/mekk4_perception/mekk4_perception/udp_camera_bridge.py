@@ -3,6 +3,7 @@ import shlex
 import subprocess
 import threading
 import time
+from collections import deque
 
 import numpy as np
 import rclpy
@@ -32,6 +33,7 @@ class UdpCameraBridge(Node):
         self.proc = None
         self.frame_bytes = self.width * self.height * 3
         self._buf = bytearray()
+        self._stderr_lines = deque(maxlen=20)
         self._last_warn = 0.0
         self._stop = False
 
@@ -57,12 +59,18 @@ class UdpCameraBridge(Node):
                     self._warn_throttled("gstreamer source not available")
                     time.sleep(1.0)
                     continue
+                if self.proc.stderr is not None:
+                    threading.Thread(target=self._drain_stderr, daemon=True).start()
 
                 self._buf.clear()
+                self._stderr_lines.clear()
 
             chunk = self.proc.stdout.read(4096) if self.proc.stdout else b""
             if not chunk:
-                self._warn_throttled("failed to read frame")
+                if self.proc is not None and self.proc.poll() is not None:
+                    self._log_gst_failure()
+                else:
+                    self._warn_throttled("failed to read frame")
                 if self.proc is not None:
                     self.proc.terminate()
                 self.proc = None
@@ -81,6 +89,28 @@ class UdpCameraBridge(Node):
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = self.frame_id
         self.publisher.publish(msg)
+
+    def _drain_stderr(self):
+        if self.proc is None or self.proc.stderr is None:
+            return
+
+        while not self._stop:
+            line = self.proc.stderr.readline()
+            if not line:
+                return
+            self._stderr_lines.append(line.decode(errors="replace").rstrip())
+
+    def _log_gst_failure(self):
+        if self.proc is None:
+            return
+
+        code = self.proc.poll()
+        if self._stderr_lines:
+            message = "; ".join(self._stderr_lines)
+            self._warn_throttled(f"gstreamer exited with code {code}: {message}", interval_sec=2.0)
+            return
+
+        self._warn_throttled(f"gstreamer exited with code {code}", interval_sec=2.0)
 
     def destroy_node(self):
         self._stop = True
@@ -102,7 +132,7 @@ class UdpCameraBridge(Node):
             return subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
                 bufsize=0,
             )
         except Exception:

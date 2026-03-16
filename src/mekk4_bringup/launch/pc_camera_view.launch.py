@@ -24,7 +24,7 @@ def generate_launch_description():
                 "udpsrc port=",
                 port,
                 " caps=application/x-rtp,media=video,encoding-name=H264,payload=96,clock-rate=90000 ",
-                "! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false",
+                "! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink drop=true max-buffers=1 sync=false",
             ],
         ),
         SetEnvironmentVariable("MEKK4_CAM_WIDTH", width),
