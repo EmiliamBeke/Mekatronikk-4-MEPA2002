@@ -135,8 +135,12 @@ class MegaKeyboardGui:
 
     def _start_remote_bridge(self) -> subprocess.Popen[str]:
         remote_repo = self.args.remote_repo
-        if remote_repo.startswith("~/"):
+        if remote_repo == "~" or remote_repo == "$HOME":
+            remote_repo_expr = "$HOME"
+        elif remote_repo.startswith("~/"):
             remote_repo_expr = "$HOME/" + shlex.quote(remote_repo[2:])
+        elif remote_repo.startswith("$HOME/"):
+            remote_repo_expr = "$HOME/" + shlex.quote(remote_repo[len("$HOME/"):])
         else:
             remote_repo_expr = shlex.quote(remote_repo)
 

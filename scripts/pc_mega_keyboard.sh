@@ -10,7 +10,7 @@ MEGA_PORT="${MEGA_PORT:-/dev/ttyACM0}"
 MEGA_BAUDRATE="${MEGA_BAUDRATE:-115200}"
 DRIVE_SPEED="${DRIVE_SPEED:-90}"
 TURN_SPEED="${TURN_SPEED:-55}"
-REMOTE_REPO="${REMOTE_REPO:-\$HOME/Mekatronikk-4-MEPA2002}"
+REMOTE_REPO="${REMOTE_REPO:-~/Mekatronikk-4-MEPA2002}"
 PI_PASSWORD="${PI_PASSWORD:-}"
 
 if ! python3 -c 'import tkinter' >/dev/null 2>&1; then
