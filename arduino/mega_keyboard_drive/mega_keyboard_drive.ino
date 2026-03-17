@@ -5,6 +5,7 @@ namespace {
 
 constexpr long kBaudrate = 115200;
 constexpr size_t kMaxCommandLength = 63;
+constexpr unsigned long kDriveTimeoutMs = 350;
 
 constexpr int kIna1Pin = 22;
 constexpr int kInb1Pin = 23;
@@ -25,6 +26,11 @@ volatile uint8_t encoder2_state = 0;
 char command_buffer[kMaxCommandLength + 1];
 size_t command_length = 0;
 
+int current_m1_speed = 0;
+int current_m2_speed = 0;
+unsigned long last_drive_command_ms = 0;
+bool drive_watchdog_armed = false;
+
 constexpr int8_t kQuadratureDelta[16] = {
   0, -1,  1,  0,
   1,  0,  0, -1,
@@ -35,6 +41,16 @@ constexpr int8_t kQuadratureDelta[16] = {
 void reset_command_buffer() {
   command_length = 0;
   command_buffer[0] = '\0';
+}
+
+int clamp_pwm(int speed) {
+  if (speed > 255) {
+    return 255;
+  }
+  if (speed < -255) {
+    return -255;
+  }
+  return speed;
 }
 
 uint8_t read_encoder1_state() {
@@ -99,11 +115,8 @@ void reset_encoder2_count() {
   interrupts();
 }
 
-void set_motor(int ina_pin, int inb_pin, int pwm_pin, int speed) {
-  int pwm = abs(speed);
-  if (pwm > 255) {
-    pwm = 255;
-  }
+void apply_motor_output(int ina_pin, int inb_pin, int pwm_pin, int speed) {
+  const int pwm = abs(speed);
 
   if (speed > 0) {
     digitalWrite(ina_pin, HIGH);
@@ -119,9 +132,42 @@ void set_motor(int ina_pin, int inb_pin, int pwm_pin, int speed) {
   analogWrite(pwm_pin, pwm);
 }
 
+void apply_drive(int m1_speed, int m2_speed) {
+  current_m1_speed = clamp_pwm(m1_speed);
+  current_m2_speed = clamp_pwm(m2_speed);
+
+  apply_motor_output(kIna1Pin, kInb1Pin, kPwm1Pin, current_m1_speed);
+  apply_motor_output(kIna2Pin, kInb2Pin, kPwm2Pin, current_m2_speed);
+
+  if (current_m1_speed == 0 && current_m2_speed == 0) {
+    drive_watchdog_armed = false;
+    return;
+  }
+
+  last_drive_command_ms = millis();
+  drive_watchdog_armed = true;
+}
+
 void stop_all() {
-  set_motor(kIna1Pin, kInb1Pin, kPwm1Pin, 0);
-  set_motor(kIna2Pin, kInb2Pin, kPwm2Pin, 0);
+  current_m1_speed = 0;
+  current_m2_speed = 0;
+  drive_watchdog_armed = false;
+  apply_motor_output(kIna1Pin, kInb1Pin, kPwm1Pin, 0);
+  apply_motor_output(kIna2Pin, kInb2Pin, kPwm2Pin, 0);
+}
+
+void maybe_stop_on_watchdog() {
+  if (!drive_watchdog_armed) {
+    return;
+  }
+
+  const unsigned long elapsed = millis() - last_drive_command_ms;
+  if (elapsed <= kDriveTimeoutMs) {
+    return;
+  }
+
+  stop_all();
+  Serial.println("EVENT WATCHDOG STOP");
 }
 
 void handle_command(const char *command) {
@@ -131,7 +177,7 @@ void handle_command(const char *command) {
   }
 
   if (strcmp(command, "ID") == 0) {
-    Serial.println("MEGA_DFR0601_TEST");
+    Serial.println("MEGA_KEYBOARD_DRIVE");
     return;
   }
 
@@ -166,45 +212,40 @@ void handle_command(const char *command) {
   }
 
   if (strcmp(command, "STATE") == 0) {
-    Serial.print("STATE ENC1=");
+    Serial.print("STATE M1=");
+    Serial.print(current_m1_speed);
+    Serial.print(" M2=");
+    Serial.print(current_m2_speed);
+    Serial.print(" ENC1=");
     Serial.print(read_encoder1_count());
     Serial.print(" ENC2=");
-    Serial.print(read_encoder2_count());
-    Serial.print(" HALLA=");
-    Serial.print(digitalRead(kHallA1Pin));
-    Serial.print(" HALLB=");
-    Serial.print(digitalRead(kHallB1Pin));
-    Serial.print(" HALLA2=");
-    Serial.print(digitalRead(kHallA2Pin));
-    Serial.print(" HALLB2=");
-    Serial.println(digitalRead(kHallB2Pin));
+    Serial.println(read_encoder2_count());
     return;
   }
 
   int speed = 0;
   if (sscanf(command, "M1 %d", &speed) == 1) {
-    set_motor(kIna1Pin, kInb1Pin, kPwm1Pin, speed);
+    apply_drive(speed, current_m2_speed);
     Serial.print("OK M1 ");
-    Serial.println(speed);
+    Serial.println(current_m1_speed);
     return;
   }
 
   if (sscanf(command, "M2 %d", &speed) == 1) {
-    set_motor(kIna2Pin, kInb2Pin, kPwm2Pin, speed);
+    apply_drive(current_m1_speed, speed);
     Serial.print("OK M2 ");
-    Serial.println(speed);
+    Serial.println(current_m2_speed);
     return;
   }
 
   int left = 0;
   int right = 0;
   if (sscanf(command, "BOTH %d %d", &left, &right) == 2) {
-    set_motor(kIna1Pin, kInb1Pin, kPwm1Pin, left);
-    set_motor(kIna2Pin, kInb2Pin, kPwm2Pin, right);
+    apply_drive(left, right);
     Serial.print("OK BOTH ");
-    Serial.print(left);
+    Serial.print(current_m1_speed);
     Serial.print(' ');
-    Serial.println(right);
+    Serial.println(current_m2_speed);
     return;
   }
 
@@ -238,10 +279,12 @@ void setup() {
   }
 
   reset_command_buffer();
-  Serial.println("MEGA_DFR0601_READY");
+  Serial.println("MEGA_KEYBOARD_READY");
 }
 
 void loop() {
+  maybe_stop_on_watchdog();
+
   while (Serial.available() > 0) {
     const char c = static_cast<char>(Serial.read());
 
