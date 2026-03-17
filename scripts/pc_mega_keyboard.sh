@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
-PI_HOST="${1:-${PI_HOST:-gruppe5pi5}}"
+PI_HOST="${1:-${PI_HOST:-gruppe5@gruppe5pi5}}"
 MEGA_PORT="${MEGA_PORT:-/dev/ttyACM0}"
 MEGA_BAUDRATE="${MEGA_BAUDRATE:-115200}"
 DRIVE_SPEED="${DRIVE_SPEED:-90}"

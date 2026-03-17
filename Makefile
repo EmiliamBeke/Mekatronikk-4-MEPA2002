@@ -33,7 +33,7 @@ mega-keyboard:
 	bash ./scripts/mega_keyboard_teleop.sh
 
 pc-mega-keyboard:
-	bash ./scripts/pc_mega_keyboard.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"
+	bash ./scripts/pc_mega_keyboard.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5@gruppe5pi5)"
 
 # Native (non-Docker) simulation helpers for developer machines
 sim-build:
