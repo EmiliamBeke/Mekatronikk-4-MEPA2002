@@ -150,8 +150,9 @@ class MegaKeyboardGui:
             f"--port {shlex.quote(self.args.port)} "
             f"--baudrate {int(self.args.baudrate)}"
         )
+        ssh_remote_cmd = f"bash -lc {shlex.quote(remote_cmd)}"
 
-        ssh_cmd = ["ssh", self.args.host, "bash", "-lc", remote_cmd]
+        ssh_cmd = ["ssh", self.args.host, ssh_remote_cmd]
         env = os.environ.copy()
 
         if self.args.password:
@@ -165,9 +166,7 @@ class MegaKeyboardGui:
                 "-o",
                 "PubkeyAuthentication=no",
                 self.args.host,
-                "bash",
-                "-lc",
-                remote_cmd,
+                ssh_remote_cmd,
             ]
 
         proc = subprocess.Popen(
