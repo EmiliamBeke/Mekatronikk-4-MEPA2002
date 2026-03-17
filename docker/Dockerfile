@@ -38,4 +38,4 @@ RUN python3 -m venv /opt/venv
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --upgrade pip && \
-  pip install numpy==1.26.4 catkin_pkg==1.0.0 ultralytics==8.4.12 ncnn==1.0.20260114
+  pip install numpy==1.26.4 catkin_pkg==1.0.0 pyserial==3.5 ultralytics==8.4.12 ncnn==1.0.20260114
