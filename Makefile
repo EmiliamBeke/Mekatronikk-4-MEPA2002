@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws lidar-setup lidar-test mega-test mega-motor-test mega-keyboard sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz pc-teddy-rviz camera-stop camera-reload
+.PHONY: build shell up down ws lidar-setup lidar-test mega-test mega-motor-test mega-keyboard pc-mega-keyboard sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz pc-teddy-rviz camera-stop camera-reload
 
 build:
 	docker compose build
@@ -31,6 +31,9 @@ mega-motor-test:
 
 mega-keyboard:
 	bash ./scripts/mega_keyboard_teleop.sh
+
+pc-mega-keyboard:
+	bash ./scripts/pc_mega_keyboard.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"
 
 # Native (non-Docker) simulation helpers for developer machines
 sim-build:
