@@ -37,9 +37,9 @@ def is_active(last_seen: float, now: float, timeout: float) -> bool:
 def tank_mix(drive: int, steer: int, speed: int, turn_speed: int) -> tuple[int, int]:
     if drive == 0:
         if steer > 0:
-            return -turn_speed, turn_speed
-        if steer < 0:
             return turn_speed, -turn_speed
+        if steer < 0:
+            return -turn_speed, turn_speed
         return 0, 0
 
     left = drive * speed
@@ -47,11 +47,11 @@ def tank_mix(drive: int, steer: int, speed: int, turn_speed: int) -> tuple[int, 
 
     turn_delta = min(speed, turn_speed)
     if steer > 0:
-        left = drive * (speed - turn_delta)
-        right = drive * speed
-    elif steer < 0:
         left = drive * speed
         right = drive * (speed - turn_delta)
+    elif steer < 0:
+        left = drive * (speed - turn_delta)
+        right = drive * speed
 
     return clamp_pwm(left), clamp_pwm(right)
 

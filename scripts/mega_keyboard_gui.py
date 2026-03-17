@@ -17,9 +17,9 @@ def clamp_pwm(value: int) -> int:
 def tank_mix(drive: int, steer: int, speed: int, turn_speed: int) -> tuple[int, int]:
     if drive == 0:
         if steer > 0:
-            return -turn_speed, turn_speed
-        if steer < 0:
             return turn_speed, -turn_speed
+        if steer < 0:
+            return -turn_speed, turn_speed
         return 0, 0
 
     left = drive * speed
@@ -27,11 +27,11 @@ def tank_mix(drive: int, steer: int, speed: int, turn_speed: int) -> tuple[int, 
     turn_delta = min(speed, turn_speed)
 
     if steer > 0:
-        left = drive * (speed - turn_delta)
-        right = drive * speed
-    elif steer < 0:
         left = drive * speed
         right = drive * (speed - turn_delta)
+    elif steer < 0:
+        left = drive * (speed - turn_delta)
+        right = drive * speed
 
     return clamp_pwm(left), clamp_pwm(right)
 
@@ -49,6 +49,8 @@ class MegaKeyboardGui:
         self.remote_failed = threading.Event()
         self.remote_error = ""
         self.closed = False
+        self.reconnect_delay_s = 1.0
+        self.next_reconnect_at = 0.0
 
         self.proc = self._start_remote_bridge()
 
@@ -151,8 +153,16 @@ class MegaKeyboardGui:
             f"--baudrate {int(self.args.baudrate)}"
         )
         ssh_remote_cmd = f"bash -lc {shlex.quote(remote_cmd)}"
+        ssh_options = [
+            "-o",
+            "ServerAliveInterval=10",
+            "-o",
+            "ServerAliveCountMax=3",
+            "-o",
+            "TCPKeepAlive=yes",
+        ]
 
-        ssh_cmd = ["ssh", self.args.host, ssh_remote_cmd]
+        ssh_cmd = ["ssh", *ssh_options, self.args.host, ssh_remote_cmd]
         env = os.environ.copy()
 
         if self.args.password:
@@ -161,6 +171,7 @@ class MegaKeyboardGui:
                 "sshpass",
                 "-e",
                 "ssh",
+                *ssh_options,
                 "-o",
                 "PreferredAuthentications=password",
                 "-o",
@@ -183,6 +194,36 @@ class MegaKeyboardGui:
         threading.Thread(target=self._read_stream, args=(proc.stderr, "stderr"), daemon=True).start()
         return proc
 
+    def _schedule_reconnect(self, reason: str) -> None:
+        if self.closed:
+            return
+        if self.next_reconnect_at and time.monotonic() < self.next_reconnect_at:
+            return
+        self.remote_ready.clear()
+        self.remote_failed.set()
+        self.remote_error = reason
+        self.status_var.set(f"SSH bridge stopped, reconnecting... ({reason})")
+        self.next_reconnect_at = time.monotonic() + self.reconnect_delay_s
+
+    def _restart_remote_bridge_if_needed(self) -> None:
+        if self.closed or self.proc.poll() is None:
+            return
+        if time.monotonic() < self.next_reconnect_at:
+            return
+
+        try:
+            if self.proc.stdin is not None:
+                self.proc.stdin.close()
+        except OSError:
+            pass
+
+        self.remote_ready.clear()
+        self.remote_failed.clear()
+        self.remote_error = ""
+        self.next_reconnect_at = 0.0
+        self.status_var.set(f"Reconnecting to {self.args.host} ...")
+        self.proc = self._start_remote_bridge()
+
     def _read_stream(self, stream, stream_name: str) -> None:
         for line in stream:
             text = line.strip()
@@ -200,6 +241,7 @@ class MegaKeyboardGui:
 
             if stream_name == "stdout" and text == "READY":
                 self.remote_ready.set()
+                self.next_reconnect_at = 0.0
                 self.status_var.set(f"Connected to {self.args.host}")
             elif stream_name == "stderr":
                 self.remote_failed.set()
@@ -250,22 +292,23 @@ class MegaKeyboardGui:
     def _send_command(self, command: str) -> None:
         if self.proc.stdin is None or self.proc.poll() is not None:
             if not self.closed:
-                self.status_var.set("SSH bridge stopped")
+                self._schedule_reconnect(self.remote_error or "ssh exited")
             return
 
         try:
             self.proc.stdin.write(command + "\n")
             self.proc.stdin.flush()
         except OSError as exc:
-            self.status_var.set(f"Write failed: {exc}")
+            self._schedule_reconnect(f"write failed: {exc}")
 
     def _tick(self) -> None:
         if self.closed:
             return
 
-        if self.proc.poll() is not None and not self.remote_ready.is_set():
-            error = self.remote_error or f"ssh exited with code {self.proc.returncode}"
-            self.status_var.set(f"Connect failed: {error}")
+        if self.proc.poll() is not None:
+            exit_reason = self.remote_error or f"ssh exited with code {self.proc.returncode}"
+            self._schedule_reconnect(exit_reason)
+            self._restart_remote_bridge_if_needed()
 
         drive = 0
         if "w" in self.pressed_keys and "s" not in self.pressed_keys:

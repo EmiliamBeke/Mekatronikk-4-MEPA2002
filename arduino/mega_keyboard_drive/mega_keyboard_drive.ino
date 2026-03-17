@@ -226,15 +226,11 @@ void handle_command(const char *command) {
   int speed = 0;
   if (sscanf(command, "M1 %d", &speed) == 1) {
     apply_drive(speed, current_m2_speed);
-    Serial.print("OK M1 ");
-    Serial.println(current_m1_speed);
     return;
   }
 
   if (sscanf(command, "M2 %d", &speed) == 1) {
     apply_drive(current_m1_speed, speed);
-    Serial.print("OK M2 ");
-    Serial.println(current_m2_speed);
     return;
   }
 
@@ -242,10 +238,6 @@ void handle_command(const char *command) {
   int right = 0;
   if (sscanf(command, "BOTH %d %d", &left, &right) == 2) {
     apply_drive(left, right);
-    Serial.print("OK BOTH ");
-    Serial.print(current_m1_speed);
-    Serial.print(' ');
-    Serial.println(current_m2_speed);
     return;
   }
 
