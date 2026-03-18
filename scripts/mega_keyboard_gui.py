@@ -265,8 +265,9 @@ class MegaKeyboardGui:
                 self.next_reconnect_at = 0.0
                 self.status_var.set(f"Connected to {self.args.host}")
             elif stream_name == "stderr" and text.startswith("SERIAL_ERROR "):
+                self.remote_ready.clear()
+                self.remote_error = text
                 self.status_var.set(text)
-                self._schedule_reconnect(text)
             elif stream_name == "stderr":
                 self.status_var.set(text)
             elif text:
