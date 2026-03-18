@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws lidar-setup lidar-test mega-test mega-motor-test mega-keyboard pc-mega-keyboard sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz pc-teddy-rviz camera-stop camera-reload
+.PHONY: build shell up down ws lidar-setup lidar-test mega-upload mega-test mega-motor-test mega-keyboard pc-mega-keyboard sim-build sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz pc-teddy-rviz camera-stop camera-reload
 
 build:
 	docker compose build
@@ -22,6 +22,9 @@ lidar-setup:
 
 lidar-test:
 	docker compose run --rm ros bash -lc '/ws/scripts/lidar_smoketest.sh'
+
+mega-upload:
+	bash ./scripts/mega_upload.sh "$(if $(MEGA_SKETCH),$(MEGA_SKETCH),mega_smoketest)"
 
 mega-test:
 	bash ./scripts/mega_test.sh

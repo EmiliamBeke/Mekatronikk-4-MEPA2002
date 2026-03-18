@@ -204,11 +204,44 @@ Kort oppdeling:
 | `make camera-reload` | Restarter bare kamerastreamen med nye `camera_stream.*`-verdier fra [config/camera_params.yaml](/home/emiliam/Mekatronikk-4-MEPA2002/config/camera_params.yaml). Bruk denne etter tuning av farger, bitrate, intra, denoise osv. |
 | `make camera-stop` | Stopper kamerastream/supervisor hvis noe henger igjen. Dette er en recovery-knapp, ikke vanlig workflow. |
 
+### Arduino Mega upload fra Pi
+
+Arduino-sketchene i repoet kan lastes opp direkte fra Pi-host. Dette bør kjøre paa hosten, ikke i Docker, siden dagens container bare mapper inn LiDAR-porten og ikke Mega over USB.
+
+1. Installer `arduino-cli` paa Pi-host.
+2. Installer board-stoette én gang:
+
+```bash
+arduino-cli core install arduino:avr
+```
+
+3. Last opp ønsket sketch:
+
+```bash
+make mega-upload
+MEGA_SKETCH=mega_keyboard_drive make mega-upload
+MEGA_SKETCH=mega_dfr0601_test make mega-upload
+```
+
+Dette gjør:
+
+1. finner `Mega`-porten automatisk (`/dev/serial/by-id`, `/dev/ttyACM*` eller `/dev/ttyUSB*`)
+2. bygger med `arduino:avr:mega`
+3. bruker en midlertidig build-katalog i `/tmp`
+4. laster opp direkte fra Pi-host til Mega over USB
+
+Hvis du vil overstyre port eller board:
+
+```bash
+MEGA_PORT=/dev/ttyACM0 make mega-upload
+MEGA_FQBN=arduino:avr:mega make mega-upload
+```
+
 ### Arduino Mega smoke test
 
 Hvis du vil verifisere at Pi-en faktisk kan snakke med en Arduino Mega over USB, finnes det nå en enkel smoke test.
 
-1. Last opp [mega_smoketest.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_smoketest/mega_smoketest.ino) til Mega.
+1. Last opp [mega_smoketest.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_smoketest/mega_smoketest.ino) til Mega, for eksempel med `make mega-upload`.
 2. Sørg for at Pi-host har `python3-serial` tilgjengelig.
 3. Kjør testen på Pi:
 
@@ -239,7 +272,7 @@ MEGA_PORT=/dev/ttyACM0 make mega-test
 
 Hvis du vil kjøre roboten manuelt med tastatur, bruk keyboard-firmwaren på Mega og start teleop fra Ubuntu-maskinen din, ikke fra SSH-terminalen på Pi.
 
-1. Last opp [mega_keyboard_drive.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_keyboard_drive/mega_keyboard_drive.ino) til Mega.
+1. Last opp [mega_keyboard_drive.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_keyboard_drive/mega_keyboard_drive.ino) til Mega, for eksempel med `MEGA_SKETCH=mega_keyboard_drive make mega-upload`.
 2. Sørg for at Pi-host har `python3-serial`.
 3. Sørg for at Ubuntu-PC-en har `python3-tk` og `sshpass`.
 4. Start kjøring fra Ubuntu-PC:
@@ -299,7 +332,7 @@ Det finnes også en enkel motor-test for en Arduino Mega koblet til DFR0601 med 
 
 Test-firmwaren støtter begge encoderne, men [mega_motor_test.py](/home/emiliam/Mekatronikk-4-MEPA2002/scripts/mega_motor_test.py) validerer foreløpig `ENC1` eksplisitt i den automatiske sekvensen.
 
-Last opp [mega_dfr0601_test.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_dfr0601_test/mega_dfr0601_test.ino) til Mega, løft roboten opp fra gulvet, og kjør:
+Last opp [mega_dfr0601_test.ino](/home/emiliam/Mekatronikk-4-MEPA2002/arduino/mega_dfr0601_test/mega_dfr0601_test.ino) til Mega, for eksempel med `MEGA_SKETCH=mega_dfr0601_test make mega-upload`, løft roboten opp fra gulvet, og kjør:
 
 ```bash
 make mega-motor-test
