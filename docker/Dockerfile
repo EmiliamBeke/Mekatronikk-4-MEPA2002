@@ -17,10 +17,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-navigation2 \
     ros-jazzy-cv-bridge \
     ros-dev-tools \
+    build-essential \
+    i2c-tools \
+    liblgpio-dev \
+    liblgpio1 \
     v4l-utils \
     python3-opencv \
+    python3-dev \
     python3-pip \
     python3-colcon-common-extensions \
+    swig \
   && rm -rf /var/lib/apt/lists/*
 
 # Set a persistent password for the default ubuntu user (override via build arg)
@@ -38,4 +44,5 @@ RUN python3 -m venv /opt/venv
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --upgrade pip && \
-  pip install numpy==1.26.4 catkin_pkg==1.0.0 pyserial==3.5 ultralytics==8.4.12 ncnn==1.0.20260114
+  pip install numpy==1.26.4 catkin_pkg==1.0.0 pyserial==3.5 ultralytics==8.4.12 ncnn==1.0.20260114 \
+    lgpio==0.2.2.0 adafruit-blinka==9.0.2 adafruit-circuitpython-bno08x==1.3.1

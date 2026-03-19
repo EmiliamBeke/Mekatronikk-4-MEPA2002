@@ -9,12 +9,14 @@ eval "$(python3 "${SCRIPT_DIR}/camera_config_env.py")"
 
 WITH_NAV2="${WITH_NAV2:-1}"
 WITH_TEDDY="${WITH_TEDDY:-0}"
+WITH_IMU="${WITH_IMU:-0}"
 PC_HOST="${PC_HOST:-}"
 PORT_NAME="${PORT_NAME:-/dev/ttyAMA0}"
 PORT_BAUDRATE="${PORT_BAUDRATE:-230400}"
 PRODUCT_NAME="${PRODUCT_NAME:-LDLiDAR_LD06}"
 LIDAR_FRAME="${LIDAR_FRAME:-base_laser}"
 BASE_FRAME="${BASE_FRAME:-chassis}"
+IMU_FRAME="${IMU_FRAME:-imu_link}"
 MAP_FILE="${MAP_FILE:-/ws/maps/my_map.yaml}"
 PARAMS_FILE="${PARAMS_FILE:-/ws/config/nav2_params.yaml}"
 WIDTH="${WIDTH:-1296}"
@@ -119,4 +121,4 @@ docker compose run --rm \
   -e MEKK4_DEBUG_STREAM_SCALE="${MEKK4_DEBUG_STREAM_SCALE}" \
   -e MEKK4_DEBUG_STREAM_FPS="${MEKK4_DEBUG_STREAM_FPS}" \
   -e MEKK4_DEBUG_STREAM_BITRATE="${MEKK4_DEBUG_STREAM_BITRATE}" \
-  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} map:=${MAP_FILE} params_file:=${PARAMS_FILE}"
+  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} use_imu:=${WITH_IMU} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} imu_frame:=${IMU_FRAME} map:=${MAP_FILE} params_file:=${PARAMS_FILE}"

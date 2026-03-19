@@ -20,5 +20,9 @@ setup(
     maintainer_email='gruppe5pi5@users.noreply.github.com',
     description='Bringup and launch tooling for the MEKK4 robot.',
     license='MIT',
-    entry_points={},
+    entry_points={
+        'console_scripts': [
+            'bno085_node = mekk4_bringup.bno085_node:main',
+        ],
+    },
 )

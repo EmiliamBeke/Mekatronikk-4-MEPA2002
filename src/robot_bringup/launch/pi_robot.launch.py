@@ -21,11 +21,13 @@ def generate_launch_description():
 
     use_nav2 = LaunchConfiguration('use_nav2')
     use_teddy = LaunchConfiguration('use_teddy')
+    use_imu = LaunchConfiguration('use_imu')
     product_name = LaunchConfiguration('product_name')
     port_name = LaunchConfiguration('port_name')
     port_baudrate = LaunchConfiguration('port_baudrate')
     frame_id = LaunchConfiguration('frame_id')
     base_frame = LaunchConfiguration('base_frame')
+    imu_frame = LaunchConfiguration('imu_frame')
     tf_x = LaunchConfiguration('tf_x')
     tf_y = LaunchConfiguration('tf_y')
     tf_z = LaunchConfiguration('tf_z')
@@ -86,14 +88,25 @@ def generate_launch_description():
         condition=IfCondition(use_teddy),
     )
 
+    imu_node = Node(
+        package='mekk4_bringup',
+        executable='bno085_node',
+        name='bno085',
+        output='screen',
+        condition=IfCondition(use_imu),
+        parameters=[{'frame_id': imu_frame}],
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument('use_nav2', default_value='true'),
         DeclareLaunchArgument('use_teddy', default_value='false'),
+        DeclareLaunchArgument('use_imu', default_value='false'),
         DeclareLaunchArgument('product_name', default_value='LDLiDAR_LD06'),
         DeclareLaunchArgument('port_name', default_value='/dev/ttyAMA0'),
         DeclareLaunchArgument('port_baudrate', default_value='230400'),
         DeclareLaunchArgument('frame_id', default_value='base_laser'),
         DeclareLaunchArgument('base_frame', default_value='chassis'),
+        DeclareLaunchArgument('imu_frame', default_value='imu_link'),
         DeclareLaunchArgument('tf_x', default_value='0.0'),
         DeclareLaunchArgument('tf_y', default_value='0.0'),
         DeclareLaunchArgument('tf_z', default_value='0.18'),
@@ -107,6 +120,7 @@ def generate_launch_description():
         SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
         SetParameter('use_sim_time', False),
         robot_state_publisher,
+        imu_node,
         lidar_launch,
         nav2_launch,
         teddy_detector,
