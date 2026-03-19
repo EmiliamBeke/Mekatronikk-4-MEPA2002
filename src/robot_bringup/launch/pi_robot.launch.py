@@ -25,6 +25,7 @@ def generate_launch_description():
     use_imu = LaunchConfiguration('use_imu')
     use_mega_driver = LaunchConfiguration('use_mega_driver')
     use_ekf = LaunchConfiguration('use_ekf')
+    use_joint_states = LaunchConfiguration('use_joint_states')
     product_name = LaunchConfiguration('product_name')
     port_name = LaunchConfiguration('port_name')
     port_baudrate = LaunchConfiguration('port_baudrate')
@@ -62,6 +63,14 @@ def generate_launch_description():
         executable='robot_state_publisher',
         output='screen',
         parameters=[{'use_sim_time': False}, {'robot_description': robot_description_content}],
+    )
+
+    joint_state_publisher = Node(
+        package='mekk4_bringup',
+        executable='zero_joint_state_publisher',
+        name='zero_joint_state_publisher',
+        output='screen',
+        condition=IfCondition(use_joint_states),
     )
 
     lidar_launch = IncludeLaunchDescription(
@@ -158,6 +167,7 @@ def generate_launch_description():
         DeclareLaunchArgument('use_imu', default_value='false'),
         DeclareLaunchArgument('use_mega_driver', default_value='false'),
         DeclareLaunchArgument('use_ekf', default_value='false'),
+        DeclareLaunchArgument('use_joint_states', default_value='true'),
         DeclareLaunchArgument('product_name', default_value='LDLiDAR_LD06'),
         DeclareLaunchArgument('port_name', default_value='/dev/ttyAMA0'),
         DeclareLaunchArgument('port_baudrate', default_value='230400'),
@@ -191,6 +201,7 @@ def generate_launch_description():
         DeclareLaunchArgument('log_level', default_value='info'),
         SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
         SetParameter('use_sim_time', False),
+        joint_state_publisher,
         robot_state_publisher,
         imu_node,
         mega_driver_node,
