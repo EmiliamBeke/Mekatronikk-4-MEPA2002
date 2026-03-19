@@ -29,7 +29,7 @@ services:
     group_add:
       - dialout
       - i2c
-      - gpio
+      - "${DOCKER_GPIO_GID:-997}"
 
     volumes:
       - ./:/ws:rw
