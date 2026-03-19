@@ -32,10 +32,16 @@ CAM_PORT="${CAM_PORT:-5600}"
 WITH_CAMERA_RVIZ="${WITH_CAMERA_RVIZ:-0}"
 CAMERA_REMOTE_HOST="${CAMERA_REMOTE_HOST:-}"
 CAMERA_REMOTE_PORT="${CAMERA_REMOTE_PORT:-5601}"
+DOCKER_GPIO_GID="${DOCKER_GPIO_GID:-}"
 SOURCE_LAUNCH="${REPO_ROOT}/src/robot_bringup/launch/pi_robot.launch.py"
 INSTALLED_LAUNCH="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/launch/pi_robot.launch.py"
 SOURCE_PKG_XML="${REPO_ROOT}/src/robot_bringup/package.xml"
 SOURCE_CMAKE="${REPO_ROOT}/src/robot_bringup/CMakeLists.txt"
+
+if [[ -z "${DOCKER_GPIO_GID}" && -e /dev/gpiochip0 ]]; then
+  DOCKER_GPIO_GID="$(stat -c '%g' /dev/gpiochip0)"
+fi
+export DOCKER_GPIO_GID
 
 needs_ws_build=0
 if [[ ! -f "${REPO_ROOT}/install/setup.bash" ]]; then
