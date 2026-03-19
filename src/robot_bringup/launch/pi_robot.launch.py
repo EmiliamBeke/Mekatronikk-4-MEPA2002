@@ -32,6 +32,10 @@ def generate_launch_description():
     imu_frame = LaunchConfiguration('imu_frame')
     mega_port = LaunchConfiguration('mega_port')
     mega_baudrate = LaunchConfiguration('mega_baudrate')
+    left_cmd_sign = LaunchConfiguration('left_cmd_sign')
+    right_cmd_sign = LaunchConfiguration('right_cmd_sign')
+    left_tick_sign = LaunchConfiguration('left_tick_sign')
+    right_tick_sign = LaunchConfiguration('right_tick_sign')
     left_m_per_tick = LaunchConfiguration('left_m_per_tick')
     right_m_per_tick = LaunchConfiguration('right_m_per_tick')
     track_width_eff_m = LaunchConfiguration('track_width_eff_m')
@@ -115,6 +119,10 @@ def generate_launch_description():
                 'port': ParameterValue(mega_port, value_type=str),
                 'baudrate': ParameterValue(mega_baudrate, value_type=int),
                 'base_frame_id': ParameterValue(base_frame, value_type=str),
+                'left_cmd_sign': ParameterValue(left_cmd_sign, value_type=int),
+                'right_cmd_sign': ParameterValue(right_cmd_sign, value_type=int),
+                'left_tick_sign': ParameterValue(left_tick_sign, value_type=int),
+                'right_tick_sign': ParameterValue(right_tick_sign, value_type=int),
                 'left_m_per_tick': ParameterValue(left_m_per_tick, value_type=float),
                 'right_m_per_tick': ParameterValue(right_m_per_tick, value_type=float),
                 'track_width_eff_m': ParameterValue(track_width_eff_m, value_type=float),
@@ -135,6 +143,10 @@ def generate_launch_description():
         DeclareLaunchArgument('imu_frame', default_value='imu_link'),
         DeclareLaunchArgument('mega_port', default_value='/dev/ttyACM0'),
         DeclareLaunchArgument('mega_baudrate', default_value='115200'),
+        DeclareLaunchArgument('left_cmd_sign', default_value='1'),
+        DeclareLaunchArgument('right_cmd_sign', default_value='1'),
+        DeclareLaunchArgument('left_tick_sign', default_value='1'),
+        DeclareLaunchArgument('right_tick_sign', default_value='1'),
         DeclareLaunchArgument('left_m_per_tick', default_value='0.0'),
         DeclareLaunchArgument('right_m_per_tick', default_value='0.0'),
         DeclareLaunchArgument('track_width_eff_m', default_value='0.35'),
