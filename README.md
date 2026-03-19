@@ -368,9 +368,35 @@ Merk:
 | `df -h` | Viser total diskbruk på Pi. |
 | `docker system df` | Viser hvor mye plass Docker bruker. |
 | `du -h --max-depth=1 ~/Mekatronikk-4-MEPA2002` | Viser store mapper i repoet. |
+| `docker compose down --remove-orphans` | Stopper prosjektcontainere og rydder gamle orphan-containere. |
+| `docker container prune -f` | Fjerner stoppede containere. |
+| `docker image rm mekk4/ros2-jazzy-dev:local` | Fjerner det lokale ROS-imaget før en ny build hvis dere trenger plass. |
 | `docker system prune -af` | Fjerner ubrukte containere/nettverk/images. |
 | `docker builder prune -af` | Fjerner docker build-cache. |
 | `sudo apt clean` | Fjerner apt-pakke-cache. |
 | `sudo rm -rf /var/lib/apt/lists/*` | Fjerner lokale apt-indekser. |
 | `rm -rf ~/Mekatronikk-4-MEPA2002/build ~/Mekatronikk-4-MEPA2002/log` | Fjerner lokale build/log-mapper. |
 | `rm -rf ~/Mekatronikk-4-MEPA2002/install` | Valgfritt: frigjør mer, men krever ny `make ws`. |
+
+For å frigjøre plass før en ny `make build`, start med denne rekkefølgen:
+
+```bash
+cd ~/Mekatronikk-4-MEPA2002
+docker compose down --remove-orphans
+docker container prune -f
+docker image rm mekk4/ros2-jazzy-dev:local || true
+rm -rf build log install
+docker system df
+```
+
+Hvis det fortsatt er for lite plass:
+
+```bash
+docker builder prune -af
+```
+
+Og hvis dere bare må få bygget og er ok med å miste ubrukte images og cache:
+
+```bash
+docker system prune -af
+```
