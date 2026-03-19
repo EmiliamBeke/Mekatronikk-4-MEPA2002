@@ -24,10 +24,12 @@ services:
     devices:
       - /dev/ttyAMA0:/dev/ttyAMA0
       - /dev/i2c-1:/dev/i2c-1
+      - /dev/gpiochip0:/dev/gpiochip0
 
     group_add:
       - dialout
       - i2c
+      - gpio
 
     volumes:
       - ./:/ws:rw
