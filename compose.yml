@@ -30,7 +30,6 @@ services:
       - "${DOCKER_LIDAR_GID:-20}"
       - "${DOCKER_I2C_GID:-998}"
       - "${DOCKER_GPIO_GID:-997}"
-      - "${DOCKER_MEGA_GID:-20}"
 
     volumes:
       - ./:/ws:rw
