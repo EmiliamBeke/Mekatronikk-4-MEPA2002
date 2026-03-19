@@ -35,6 +35,7 @@ CAMERA_REMOTE_PORT="${CAMERA_REMOTE_PORT:-5601}"
 DOCKER_LIDAR_GID="${DOCKER_LIDAR_GID:-}"
 DOCKER_I2C_GID="${DOCKER_I2C_GID:-}"
 DOCKER_GPIO_GID="${DOCKER_GPIO_GID:-}"
+COMPOSE_MEGA_DEVICE="${COMPOSE_MEGA_DEVICE:-/dev/null}"
 SOURCE_LAUNCH="${REPO_ROOT}/src/robot_bringup/launch/pi_robot.launch.py"
 INSTALLED_LAUNCH="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/launch/pi_robot.launch.py"
 SOURCE_PKG_XML="${REPO_ROOT}/src/robot_bringup/package.xml"
@@ -129,8 +130,9 @@ if [[ "${WITH_MEGA_DRIVER}" == "1" ]]; then
     echo "[pi-bringup] Mega serial device not found: ${MEGA_PORT}" >&2
     exit 1
   fi
-  docker_run_args+=(--device "${MEGA_PORT}:${MEGA_PORT}")
+  COMPOSE_MEGA_DEVICE="${MEGA_PORT}"
 fi
+export COMPOSE_MEGA_DEVICE
 
 docker "${docker_run_args[@]}" \
   -e ROS_DOMAIN_ID="${ROS_DOMAIN_ID}" \

@@ -25,6 +25,7 @@ services:
       - /dev/ttyAMA0:/dev/ttyAMA0
       - /dev/i2c-1:/dev/i2c-1
       - /dev/gpiochip0:/dev/gpiochip0
+      - "${COMPOSE_MEGA_DEVICE:-/dev/null}:${COMPOSE_MEGA_DEVICE:-/dev/null}"
 
     group_add:
       - "${DOCKER_LIDAR_GID:-20}"
