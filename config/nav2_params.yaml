@@ -35,10 +35,9 @@ controller_server:
       movement_time_allowance: 12.0
 
     general_goal_checker:
-      plugin: "nav2_controller::SimpleGoalChecker"
+      plugin: "nav2_controller::PositionGoalChecker"
       stateful: true
-      xy_goal_tolerance: 0.12
-      yaw_goal_tolerance: 0.25
+      xy_goal_tolerance: 0.15
 
     FollowPath:
       plugin: "nav2_mppi_controller::MPPIController"
@@ -49,20 +48,20 @@ controller_server:
       model_dt: 0.10
       batch_size: 400
       iteration_count: 1
-      prune_distance: 1.6
+      prune_distance: 1.0
       transform_tolerance: 0.15
       temperature: 0.25
       gamma: 0.015
       vx_max: 0.35
-      vx_min: -0.10
+      vx_min: 0.0
       vy_max: 0.0
-      wz_max: 1.2
+      wz_max: 0.75
       ax_max: 1.5
       ax_min: -1.5
-      az_max: 2.5
+      az_max: 1.2
       vx_std: 0.15
       vy_std: 0.0
-      wz_std: 0.30
+      wz_std: 0.18
       critics: [
         "ConstraintCritic",
         "CostCritic",
@@ -93,10 +92,10 @@ controller_server:
         cost_weight: 5.0
         threshold_to_consider: 1.2
       GoalAngleCritic:
-        enabled: true
+        enabled: false
         cost_power: 1
-        cost_weight: 3.0
-        threshold_to_consider: 0.5
+        cost_weight: 1.0
+        threshold_to_consider: 0.35
       PathAlignCritic:
         enabled: true
         cost_power: 1
@@ -115,7 +114,7 @@ controller_server:
       PathAngleCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 2.0
+        cost_weight: 0.5
         offset_from_furthest: 4
         threshold_to_consider: 0.5
         max_angle_to_furthest: 1.0
@@ -123,8 +122,8 @@ controller_server:
       PreferForwardCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 3.0
-        threshold_to_consider: 0.4
+        cost_weight: 10.0
+        threshold_to_consider: 0.8
 
 local_costmap:
   local_costmap:
@@ -231,9 +230,9 @@ behavior_server:
     robot_base_frame: chassis
     transform_tolerance: 0.2
     simulate_ahead_time: 1.5
-    max_rotational_vel: 1.0
-    min_rotational_vel: 0.2
-    rotational_acc_lim: 2.5
+    max_rotational_vel: 0.5
+    min_rotational_vel: 0.1
+    rotational_acc_lim: 1.5
 
 velocity_smoother:
   ros__parameters:
