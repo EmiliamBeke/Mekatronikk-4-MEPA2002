@@ -253,7 +253,7 @@ collision_monitor:
   ros__parameters:
     base_frame_id: "chassis"
     odom_frame_id: "odom"
-    cmd_vel_in_topic: "cmd_vel_smoothed_corrected"
+    cmd_vel_in_topic: "cmd_vel_smoothed"
     cmd_vel_out_topic: "cmd_vel"
     state_topic: "collision_monitor_state"
     transform_tolerance: 0.2

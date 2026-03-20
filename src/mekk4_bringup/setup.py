@@ -24,7 +24,6 @@ setup(
         'console_scripts': [
             'bno085_node = mekk4_bringup.bno085_node:main',
             'mega_driver_node = mekk4_bringup.mega_driver_node:main',
-            'twist_transform_node = mekk4_bringup.twist_transform_node:main',
             'zero_joint_state_publisher = mekk4_bringup.zero_joint_state_publisher:main',
         ],
     },

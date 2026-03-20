@@ -19,7 +19,6 @@ def generate_launch_description():
         'planner_server',
         'behavior_server',
         'velocity_smoother',
-        'nav_cmd_vel_transform',
         'collision_monitor',
         'bt_navigator',
     ]
@@ -86,24 +85,6 @@ def generate_launch_description():
             parameters=[params_file],
             arguments=['--ros-args', '--log-level', log_level],
             remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
-        ),
-        Node(
-            package='mekk4_bringup',
-            executable='twist_transform_node',
-            name='nav_cmd_vel_transform',
-            output='screen',
-            respawn=use_respawn,
-            respawn_delay=2.0,
-            arguments=['--ros-args', '--log-level', log_level],
-            parameters=[
-                {
-                    'input_topic': 'cmd_vel_smoothed',
-                    'output_topic': 'cmd_vel_smoothed_corrected',
-                    'invert_linear_x': False,
-                    'invert_angular_z': True,
-                }
-            ],
-            remappings=remappings,
         ),
         Node(
             package='nav2_collision_monitor',
