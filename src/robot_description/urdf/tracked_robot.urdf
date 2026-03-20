@@ -192,7 +192,7 @@
     </visual>
   </link>
   <joint name="imu_joint" type="fixed">
-    <origin xyz="0 0 0.03" rpy="0 0 0"/>
+    <origin xyz="0.11 0 0.03" rpy="0 0 0"/>
     <parent link="chassis"/>
     <child link="imu_link"/>
   </joint>
