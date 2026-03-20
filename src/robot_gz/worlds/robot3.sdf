@@ -199,6 +199,172 @@
             <specular>0.5 0.5 0.5 1</specular>
           </material>
         </visual>
+        <visual name="left_track_belt_visual">
+          <pose>-0.02 0.185 -0.03 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.34 0.08 0.14</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.08 0.08 0.08 1</ambient>
+            <diffuse>0.12 0.12 0.12 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+        <visual name="right_track_belt_visual">
+          <pose>-0.02 -0.185 -0.03 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.34 0.08 0.14</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.08 0.08 0.08 1</ambient>
+            <diffuse>0.12 0.12 0.12 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+        <visual name="left_track_front_idler_visual">
+          <pose>0.13 0.185 -0.03 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.07</radius>
+              <length>0.08</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.08 0.08 0.08 1</ambient>
+            <diffuse>0.12 0.12 0.12 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+        <visual name="left_track_rear_idler_visual">
+          <pose>-0.17 0.185 -0.03 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.07</radius>
+              <length>0.08</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.08 0.08 0.08 1</ambient>
+            <diffuse>0.12 0.12 0.12 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+        <visual name="right_track_front_idler_visual">
+          <pose>0.13 -0.185 -0.03 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.07</radius>
+              <length>0.08</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.08 0.08 0.08 1</ambient>
+            <diffuse>0.12 0.12 0.12 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+        <visual name="right_track_rear_idler_visual">
+          <pose>-0.17 -0.185 -0.03 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.07</radius>
+              <length>0.08</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.08 0.08 0.08 1</ambient>
+            <diffuse>0.12 0.12 0.12 1</diffuse>
+            <specular>0.02 0.02 0.02 1</specular>
+          </material>
+        </visual>
+        <visual name="left_track_roller_front_visual">
+          <pose>-0.12 0.185 -0.08 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.025</radius>
+              <length>0.085</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.35 0.35 0.35 1</ambient>
+            <diffuse>0.45 0.45 0.45 1</diffuse>
+            <specular>0.08 0.08 0.08 1</specular>
+          </material>
+        </visual>
+        <visual name="left_track_roller_mid_visual">
+          <pose>0 0.185 -0.08 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.025</radius>
+              <length>0.085</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.35 0.35 0.35 1</ambient>
+            <diffuse>0.45 0.45 0.45 1</diffuse>
+            <specular>0.08 0.08 0.08 1</specular>
+          </material>
+        </visual>
+        <visual name="left_track_roller_rear_visual">
+          <pose>0.12 0.185 -0.08 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.025</radius>
+              <length>0.085</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.35 0.35 0.35 1</ambient>
+            <diffuse>0.45 0.45 0.45 1</diffuse>
+            <specular>0.08 0.08 0.08 1</specular>
+          </material>
+        </visual>
+        <visual name="right_track_roller_front_visual">
+          <pose>-0.12 -0.185 -0.08 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.025</radius>
+              <length>0.085</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.35 0.35 0.35 1</ambient>
+            <diffuse>0.45 0.45 0.45 1</diffuse>
+            <specular>0.08 0.08 0.08 1</specular>
+          </material>
+        </visual>
+        <visual name="right_track_roller_mid_visual">
+          <pose>0 -0.185 -0.08 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.025</radius>
+              <length>0.085</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.35 0.35 0.35 1</ambient>
+            <diffuse>0.45 0.45 0.45 1</diffuse>
+            <specular>0.08 0.08 0.08 1</specular>
+          </material>
+        </visual>
+        <visual name="right_track_roller_rear_visual">
+          <pose>0.12 -0.185 -0.08 1.5708 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.025</radius>
+              <length>0.085</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.35 0.35 0.35 1</ambient>
+            <diffuse>0.45 0.45 0.45 1</diffuse>
+            <specular>0.08 0.08 0.08 1</specular>
+          </material>
+        </visual>
       </link>
 
       <!-- ===== Caster Wheel (front support) ===== -->
@@ -230,17 +396,6 @@
             </friction>
           </surface>
         </collision>
-        <visual name="caster_visual">
-          <geometry>
-            <sphere>
-              <radius>0.04</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <ambient>0.3 0.3 0.3 1</ambient>
-            <diffuse>0.4 0.4 0.4 1</diffuse>
-          </material>
-        </visual>
       </link>
 
       <joint name="caster_joint" type="fixed">
@@ -442,7 +597,7 @@
           <update_rate>10</update_rate>
           <visualize>true</visualize>
           <topic>lidar</topic>
-          <frame_id>lidar_link</frame_id>
+          <frame_id>base_laser</frame_id>
           <lidar>
             <scan>
               <horizontal>

@@ -10,6 +10,7 @@ def generate_launch_description():
     port_baudrate = LaunchConfiguration('port_baudrate')
     topic_name = LaunchConfiguration('topic_name')
     frame_id = LaunchConfiguration('frame_id')
+    mount_frame = LaunchConfiguration('mount_frame')
 
     tf_x = LaunchConfiguration('tf_x')
     tf_y = LaunchConfiguration('tf_y')
@@ -17,8 +18,6 @@ def generate_launch_description():
     tf_roll = LaunchConfiguration('tf_roll')
     tf_pitch = LaunchConfiguration('tf_pitch')
     tf_yaw = LaunchConfiguration('tf_yaw')
-
-    base_frame = LaunchConfiguration('base_frame')
 
     ldlidar_node = Node(
         package='ldlidar_stl_ros2',
@@ -49,7 +48,7 @@ def generate_launch_description():
             '--roll', tf_roll,
             '--pitch', tf_pitch,
             '--yaw', tf_yaw,
-            '--frame-id', base_frame,
+            '--frame-id', mount_frame,
             '--child-frame-id', frame_id,
         ],
     )
@@ -60,10 +59,10 @@ def generate_launch_description():
         DeclareLaunchArgument('port_baudrate', default_value='230400'),
         DeclareLaunchArgument('topic_name', default_value='/lidar'),
         DeclareLaunchArgument('frame_id', default_value='base_laser'),
-        DeclareLaunchArgument('base_frame', default_value='chassis'),
+        DeclareLaunchArgument('mount_frame', default_value='lidar_link'),
         DeclareLaunchArgument('tf_x', default_value='0.0'),
         DeclareLaunchArgument('tf_y', default_value='0.0'),
-        DeclareLaunchArgument('tf_z', default_value='0.18'),
+        DeclareLaunchArgument('tf_z', default_value='0.0'),
         DeclareLaunchArgument('tf_roll', default_value='0.0'),
         DeclareLaunchArgument('tf_pitch', default_value='0.0'),
         DeclareLaunchArgument('tf_yaw', default_value='0.0'),

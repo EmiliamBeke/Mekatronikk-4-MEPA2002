@@ -79,7 +79,7 @@ def generate_launch_description():
             '--x', '0', '--y', '0', '--z', '0',
             '--roll', '0', '--pitch', '0', '--yaw', '0',
             '--frame-id', 'lidar_link',
-            '--child-frame-id', 'two_wheel_robot/lidar_link/lidar',
+            '--child-frame-id', 'base_laser',
         ],
     )
 
