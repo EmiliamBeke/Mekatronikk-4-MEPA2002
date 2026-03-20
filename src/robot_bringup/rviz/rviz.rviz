@@ -7,13 +7,10 @@ Panels:
         - /Global Options1
         - /Camera1
         - /LaserScan1
-        - /Odometry1
         - /RobotModel1
-        - /Global Plan1
-        - /Local Plan1
-        - /Footprint1
+        - /Odometry1
         - /TF1
-      Splitter Ratio: 0.56
+      Splitter Ratio: 0.5
     Tree Height: 720
   - Class: rviz_common/Selection
     Name: Selection
@@ -21,7 +18,7 @@ Panels:
     Expanded:
       - /2D Goal Pose1
     Name: Tool Properties
-    Splitter Ratio: 0.58
+    Splitter Ratio: 0.5886790156364441
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
@@ -35,13 +32,13 @@ Panels:
 Visualization Manager:
   Class: ""
   Displays:
-    - Alpha: 0.5
+    - Alpha: 0.35
       Cell Size: 0.5
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
       Enabled: true
       Line Style:
-        Line Width: 0.03
+        Line Width: 0.029999999329447746
         Value: Lines
       Name: Grid
       Normal Cell Count: 0
@@ -88,9 +85,9 @@ Visualization Manager:
       Name: LaserScan
       Position Transformer: XYZ
       Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.02
-      Style: Points
+      Size (Pixels): 4
+      Size (m): 0.029999999329447746
+      Style: Spheres
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -127,7 +124,7 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Angle Tolerance: 0.1
+    - Angle Tolerance: 0.10000000149011612
       Class: rviz_default_plugins/Odometry
       Covariance:
         Orientation:
@@ -137,107 +134,36 @@ Visualization Manager:
           Frame: Local
           Offset: 1
           Scale: 1
-          Value: true
+          Value: false
         Position:
-          Alpha: 0.3
+          Alpha: 0.30000001192092896
           Color: 204; 51; 204
           Scale: 1
-          Value: true
+          Value: false
         Value: true
       Enabled: true
-      Keep: 200
+      Keep: 100
       Name: Odometry
-      Position Tolerance: 0.1
+      Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
-        Axes Length: 0.4
-        Axes Radius: 0.03
+        Axes Length: 0.4000000059604645
+        Axes Radius: 0.029999999329447746
         Color: 255; 25; 0
-        Head Length: 0.08
-        Head Radius: 0.04
-        Shaft Length: 0.2
-        Shaft Radius: 0.02
+        Head Length: 0.07999999821186066
+        Head Radius: 0.03999999910593033
+        Shaft Length: 0.20000000298023224
+        Shaft Radius: 0.019999999552965164
         Value: Arrow
       Topic: /odom
       Unreliable: false
       Value: true
-    - Alpha: 1
-      Buffer Length: 1
-      Class: rviz_default_plugins/Path
-      Color: 255; 0; 0
-      Enabled: true
-      Head Diameter: 0.03
-      Head Length: 0.03
-      Length: 0.3
-      Line Style: Lines
-      Line Width: 0.03
-      Name: Global Plan
-      Offset:
-        X: 0
-        Y: 0
-        Z: 0
-      Pose Color: 255; 85; 255
-      Pose Style: Arrows
-      Radius: 0.03
-      Shaft Diameter: 0.01
-      Shaft Length: 0.03
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /plan
-      Value: true
-    - Alpha: 1
-      Buffer Length: 1
-      Class: rviz_default_plugins/Path
-      Color: 0; 64; 255
-      Enabled: true
-      Head Diameter: 0.1
-      Head Length: 0.05
-      Length: 0.25
-      Line Style: Lines
-      Line Width: 0.03
-      Name: Local Plan
-      Offset:
-        X: 0
-        Y: 0
-        Z: 0
-      Pose Color: 255; 85; 255
-      Pose Style: None
-      Radius: 0.03
-      Shaft Diameter: 0.05
-      Shaft Length: 0.05
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /local_plan
-      Value: true
-    - Alpha: 1
-      Class: rviz_default_plugins/Polygon
-      Color: 25; 255; 0
-      Enabled: true
-      Name: Footprint
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /local_costmap/published_footprint
-      Value: true
     - Class: rviz_default_plugins/TF
       Enabled: true
-      Filter (blacklist): ""
-      Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
         All Enabled: true
-      Marker Scale: 0.4
+      Marker Scale: 0.4000000059604645
       Name: TF
       Show Arrows: true
       Show Axes: true
@@ -246,6 +172,75 @@ Visualization Manager:
         {}
       Update Interval: 0
       Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 255; 0; 0
+      Enabled: false
+      Head Diameter: 0.019999999552965164
+      Head Length: 0.019999999552965164
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Global Plan
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: Arrows
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.004999999888241291
+      Shaft Length: 0.019999999552965164
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /plan
+      Value: false
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 0; 64; 255
+      Enabled: false
+      Head Diameter: 0.10000000149011612
+      Head Length: 0.05000000074505806
+      Length: 0.25
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Local Plan
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.05000000074505806
+      Shaft Length: 0.05000000074505806
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /local_plan
+      Value: false
+    - Alpha: 1
+      Class: rviz_default_plugins/Polygon
+      Color: 25; 255; 0
+      Enabled: false
+      Name: Footprint
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /local_costmap/published_footprint
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -274,22 +269,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3
+      Distance: 3.0
       Enable Stereo Rendering:
-        Stereo Eye Separation: 0.06
+        Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
         X: 0
         Y: 0
-        Z: 0.1
+        Z: 0.10000000149011612
       Focal Shape Fixed Size: true
-      Focal Shape Size: 0.05
+      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
-      Near Clip Distance: 0.01
-      Pitch: 1.05
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 1.0499999523162842
       Target Frame: odom
       Value: Orbit (rviz)
-      Yaw: 0.8
+      Yaw: 0.800000011920929
