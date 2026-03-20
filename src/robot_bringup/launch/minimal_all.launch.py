@@ -102,20 +102,12 @@ def generate_launch_description():
         ],
     )
 
-    joint_state_publisher = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        output='screen',
-        parameters=[{'use_sim_time': True}],
-    )
-
     # Liten delay så gz rekker å starte før bridge/node/rviz starter
     start_rest = TimerAction(
         period=1.0,
         actions=[
             bridge,
             robot_state_publisher,
-            joint_state_publisher,
             lidar_static_tf,
             keyboard_teleop,
             rviz,

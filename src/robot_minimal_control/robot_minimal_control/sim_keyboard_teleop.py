@@ -228,11 +228,15 @@ def main() -> int:
 
     rclpy.init()
     app = SimKeyboardTeleop(args)
+    exit_code = 0
     try:
-        return app.run()
+        exit_code = app.run()
+    except KeyboardInterrupt:
+        exit_code = 0
     finally:
         app.shutdown()
-        rclpy.shutdown()
+        rclpy.try_shutdown()
+    return exit_code
 
 
 if __name__ == "__main__":
