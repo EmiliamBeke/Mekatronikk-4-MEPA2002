@@ -53,7 +53,6 @@ def generate_launch_description():
     tf_roll = LaunchConfiguration('tf_roll')
     tf_pitch = LaunchConfiguration('tf_pitch')
     tf_yaw = LaunchConfiguration('tf_yaw')
-    map_yaml = LaunchConfiguration('map')
     params_file = LaunchConfiguration('params_file')
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
@@ -100,7 +99,6 @@ def generate_launch_description():
         condition=IfCondition(use_nav2),
         launch_arguments={
             'use_sim_time': 'false',
-            'map': map_yaml,
             'params_file': params_file,
             'use_respawn': use_respawn,
             'log_level': log_level,
@@ -195,7 +193,6 @@ def generate_launch_description():
         DeclareLaunchArgument('tf_roll', default_value='0.0'),
         DeclareLaunchArgument('tf_pitch', default_value='0.0'),
         DeclareLaunchArgument('tf_yaw', default_value='0.0'),
-        DeclareLaunchArgument('map', default_value='/ws/maps/my_map.yaml'),
         DeclareLaunchArgument('params_file', default_value='/ws/config/nav2_params.yaml'),
         DeclareLaunchArgument('use_respawn', default_value='false'),
         DeclareLaunchArgument('log_level', default_value='info'),
