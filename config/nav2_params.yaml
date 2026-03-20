@@ -260,40 +260,24 @@ collision_monitor:
     source_timeout: 0.5
     base_shift_correction: true
     stop_pub_timeout: 1.0
-    polygons: ["VelocityPolygonStop", "FootprintApproach"]
-    VelocityPolygonStop:
-      type: "velocity_polygon"
+    polygons: ["FrontStop", "FrontSlow", "FootprintApproach"]
+    FrontStop:
+      type: "polygon"
+      points: "[[0.45, 0.22], [0.45, -0.22], [0.04, -0.22], [0.04, 0.22]]"
       action_type: "stop"
       min_points: 4
       visualize: true
+      polygon_pub_topic: "polygon_front_stop"
       enabled: true
-      polygon_pub_topic: "velocity_polygon_stop"
-      velocity_polygons: ["rotation", "translation_forward", "translation_backward", "stopped"]
-      holonomic: false
-      rotation:
-        points: "[[0.25, 0.22], [0.25, -0.22], [-0.25, -0.22], [-0.25, 0.22]]"
-        linear_min: -0.05
-        linear_max: 0.05
-        theta_min: -1.5
-        theta_max: 1.5
-      translation_forward:
-        points: "[[0.48, 0.24], [0.48, -0.24], [-0.10, -0.24], [-0.10, 0.24]]"
-        linear_min: 0.05
-        linear_max: 1.0
-        theta_min: -1.5
-        theta_max: 1.5
-      translation_backward:
-        points: "[[0.18, 0.22], [0.18, -0.22], [-0.30, -0.22], [-0.30, 0.22]]"
-        linear_min: -1.0
-        linear_max: -0.05
-        theta_min: -1.5
-        theta_max: 1.5
-      stopped:
-        points: "[[0.22, 0.20], [0.22, -0.20], [-0.22, -0.20], [-0.22, 0.20]]"
-        linear_min: -0.05
-        linear_max: 0.05
-        theta_min: -0.2
-        theta_max: 0.2
+    FrontSlow:
+      type: "polygon"
+      points: "[[0.60, 0.26], [0.60, -0.26], [0.06, -0.26], [0.06, 0.26]]"
+      action_type: "slowdown"
+      min_points: 4
+      slowdown_ratio: 0.35
+      visualize: true
+      polygon_pub_topic: "polygon_front_slow"
+      enabled: true
     FootprintApproach:
       type: "polygon"
       action_type: "approach"
