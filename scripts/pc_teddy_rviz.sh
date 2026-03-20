@@ -12,5 +12,6 @@ export WIDTH="${TEDDY_WIDTH:-${MEKK4_DEBUG_STREAM_WIDTH}}"
 export HEIGHT="${TEDDY_HEIGHT:-${MEKK4_DEBUG_STREAM_HEIGHT}}"
 export TOPIC_NAME="${TEDDY_TOPIC_NAME:-${MEKK4_DEBUG_IMAGE_TOPIC}}"
 export FRAME_ID="${TEDDY_FRAME_ID:-camera_link}"
+export RVIZ_CONFIG="${RVIZ_CONFIG:-${REPO_ROOT}/src/robot_bringup/rviz/pc_teddy_nav.rviz}"
 
 bash "${SCRIPT_DIR}/pc_camera_rviz.sh" "${1:-${PI_HOST:-gruppe5pi5}}"
