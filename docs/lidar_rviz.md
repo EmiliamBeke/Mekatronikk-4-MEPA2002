@@ -64,7 +64,7 @@ Denne konfigen er laget for situasjonen deres akkurat naa:
 2. `LaserScan` bruker `/lidar` med `Reliability = Best Effort`
 3. `RobotModel` bruker `/robot_description`
 4. `Image`-display viser `/camera`
-5. `TF`, odometri, costmaps og planer kan slas av/paa i samme konfig
+5. `TF`, odometri, footprint og planer kan slas av/paa i samme konfig
 
 Hvis du vil sette opp manuelt i stedet:
 

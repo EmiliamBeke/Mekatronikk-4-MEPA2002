@@ -109,7 +109,7 @@ I denne RViz-konfigen er standarden:
 1. `Fixed Frame = odom`
 2. `/lidar` vises som LaserScan
 3. `/camera` vises som Image
-4. `TF`, odometri, costmaps og planer kan vises i samme konfig
+4. `TF`, odometri, footprint og planer vises i samme konfig
 
 ### Nyttige varianter
 
