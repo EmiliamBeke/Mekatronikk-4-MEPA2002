@@ -170,6 +170,7 @@
       <link name="chassis">
         <pose>0 0 0.025 0 0 0</pose>
         <inertial>
+          <pose>-0.048 0 0.022 0 0 0</pose>
           <mass>5.0</mass>
           <inertia>
             <ixx>0.0417</ixx>
@@ -367,80 +368,202 @@
         </visual>
       </link>
 
-      <!-- ===== Hidden Supports (stabilize tracked proxy in pitch) ===== -->
-      <link name="caster_wheel">
-        <pose>0.11 0 -0.03 0 0 0</pose>
+      <!-- ===== Simple Suspended Track Modules ===== -->
+      <link name="front_left_track">
+        <pose>0.065 0.082 -0.045 0 0 0</pose>
         <inertial>
-          <mass>0.2</mass>
+          <mass>0.12</mass>
           <inertia>
-            <ixx>0.00008</ixx>
-            <iyy>0.00008</iyy>
-            <izz>0.00008</izz>
+            <ixx>0.00012</ixx>
+            <iyy>0.00018</iyy>
+            <izz>0.00018</izz>
             <ixy>0</ixy>
             <ixz>0</ixz>
             <iyz>0</iyz>
           </inertia>
         </inertial>
-        <collision name="caster_collision">
+        <collision name="front_left_track_collision">
           <geometry>
-            <sphere>
-              <radius>0.03</radius>
-            </sphere>
+            <box>
+              <size>0.11 0.036 0.03</size>
+            </box>
           </geometry>
           <surface>
             <friction>
               <ode>
-                <mu>0.0</mu>
-                <mu2>0.0</mu2>
+                <mu>0.7</mu>
+                <mu2>150</mu2>
+                <fdir1>1 0 0</fdir1>
               </ode>
             </friction>
           </surface>
         </collision>
       </link>
 
-      <joint name="caster_joint" type="fixed">
+      <joint name="front_left_track_joint" type="prismatic">
         <parent>chassis</parent>
-        <child>caster_wheel</child>
+        <child>front_left_track</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.018</lower>
+            <upper>0.012</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>1500</spring_stiffness>
+            <damping>55</damping>
+          </dynamics>
+        </axis>
       </joint>
 
-      <link name="rear_support">
-        <pose>-0.11 0 -0.03 0 0 0</pose>
+      <link name="rear_left_track">
+        <pose>-0.07 0.082 -0.045 0 0 0</pose>
         <inertial>
-          <mass>0.2</mass>
+          <mass>0.12</mass>
           <inertia>
-            <ixx>0.00008</ixx>
-            <iyy>0.00008</iyy>
-            <izz>0.00008</izz>
+            <ixx>0.00012</ixx>
+            <iyy>0.00018</iyy>
+            <izz>0.00018</izz>
             <ixy>0</ixy>
             <ixz>0</ixz>
             <iyz>0</iyz>
           </inertia>
         </inertial>
-        <collision name="rear_support_collision">
+        <collision name="rear_left_track_collision">
           <geometry>
-            <sphere>
-              <radius>0.03</radius>
-            </sphere>
+            <box>
+              <size>0.11 0.036 0.03</size>
+            </box>
           </geometry>
           <surface>
             <friction>
               <ode>
-                <mu>0.0</mu>
-                <mu2>0.0</mu2>
+                <mu>0.7</mu>
+                <mu2>150</mu2>
+                <fdir1>1 0 0</fdir1>
               </ode>
             </friction>
           </surface>
         </collision>
       </link>
 
-      <joint name="rear_support_joint" type="fixed">
+      <joint name="rear_left_track_joint" type="prismatic">
         <parent>chassis</parent>
-        <child>rear_support</child>
+        <child>rear_left_track</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.02</lower>
+            <upper>0.012</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>900</spring_stiffness>
+            <damping>35</damping>
+          </dynamics>
+        </axis>
+      </joint>
+
+      <link name="front_right_track">
+        <pose>0.065 -0.082 -0.045 0 0 0</pose>
+        <inertial>
+          <mass>0.12</mass>
+          <inertia>
+            <ixx>0.00012</ixx>
+            <iyy>0.00018</iyy>
+            <izz>0.00018</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="front_right_track_collision">
+          <geometry>
+            <box>
+              <size>0.11 0.036 0.03</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>150</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+      </link>
+
+      <joint name="front_right_track_joint" type="prismatic">
+        <parent>chassis</parent>
+        <child>front_right_track</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.018</lower>
+            <upper>0.012</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>1500</spring_stiffness>
+            <damping>55</damping>
+          </dynamics>
+        </axis>
+      </joint>
+
+      <link name="rear_right_track">
+        <pose>-0.07 -0.082 -0.045 0 0 0</pose>
+        <inertial>
+          <mass>0.12</mass>
+          <inertia>
+            <ixx>0.00012</ixx>
+            <iyy>0.00018</iyy>
+            <izz>0.00018</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="rear_right_track_collision">
+          <geometry>
+            <box>
+              <size>0.11 0.036 0.03</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>150</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+      </link>
+
+      <joint name="rear_right_track_joint" type="prismatic">
+        <parent>chassis</parent>
+        <child>rear_right_track</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.02</lower>
+            <upper>0.012</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>900</spring_stiffness>
+            <damping>35</damping>
+          </dynamics>
+        </axis>
       </joint>
 
       <!-- ===== Left Wheel ===== -->
       <link name="left_wheel">
-        <pose>0 0.093 -0.01 -1.5708 0 0</pose>
+        <pose>-0.035 0.093 0.005 -1.5708 0 0</pose>
         <inertial>
           <mass>0.5</mass>
           <inertia>
@@ -452,22 +575,6 @@
             <iyz>0</iyz>
           </inertia>
         </inertial>
-        <collision name="left_wheel_collision">
-          <geometry>
-            <cylinder>
-              <radius>0.05</radius>
-              <length>0.03</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1.0</mu>
-                <mu2>1.0</mu2>
-              </ode>
-            </friction>
-          </surface>
-        </collision>
         <visual name="left_wheel_visual">
           <geometry>
             <cylinder>
@@ -496,7 +603,7 @@
 
       <!-- ===== Right Wheel ===== -->
       <link name="right_wheel">
-        <pose>0 -0.093 -0.01 -1.5708 0 0</pose>
+        <pose>-0.035 -0.093 0.005 -1.5708 0 0</pose>
         <inertial>
           <mass>0.5</mass>
           <inertia>
@@ -508,22 +615,6 @@
             <iyz>0</iyz>
           </inertia>
         </inertial>
-        <collision name="right_wheel_collision">
-          <geometry>
-            <cylinder>
-              <radius>0.05</radius>
-              <length>0.03</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1.0</mu>
-                <mu2>1.0</mu2>
-              </ode>
-            </friction>
-          </surface>
-        </collision>
         <visual name="right_wheel_visual">
           <geometry>
             <cylinder>
@@ -667,26 +758,59 @@
         <child>lidar_link</child>
       </joint>
 
-      <!-- ===== Differential Drive Plugin ===== -->
-      <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
-        <left_joint>left_wheel_joint</left_joint>
-        <right_joint>right_wheel_joint</right_joint>
-        <wheel_separation>0.186605297</wheel_separation>
-        <wheel_radius>0.05</wheel_radius>
+      <plugin name="gz::sim::systems::TrackedVehicle" filename="gz-sim-tracked-vehicle-system">
+        <left_track><link>front_left_track</link></left_track>
+        <left_track><link>rear_left_track</link></left_track>
+        <right_track><link>front_right_track</link></right_track>
+        <right_track><link>rear_right_track</link></right_track>
+        <tracks_separation>0.186605297</tracks_separation>
+        <tracks_height>0.09</tracks_height>
+        <steering_efficiency>1.0</steering_efficiency>
         <odom_publish_frequency>50</odom_publish_frequency>
-        <topic>cmd_vel</topic>
         <odom_topic>odom</odom_topic>
         <tf_topic>tf</tf_topic>
-        <frame_id>odom</frame_id>
         <child_frame_id>chassis</child_frame_id>
-        <max_linear_acceleration>1.0</max_linear_acceleration>
-        <min_linear_acceleration>-1.0</min_linear_acceleration>
-        <max_angular_acceleration>2.0</max_angular_acceleration>
-        <min_angular_acceleration>-2.0</min_angular_acceleration>
+        <min_velocity>-0.5555555555555556</min_velocity>
+        <max_velocity>0.5555555555555556</max_velocity>
+        <min_acceleration>-4.0</min_acceleration>
+        <max_acceleration>4.0</max_acceleration>
+      </plugin>
+      <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+        <link>front_left_track</link>
+        <min_velocity>-0.5555555555555556</min_velocity>
+        <max_velocity>0.5555555555555556</max_velocity>
+        <min_acceleration>-4.0</min_acceleration>
+        <max_acceleration>4.0</max_acceleration>
+      </plugin>
+      <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+        <link>rear_left_track</link>
+        <min_velocity>-0.5555555555555556</min_velocity>
+        <max_velocity>0.5555555555555556</max_velocity>
+        <min_acceleration>-4.0</min_acceleration>
+        <max_acceleration>4.0</max_acceleration>
+      </plugin>
+      <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+        <link>front_right_track</link>
+        <min_velocity>-0.5555555555555556</min_velocity>
+        <max_velocity>0.5555555555555556</max_velocity>
+        <min_acceleration>-4.0</min_acceleration>
+        <max_acceleration>4.0</max_acceleration>
+      </plugin>
+      <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+        <link>rear_right_track</link>
+        <min_velocity>-0.5555555555555556</min_velocity>
+        <max_velocity>0.5555555555555556</max_velocity>
+        <min_acceleration>-4.0</min_acceleration>
+        <max_acceleration>4.0</max_acceleration>
       </plugin>
 
       <!-- Joint State Publisher -->
-      <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher"/>
+      <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+        <joint_name>left_wheel_joint</joint_name>
+        <joint_name>right_wheel_joint</joint_name>
+        <topic>/joint_states</topic>
+        <update_rate>30</update_rate>
+      </plugin>
 
     </model>
 

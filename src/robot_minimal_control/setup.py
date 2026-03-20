@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'cmd_vel_loop = robot_minimal_control.cmd_vel_loop:main',
+            'sim_cmd_vel_calibrator = robot_minimal_control.sim_cmd_vel_calibrator:main',
             'sim_keyboard_teleop = robot_minimal_control.sim_keyboard_teleop:main',
         ],
     },

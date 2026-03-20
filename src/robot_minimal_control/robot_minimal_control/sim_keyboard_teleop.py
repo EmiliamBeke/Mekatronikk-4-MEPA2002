@@ -217,12 +217,12 @@ class SimKeyboardTeleop:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Keyboard teleop for Gazebo sim with the same key layout as Mega teleop.")
-    parser.add_argument("--speed", type=float, default=0.50, help="Default linear speed in m/s")
-    parser.add_argument("--turn-speed", type=float, default=1.20, help="Default angular speed in rad/s")
-    parser.add_argument("--speed-step", type=float, default=0.05, help="Linear speed increment for E/Q")
-    parser.add_argument("--turn-speed-step", type=float, default=0.10, help="Angular speed increment for P/O")
-    parser.add_argument("--max-speed", type=float, default=1.00, help="Maximum linear speed in m/s")
-    parser.add_argument("--max-turn-speed", type=float, default=3.00, help="Maximum angular speed in rad/s")
+    parser.add_argument("--speed", type=float, default=0.19607843137254904, help="Default linear speed in m/s")
+    parser.add_argument("--turn-speed", type=float, default=1.2842690961875771, help="Default angular speed in rad/s")
+    parser.add_argument("--speed-step", type=float, default=0.010893246187363834, help="Linear speed increment for E/Q")
+    parser.add_argument("--turn-speed-step", type=float, default=0.11675173601705246, help="Angular speed increment for P/O")
+    parser.add_argument("--max-speed", type=float, default=0.5555555555555556, help="Maximum linear speed in m/s")
+    parser.add_argument("--max-turn-speed", type=float, default=5.954338536869675, help="Maximum angular speed in rad/s")
     parser.add_argument("--send-period", type=float, default=0.03, help="Seconds between repeated cmd_vel publishes")
     args = parser.parse_args(remove_ros_args(args=sys.argv)[1:])
 

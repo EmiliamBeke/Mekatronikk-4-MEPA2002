@@ -27,4 +27,9 @@ install(DIRECTORY launch rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../config/robot_calibration.yaml
+  DESTINATION share/${PROJECT_NAME}/config
+)
+
 ament_package()

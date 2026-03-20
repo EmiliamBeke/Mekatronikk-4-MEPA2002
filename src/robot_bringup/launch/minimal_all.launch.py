@@ -5,6 +5,7 @@ from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 import os
+import yaml
 
 def generate_launch_description():
     headless = LaunchConfiguration('headless')
@@ -27,9 +28,17 @@ def generate_launch_description():
 
     rviz_config = os.path.join(
         get_package_share_directory('robot_bringup'),
-        'rviz', 
+        'rviz',
         'minimal_all.rviz'
     )
+    calibration_path = os.path.join(
+        get_package_share_directory('robot_bringup'),
+        'config',
+        'robot_calibration.yaml'
+    )
+    with open(calibration_path, 'r', encoding='utf-8') as f:
+        calibration = yaml.safe_load(f) or {}
+    mega_driver_calibration = calibration.get('mega_driver', {})
 
     rviz = Node(
         package='rviz2',
@@ -56,15 +65,28 @@ def generate_launch_description():
     bridge = ExecuteProcess(
         cmd=[
             'ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
-            '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
+            '/model/tracked_robot/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
             '/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
             '/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
+            '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
             '/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             '/lidar/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
             '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
         ],
         output='screen'
+    )
+    sim_cmd_vel_calibrator = Node(
+        package='robot_minimal_control',
+        executable='sim_cmd_vel_calibrator',
+        output='screen',
+        parameters=[
+            {'use_sim_time': True},
+            {'track_width_eff_m': float(mega_driver_calibration.get('track_width_eff_m', 0.186605297))},
+            {'max_track_speed_mps': 0.5555555555555556},
+            {'input_topic': '/cmd_vel'},
+            {'output_topic': '/model/tracked_robot/cmd_vel'},
+        ],
     )
     keyboard_teleop = Node(
         package='robot_minimal_control',
@@ -107,6 +129,7 @@ def generate_launch_description():
         period=1.0,
         actions=[
             bridge,
+            sim_cmd_vel_calibrator,
             robot_state_publisher,
             lidar_static_tf,
             keyboard_teleop,
