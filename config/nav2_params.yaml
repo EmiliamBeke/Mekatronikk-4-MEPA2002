@@ -263,7 +263,7 @@ collision_monitor:
     polygons: ["FrontStop", "FrontSlow", "FootprintApproach"]
     FrontStop:
       type: "polygon"
-      points: "[[0.45, 0.22], [0.45, -0.22], [0.04, -0.22], [0.04, 0.22]]"
+      points: "[[0.34, 0.18], [0.34, -0.18], [0.08, -0.18], [0.08, 0.18]]"
       action_type: "stop"
       min_points: 4
       visualize: true
@@ -271,10 +271,10 @@ collision_monitor:
       enabled: true
     FrontSlow:
       type: "polygon"
-      points: "[[0.60, 0.26], [0.60, -0.26], [0.06, -0.26], [0.06, 0.26]]"
+      points: "[[0.46, 0.22], [0.46, -0.22], [0.10, -0.22], [0.10, 0.22]]"
       action_type: "slowdown"
       min_points: 4
-      slowdown_ratio: 0.35
+      slowdown_ratio: 0.55
       visualize: true
       polygon_pub_topic: "polygon_front_slow"
       enabled: true
