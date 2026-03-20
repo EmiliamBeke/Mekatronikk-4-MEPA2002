@@ -11,7 +11,7 @@ camera_stream:
 
   # Capture framerate.
   # Lower FPS usually reduces delay and makes the stream easier to keep stable.
-  fps: 10
+  fps: 8
 
   # Optional H.264 bitrate in bits/sec.
   # Leave empty to use the rpicam default.
