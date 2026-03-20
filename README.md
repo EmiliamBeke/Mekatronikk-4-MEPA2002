@@ -21,9 +21,19 @@ Kort bruk av repoet.
 
 | Kommando | Hva den gjør |
 |---|---|
-| `make sim` | Starter simulering med Gazebo GUI + RViz. |
+| `make sim` | Starter simulering med Gazebo GUI + RViz + et eget keyboard-teleop-vindu. |
 | `make sim-headless` | Starter simulering uten GUI. |
 | `make sim-topics` | Viser sentrale sim-topics. |
+
+Taster i sim-teleop-vinduet:
+
+1. hold `W` for fremover
+2. hold `S` for bakover
+3. hold `A` og `D` for sving
+4. `E` / `Q` øker og senker kjørehastighet
+5. `P` / `O` øker og senker svinghastighet
+6. `SPACE` stopper
+7. `-` avslutter teleop-vinduet
 
 ## Nav2 i simulering
 

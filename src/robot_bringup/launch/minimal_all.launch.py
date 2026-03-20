@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, SetEnvironmentVariable, TimerAction
 from launch.conditions import IfCondition, UnlessCondition
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 import os
@@ -10,6 +10,7 @@ def generate_launch_description():
     headless = LaunchConfiguration('headless')
     autostart = LaunchConfiguration('autostart')
     rviz_enabled = LaunchConfiguration('rviz')
+    keyboard_teleop_enabled = LaunchConfiguration('keyboard_teleop')
 
     world = os.path.join(
         get_package_share_directory('robot_gz'),
@@ -65,13 +66,20 @@ def generate_launch_description():
         ],
         output='screen'
     )
-    """
-    driver = Node(
+    keyboard_teleop = Node(
         package='robot_minimal_control',
-        executable='cmd_vel_loop',
-        output='screen'
+        executable='sim_keyboard_teleop',
+        output='screen',
+        condition=IfCondition(
+            PythonExpression([
+                "'",
+                keyboard_teleop_enabled,
+                "' == 'true' and '",
+                headless,
+                "' != 'true'",
+            ])
+        ),
     )
-    """
     lidar_static_tf = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -104,7 +112,7 @@ def generate_launch_description():
     # Liten delay så gz rekker å starte før bridge/node/rviz starter
     start_rest = TimerAction(
         period=1.0,
-        actions=[bridge, robot_state_publisher, joint_state_publisher, lidar_static_tf, rviz]
+        actions=[bridge, robot_state_publisher, joint_state_publisher, lidar_static_tf, keyboard_teleop, rviz]
     )
 
     # Start simuleringen automatisk (fjerner pause ved oppstart).
@@ -137,6 +145,11 @@ def generate_launch_description():
             'rviz',
             default_value='true',
             description='Run RViz visualizer.'
+        ),
+        DeclareLaunchArgument(
+            'keyboard_teleop',
+            default_value='true',
+            description='Run local keyboard teleop window for sim.'
         ),
         SetEnvironmentVariable('ROS_USE_SIM_TIME', 'true'),
         gz_gui,
