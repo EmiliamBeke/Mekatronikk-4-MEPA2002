@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="two_wheel_robot">
+<robot name="tracked_robot">
   <material name="blue_body">
     <color rgba="0.2 0.2 0.9 1.0"/>
   </material>
@@ -28,98 +28,98 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.4 0.3 0.15"/>
+        <box size="0.297 0.16 0.085"/>
       </geometry>
       <material name="blue_body"/>
     </visual>
     <visual>
-      <origin xyz="-0.02 0.185 -0.03" rpy="0 0 0"/>
+      <origin xyz="0 0.096 -0.02" rpy="0 0 0"/>
       <geometry>
-        <box size="0.34 0.08 0.14"/>
+        <box size="0.19 0.038 0.09"/>
       </geometry>
       <material name="rubber_track"/>
     </visual>
     <visual>
-      <origin xyz="-0.02 -0.185 -0.03" rpy="0 0 0"/>
+      <origin xyz="0 -0.096 -0.02" rpy="0 0 0"/>
       <geometry>
-        <box size="0.34 0.08 0.14"/>
+        <box size="0.19 0.038 0.09"/>
       </geometry>
       <material name="rubber_track"/>
     </visual>
     <visual>
-      <origin xyz="0.13 0.185 -0.03" rpy="1.5708 0 0"/>
+      <origin xyz="0.095 0.096 -0.02" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.07" length="0.08"/>
+        <cylinder radius="0.045" length="0.038"/>
       </geometry>
       <material name="rubber_track"/>
     </visual>
     <visual>
-      <origin xyz="-0.17 0.185 -0.03" rpy="1.5708 0 0"/>
+      <origin xyz="-0.095 0.096 -0.02" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.07" length="0.08"/>
+        <cylinder radius="0.045" length="0.038"/>
       </geometry>
       <material name="rubber_track"/>
     </visual>
     <visual>
-      <origin xyz="0.13 -0.185 -0.03" rpy="1.5708 0 0"/>
+      <origin xyz="0.095 -0.096 -0.02" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.07" length="0.08"/>
+        <cylinder radius="0.045" length="0.038"/>
       </geometry>
       <material name="rubber_track"/>
     </visual>
     <visual>
-      <origin xyz="-0.17 -0.185 -0.03" rpy="1.5708 0 0"/>
+      <origin xyz="-0.095 -0.096 -0.02" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.07" length="0.08"/>
+        <cylinder radius="0.045" length="0.038"/>
       </geometry>
       <material name="rubber_track"/>
     </visual>
     <visual>
-      <origin xyz="-0.12 0.185 -0.08" rpy="1.5708 0 0"/>
+      <origin xyz="-0.06 0.096 -0.055" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.025" length="0.085"/>
+        <cylinder radius="0.02" length="0.04"/>
       </geometry>
       <material name="light_gray"/>
     </visual>
     <visual>
-      <origin xyz="0.0 0.185 -0.08" rpy="1.5708 0 0"/>
+      <origin xyz="0 0.096 -0.055" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.025" length="0.085"/>
+        <cylinder radius="0.02" length="0.04"/>
       </geometry>
       <material name="light_gray"/>
     </visual>
     <visual>
-      <origin xyz="0.12 0.185 -0.08" rpy="1.5708 0 0"/>
+      <origin xyz="0.06 0.096 -0.055" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.025" length="0.085"/>
+        <cylinder radius="0.02" length="0.04"/>
       </geometry>
       <material name="light_gray"/>
     </visual>
     <visual>
-      <origin xyz="-0.12 -0.185 -0.08" rpy="1.5708 0 0"/>
+      <origin xyz="-0.06 -0.096 -0.055" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.025" length="0.085"/>
+        <cylinder radius="0.02" length="0.04"/>
       </geometry>
       <material name="light_gray"/>
     </visual>
     <visual>
-      <origin xyz="0.0 -0.185 -0.08" rpy="1.5708 0 0"/>
+      <origin xyz="0 -0.096 -0.055" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.025" length="0.085"/>
+        <cylinder radius="0.02" length="0.04"/>
       </geometry>
       <material name="light_gray"/>
     </visual>
     <visual>
-      <origin xyz="0.12 -0.185 -0.08" rpy="1.5708 0 0"/>
+      <origin xyz="0.06 -0.096 -0.055" rpy="1.5708 0 0"/>
       <geometry>
-        <cylinder radius="0.025" length="0.085"/>
+        <cylinder radius="0.02" length="0.04"/>
       </geometry>
       <material name="light_gray"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.4 0.3 0.15"/>
+        <box size="0.297 0.21 0.085"/>
       </geometry>
     </collision>
   </link>
@@ -137,7 +137,7 @@
     </collision>
   </link>
   <joint name="caster_joint" type="fixed">
-    <origin xyz="0.15 0 -0.10" rpy="0 0 0"/>
+    <origin xyz="0.11 0 -0.07" rpy="0 0 0"/>
     <parent link="chassis"/>
     <child link="caster_wheel"/>
   </joint>
@@ -148,22 +148,15 @@
       <mass value="0.5"/>
       <inertia ixx="0.00065" ixy="0.0" ixz="0.0" iyy="0.00065" iyz="0.0" izz="0.00113"/>
     </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.08" length="0.04"/>
-      </geometry>
-      <material name="dark_gray"/>
-    </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="0.08" length="0.04"/>
+        <cylinder radius="0.05" length="0.03"/>
       </geometry>
     </collision>
   </link>
   <joint name="left_wheel_joint" type="continuous">
-    <origin xyz="-0.1 0.175 -0.06" rpy="-1.5708 0 0"/>
+    <origin xyz="0 0.093 -0.035" rpy="-1.5708 0 0"/>
     <parent link="chassis"/>
     <child link="left_wheel"/>
     <axis xyz="0 0 1"/>
@@ -175,22 +168,15 @@
       <mass value="0.5"/>
       <inertia ixx="0.00065" ixy="0.0" ixz="0.0" iyy="0.00065" iyz="0.0" izz="0.00113"/>
     </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.08" length="0.04"/>
-      </geometry>
-      <material name="dark_gray"/>
-    </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="0.08" length="0.04"/>
+        <cylinder radius="0.05" length="0.03"/>
       </geometry>
     </collision>
   </link>
   <joint name="right_wheel_joint" type="continuous">
-    <origin xyz="-0.1 -0.175 -0.06" rpy="-1.5708 0 0"/>
+    <origin xyz="0 -0.093 -0.035" rpy="-1.5708 0 0"/>
     <parent link="chassis"/>
     <child link="right_wheel"/>
     <axis xyz="0 0 1"/>
@@ -206,7 +192,7 @@
     </visual>
   </link>
   <joint name="imu_joint" type="fixed">
-    <origin xyz="0 0 0.04" rpy="0 0 0"/>
+    <origin xyz="0 0 0.03" rpy="0 0 0"/>
     <parent link="chassis"/>
     <child link="imu_link"/>
   </joint>
@@ -220,13 +206,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.03 0.06 0.03"/>
+        <box size="0.04 0.05 0.03"/>
       </geometry>
       <material name="red_camera"/>
     </visual>
   </link>
   <joint name="camera_joint" type="fixed">
-    <origin xyz="0.2 0 0.05" rpy="0 0 0"/>
+    <origin xyz="0.125 0 0.06" rpy="0 0 0"/>
     <parent link="chassis"/>
     <child link="camera_link"/>
   </joint>
@@ -240,13 +226,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="0.04" length="0.04"/>
+        <cylinder radius="0.035" length="0.04"/>
       </geometry>
       <material name="green_lidar"/>
     </visual>
   </link>
   <joint name="lidar_joint" type="fixed">
-    <origin xyz="0 0 0.18" rpy="0 0 0"/>
+    <origin xyz="0.11 -0.06 0.065" rpy="0 0 0"/>
     <parent link="chassis"/>
     <child link="lidar_link"/>
   </joint>

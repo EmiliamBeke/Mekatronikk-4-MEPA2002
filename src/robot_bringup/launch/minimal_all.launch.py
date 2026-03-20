@@ -14,12 +14,12 @@ def generate_launch_description():
     world = os.path.join(
         get_package_share_directory('robot_gz'),
         'worlds',
-        'robot3.sdf'
+        'tracked_robot_world.sdf'
     )
     urdf_path = os.path.join(
         get_package_share_directory('robot_description'),
         'urdf',
-        'two_wheel_robot.urdf'
+        'tracked_robot.urdf'
     )
     with open(urdf_path, 'r', encoding='utf-8') as f:
         robot_description_content = f.read()

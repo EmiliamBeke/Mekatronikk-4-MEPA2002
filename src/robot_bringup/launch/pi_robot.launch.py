@@ -13,7 +13,7 @@ def generate_launch_description():
     robot_description_path = os.path.join(
         get_package_share_directory('robot_description'),
         'urdf',
-        'two_wheel_robot.urdf',
+        'tracked_robot.urdf',
     )
     with open(robot_description_path, 'r', encoding='utf-8') as handle:
         robot_description_content = handle.read()

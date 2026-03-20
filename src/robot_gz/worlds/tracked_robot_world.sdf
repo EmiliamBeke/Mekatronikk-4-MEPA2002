@@ -161,14 +161,14 @@
 
 
     <!-- ========================= -->
-    <!--   Two-Wheeled Robot        -->
+    <!--   Tracked Robot            -->
     <!-- ========================= -->
-    <model name="two_wheel_robot">
-      <pose>0 0 0.1 0 0 0</pose>
+    <model name="tracked_robot">
+      <pose>0 0 0.06 0 0 0</pose>
 
       <!-- ===== Chassis (body) ===== -->
       <link name="chassis">
-        <pose>0 0 0.05 0 0 0</pose>
+        <pose>0 0 0.025 0 0 0</pose>
         <inertial>
           <mass>5.0</mass>
           <inertia>
@@ -183,14 +183,14 @@
         <collision name="chassis_collision">
           <geometry>
             <box>
-              <size>0.4 0.3 0.15</size>
+              <size>0.297 0.21 0.085</size>
             </box>
           </geometry>
         </collision>
         <visual name="chassis_visual">
           <geometry>
             <box>
-              <size>0.4 0.3 0.15</size>
+              <size>0.297 0.16 0.085</size>
             </box>
           </geometry>
           <material>
@@ -200,10 +200,10 @@
           </material>
         </visual>
         <visual name="left_track_belt_visual">
-          <pose>-0.02 0.185 -0.03 0 0 0</pose>
+          <pose>0 0.096 -0.02 0 0 0</pose>
           <geometry>
             <box>
-              <size>0.34 0.08 0.14</size>
+              <size>0.19 0.038 0.09</size>
             </box>
           </geometry>
           <material>
@@ -213,10 +213,10 @@
           </material>
         </visual>
         <visual name="right_track_belt_visual">
-          <pose>-0.02 -0.185 -0.03 0 0 0</pose>
+          <pose>0 -0.096 -0.02 0 0 0</pose>
           <geometry>
             <box>
-              <size>0.34 0.08 0.14</size>
+              <size>0.19 0.038 0.09</size>
             </box>
           </geometry>
           <material>
@@ -226,11 +226,11 @@
           </material>
         </visual>
         <visual name="left_track_front_idler_visual">
-          <pose>0.13 0.185 -0.03 1.5708 0 0</pose>
+          <pose>0.095 0.096 -0.02 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.07</radius>
-              <length>0.08</length>
+              <radius>0.045</radius>
+              <length>0.038</length>
             </cylinder>
           </geometry>
           <material>
@@ -240,11 +240,11 @@
           </material>
         </visual>
         <visual name="left_track_rear_idler_visual">
-          <pose>-0.17 0.185 -0.03 1.5708 0 0</pose>
+          <pose>-0.095 0.096 -0.02 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.07</radius>
-              <length>0.08</length>
+              <radius>0.045</radius>
+              <length>0.038</length>
             </cylinder>
           </geometry>
           <material>
@@ -254,11 +254,11 @@
           </material>
         </visual>
         <visual name="right_track_front_idler_visual">
-          <pose>0.13 -0.185 -0.03 1.5708 0 0</pose>
+          <pose>0.095 -0.096 -0.02 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.07</radius>
-              <length>0.08</length>
+              <radius>0.045</radius>
+              <length>0.038</length>
             </cylinder>
           </geometry>
           <material>
@@ -268,11 +268,11 @@
           </material>
         </visual>
         <visual name="right_track_rear_idler_visual">
-          <pose>-0.17 -0.185 -0.03 1.5708 0 0</pose>
+          <pose>-0.095 -0.096 -0.02 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.07</radius>
-              <length>0.08</length>
+              <radius>0.045</radius>
+              <length>0.038</length>
             </cylinder>
           </geometry>
           <material>
@@ -282,11 +282,11 @@
           </material>
         </visual>
         <visual name="left_track_roller_front_visual">
-          <pose>-0.12 0.185 -0.08 1.5708 0 0</pose>
+          <pose>-0.06 0.096 -0.055 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.025</radius>
-              <length>0.085</length>
+              <radius>0.02</radius>
+              <length>0.04</length>
             </cylinder>
           </geometry>
           <material>
@@ -296,11 +296,11 @@
           </material>
         </visual>
         <visual name="left_track_roller_mid_visual">
-          <pose>0 0.185 -0.08 1.5708 0 0</pose>
+          <pose>0 0.096 -0.055 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.025</radius>
-              <length>0.085</length>
+              <radius>0.02</radius>
+              <length>0.04</length>
             </cylinder>
           </geometry>
           <material>
@@ -310,11 +310,11 @@
           </material>
         </visual>
         <visual name="left_track_roller_rear_visual">
-          <pose>0.12 0.185 -0.08 1.5708 0 0</pose>
+          <pose>0.06 0.096 -0.055 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.025</radius>
-              <length>0.085</length>
+              <radius>0.02</radius>
+              <length>0.04</length>
             </cylinder>
           </geometry>
           <material>
@@ -324,11 +324,11 @@
           </material>
         </visual>
         <visual name="right_track_roller_front_visual">
-          <pose>-0.12 -0.185 -0.08 1.5708 0 0</pose>
+          <pose>-0.06 -0.096 -0.055 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.025</radius>
-              <length>0.085</length>
+              <radius>0.02</radius>
+              <length>0.04</length>
             </cylinder>
           </geometry>
           <material>
@@ -338,11 +338,11 @@
           </material>
         </visual>
         <visual name="right_track_roller_mid_visual">
-          <pose>0 -0.185 -0.08 1.5708 0 0</pose>
+          <pose>0 -0.096 -0.055 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.025</radius>
-              <length>0.085</length>
+              <radius>0.02</radius>
+              <length>0.04</length>
             </cylinder>
           </geometry>
           <material>
@@ -352,11 +352,11 @@
           </material>
         </visual>
         <visual name="right_track_roller_rear_visual">
-          <pose>0.12 -0.185 -0.08 1.5708 0 0</pose>
+          <pose>0.06 -0.096 -0.055 1.5708 0 0</pose>
           <geometry>
             <cylinder>
-              <radius>0.025</radius>
-              <length>0.085</length>
+              <radius>0.02</radius>
+              <length>0.04</length>
             </cylinder>
           </geometry>
           <material>
@@ -369,7 +369,7 @@
 
       <!-- ===== Caster Wheel (front support) ===== -->
       <link name="caster_wheel">
-        <pose>0.15 0 -0.05 0 0 0</pose>
+        <pose>0.11 0 -0.045 0 0 0</pose>
         <inertial>
           <mass>0.2</mass>
           <inertia>
@@ -405,7 +405,7 @@
 
       <!-- ===== Left Wheel ===== -->
       <link name="left_wheel">
-        <pose>-0.1 0.175 -0.01 -1.5708 0 0</pose>
+        <pose>0 0.093 -0.01 -1.5708 0 0</pose>
         <inertial>
           <mass>0.5</mass>
           <inertia>
@@ -420,8 +420,8 @@
         <collision name="left_wheel_collision">
           <geometry>
             <cylinder>
-              <radius>0.08</radius>
-              <length>0.04</length>
+              <radius>0.05</radius>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -436,8 +436,8 @@
         <visual name="left_wheel_visual">
           <geometry>
             <cylinder>
-              <radius>0.08</radius>
-              <length>0.04</length>
+              <radius>0.05</radius>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <material>
@@ -461,7 +461,7 @@
 
       <!-- ===== Right Wheel ===== -->
       <link name="right_wheel">
-        <pose>-0.1 -0.175 -0.01 -1.5708 0 0</pose>
+        <pose>0 -0.093 -0.01 -1.5708 0 0</pose>
         <inertial>
           <mass>0.5</mass>
           <inertia>
@@ -476,8 +476,8 @@
         <collision name="right_wheel_collision">
           <geometry>
             <cylinder>
-              <radius>0.08</radius>
-              <length>0.04</length>
+              <radius>0.05</radius>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <surface>
@@ -492,8 +492,8 @@
         <visual name="right_wheel_visual">
           <geometry>
             <cylinder>
-              <radius>0.08</radius>
-              <length>0.04</length>
+              <radius>0.05</radius>
+              <length>0.03</length>
             </cylinder>
           </geometry>
           <material>
@@ -517,7 +517,7 @@
 
       <!-- ===== Camera Link ===== -->
       <link name="camera_link">
-        <pose>0.2 0 0.1 0 0 0</pose>
+        <pose>0.125 0 0.085 0 0 0</pose>
         <inertial>
           <mass>0.1</mass>
           <inertia>
@@ -532,7 +532,7 @@
         <visual name="camera_visual">
           <geometry>
             <box>
-              <size>0.03 0.06 0.03</size>
+              <size>0.04 0.05 0.03</size>
             </box>
           </geometry>
           <material>
@@ -568,7 +568,7 @@
 
       <!-- ===== Lidar Link ===== -->
       <link name="lidar_link">
-        <pose>0 0 0.18 0 0 0</pose>
+        <pose>0.11 -0.06 0.09 0 0 0</pose>
         <inertial>
           <mass>0.2</mass>
           <inertia>
@@ -583,7 +583,7 @@
         <visual name="lidar_visual">
           <geometry>
             <cylinder>
-              <radius>0.04</radius>
+              <radius>0.035</radius>
               <length>0.04</length>
             </cylinder>
           </geometry>
@@ -636,8 +636,8 @@
       <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
         <left_joint>left_wheel_joint</left_joint>
         <right_joint>right_wheel_joint</right_joint>
-        <wheel_separation>0.35</wheel_separation>
-        <wheel_radius>0.08</wheel_radius>
+        <wheel_separation>0.186605297</wheel_separation>
+        <wheel_radius>0.05</wheel_radius>
         <odom_publish_frequency>50</odom_publish_frequency>
         <topic>cmd_vel</topic>
         <odom_topic>odom</odom_topic>
