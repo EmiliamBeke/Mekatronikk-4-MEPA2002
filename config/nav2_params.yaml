@@ -260,14 +260,23 @@ collision_monitor:
     source_timeout: 0.5
     base_shift_correction: true
     stop_pub_timeout: 1.0
-    polygons: ["FrontStop", "FootprintApproach"]
+    polygons: ["FrontStop", "FrontSlow", "FootprintApproach"]
     FrontStop:
       type: "polygon"
-      points: "[[0.38, 0.20], [0.38, -0.20], [0.02, -0.20], [0.02, 0.20]]"
+      points: "[[0.45, 0.22], [0.45, -0.22], [0.04, -0.22], [0.04, 0.22]]"
       action_type: "stop"
       min_points: 4
       visualize: true
       polygon_pub_topic: "polygon_front_stop"
+      enabled: true
+    FrontSlow:
+      type: "polygon"
+      points: "[[0.60, 0.26], [0.60, -0.26], [0.06, -0.26], [0.06, 0.26]]"
+      action_type: "slowdown"
+      min_points: 4
+      slowdown_ratio: 0.35
+      visualize: true
+      polygon_pub_topic: "polygon_front_slow"
       enabled: true
     FootprintApproach:
       type: "polygon"
