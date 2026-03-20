@@ -10,7 +10,7 @@ eval "$(python3 "${SCRIPT_DIR}/camera_config_env.py")"
 export PORT="${TEDDY_PORT:-${MEKK4_DEBUG_STREAM_PORT}}"
 export WIDTH="${TEDDY_WIDTH:-${MEKK4_DEBUG_STREAM_WIDTH}}"
 export HEIGHT="${TEDDY_HEIGHT:-${MEKK4_DEBUG_STREAM_HEIGHT}}"
-export TOPIC_NAME="${TEDDY_TOPIC_NAME:-/camera}"
+export TOPIC_NAME="${TEDDY_TOPIC_NAME:-${MEKK4_DEBUG_IMAGE_TOPIC}}"
 export FRAME_ID="${TEDDY_FRAME_ID:-camera_link}"
 export RVIZ_CONFIG="${RVIZ_CONFIG:-${REPO_ROOT}/src/robot_bringup/rviz/rviz.rviz}"
 

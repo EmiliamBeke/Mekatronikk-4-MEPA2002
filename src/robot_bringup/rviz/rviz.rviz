@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /YOLO Image1
         - /Camera1
         - /LaserScan1
         - /RobotModel1
@@ -55,6 +56,20 @@ Visualization Manager:
       Max Value: 1
       Median window: 5
       Min Value: 0
+      Name: YOLO Image
+      Normalize Range: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /teddy_detector/debug_image
+      Value: true
+    - Class: rviz_default_plugins/Image
+      Enabled: false
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
       Name: Camera
       Normalize Range: true
       Topic:
@@ -63,7 +78,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /camera
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
