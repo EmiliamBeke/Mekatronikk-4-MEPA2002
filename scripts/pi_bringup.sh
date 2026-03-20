@@ -8,7 +8,7 @@ cd "${REPO_ROOT}"
 eval "$(python3 "${SCRIPT_DIR}/camera_config_env.py")"
 eval "$(python3 "${SCRIPT_DIR}/robot_calibration_env.py")"
 
-WITH_NAV2="${WITH_NAV2:-1}"
+WITH_NAV2="${WITH_NAV2:-0}"
 WITH_TEDDY="${WITH_TEDDY:-1}"
 WITH_IMU="${WITH_IMU:-1}"
 WITH_MEGA_DRIVER="${WITH_MEGA_DRIVER:-1}"
