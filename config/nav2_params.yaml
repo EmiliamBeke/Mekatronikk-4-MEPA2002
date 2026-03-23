@@ -54,7 +54,7 @@ controller_server:
       temperature: 0.30
       gamma: 0.015
       vx_max: 0.30
-      vx_min: 0.0
+      vx_min: -0.30
       vy_max: 0.0
       wz_max: 1.00
       ax_max: 1.5
@@ -62,7 +62,7 @@ controller_server:
       az_max: 1.8
       vx_std: 0.18
       vy_std: 0.0
-      wz_std: 0.35
+      wz_std: 1.0
       critics: [
         "ConstraintCritic",
         "CostCritic",
