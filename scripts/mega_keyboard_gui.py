@@ -14,6 +14,36 @@ def clamp_pwm(value: int) -> int:
     return max(-255, min(255, value))
 
 
+def scale_signed_pwm(value: int, scale: float, sign: int) -> int:
+    if scale <= 0.0:
+        raise ValueError("Command scale must be greater than zero.")
+    if sign not in (-1, 1):
+        raise ValueError("Command sign must be either -1 or 1.")
+    if value == 0:
+        return 0
+
+    scaled = int(round(abs(value) * scale))
+    scaled = max(1, min(255, scaled))
+    return scaled * sign if value > 0 else -scaled * sign
+
+
+def map_robot_commands(
+    left_cmd: int,
+    right_cmd: int,
+    *,
+    left_cmd_scale: float,
+    right_cmd_scale: float,
+    left_cmd_sign: int,
+    right_cmd_sign: int,
+    swap_sides: bool,
+) -> tuple[int, int]:
+    left_out = scale_signed_pwm(left_cmd, left_cmd_scale, left_cmd_sign)
+    right_out = scale_signed_pwm(right_cmd, right_cmd_scale, right_cmd_sign)
+    if swap_sides:
+        left_out, right_out = right_out, left_out
+    return left_out, right_out
+
+
 def tank_mix(drive: int, steer: int, speed: int, turn_speed: int) -> tuple[int, int]:
     if drive == 0:
         if steer > 0:
@@ -357,9 +387,18 @@ class MegaKeyboardGui:
             steer = -1
 
         left, right = tank_mix(drive, steer, self.speed, self.turn_speed)
-        command = "STOP" if left == 0 and right == 0 else f"BOTH {left} {right}"
+        send_left, send_right = map_robot_commands(
+            left,
+            right,
+            left_cmd_scale=self.args.left_cmd_scale,
+            right_cmd_scale=self.args.right_cmd_scale,
+            left_cmd_sign=self.args.left_cmd_sign,
+            right_cmd_sign=self.args.right_cmd_sign,
+            swap_sides=self.args.swap_sides,
+        )
+        command = "STOP" if send_left == 0 and send_right == 0 else f"BOTH {send_left} {send_right}"
 
-        self.command_var.set(f"cmd=({left}, {right})")
+        self.command_var.set(f"cmd=({send_left}, {send_right})")
         self.speed_var.set(self._speed_text())
 
         now = time.monotonic()
@@ -399,6 +438,11 @@ def main() -> int:
     parser.add_argument("--baudrate", type=int, default=115200, help="Serial baudrate")
     parser.add_argument("--speed", type=int, default=90, help="Forward/reverse PWM magnitude (0-255)")
     parser.add_argument("--turn-speed", type=int, default=55, help="Steering PWM magnitude (0-255)")
+    parser.add_argument("--swap-sides", action=argparse.BooleanOptionalAction, default=False, help="Swap robot-left and robot-right when sending BOTH to Mega")
+    parser.add_argument("--left-cmd-sign", type=int, default=1, help="Sign to apply to robot-left commands")
+    parser.add_argument("--right-cmd-sign", type=int, default=1, help="Sign to apply to robot-right commands")
+    parser.add_argument("--left-cmd-scale", type=float, default=1.0, help="Scale to apply to robot-left commands")
+    parser.add_argument("--right-cmd-scale", type=float, default=1.0, help="Scale to apply to robot-right commands")
     parser.add_argument("--send-period", type=float, default=0.03, help="Seconds between repeated drive commands")
     parser.add_argument(
         "--remote-repo",

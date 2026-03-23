@@ -5,6 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
+eval "$(python3 "${SCRIPT_DIR}/robot_calibration_env.py")"
+
 PI_HOST="${1:-${PI_HOST:-gruppe5@gruppe5pi5}}"
 MEGA_PORT="${MEGA_PORT:-/dev/ttyACM0}"
 MEGA_BAUDRATE="${MEGA_BAUDRATE:-115200}"
@@ -38,4 +40,9 @@ python3 "${SCRIPT_DIR}/mega_keyboard_gui.py" \
   --baudrate "${MEGA_BAUDRATE}" \
   --speed "${DRIVE_SPEED}" \
   --turn-speed "${TURN_SPEED}" \
-  --remote-repo "${REMOTE_REPO}"
+  --remote-repo "${REMOTE_REPO}" \
+  "$(if [[ "${SWAP_SIDES:-1}" == "1" ]]; then echo --swap-sides; else echo --no-swap-sides; fi)" \
+  --left-cmd-sign "${LEFT_CMD_SIGN:-1}" \
+  --right-cmd-sign "${RIGHT_CMD_SIGN:-1}" \
+  --left-cmd-scale "${LEFT_CMD_SCALE:-1.0}" \
+  --right-cmd-scale "${RIGHT_CMD_SCALE:-1.0}"
