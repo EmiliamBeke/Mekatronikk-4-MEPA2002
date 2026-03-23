@@ -181,9 +181,17 @@ class MegaKeyboardGui:
         )
         hint.pack(pady=(12, 6))
 
+        raw_frame = tk.Frame(self.root, bg="#111111")
+        raw_frame.pack(pady=(6, 6))
+
+        self._make_hold_button(raw_frame, "M1+", "y").grid(row=0, column=0, padx=6)
+        self._make_hold_button(raw_frame, "M1-", "h").grid(row=0, column=1, padx=6)
+        self._make_hold_button(raw_frame, "M2+", "u").grid(row=0, column=2, padx=6)
+        self._make_hold_button(raw_frame, "M2-", "j").grid(row=0, column=3, padx=6)
+
         focus_hint = tk.Label(
             self.root,
-            text="Klikk i vinduet hvis tastene ikke fanges.",
+            text="Klikk i vinduet hvis tastene ikke fanges. Du kan også holde inne M1/M2-knappene.",
             font=("TkDefaultFont", 10),
             fg="#8f8f8f",
             bg="#111111",
@@ -194,6 +202,23 @@ class MegaKeyboardGui:
         self.root.bind("<KeyPress>", self._on_key_press)
         self.root.bind("<KeyRelease>", self._on_key_release)
         self.root.focus_force()
+
+    def _make_hold_button(self, parent: tk.Widget, label: str, key: str) -> tk.Button:
+        button = tk.Button(
+            parent,
+            text=label,
+            width=8,
+            font=("TkDefaultFont", 11, "bold"),
+            bg="#202020",
+            fg="#f5f5f5",
+            activebackground="#3a3a3a",
+            activeforeground="#ffffff",
+            relief="raised",
+        )
+        button.bind("<ButtonPress-1>", lambda _event, k=key: self.pressed_keys.add(k))
+        button.bind("<ButtonRelease-1>", lambda _event, k=key: self.pressed_keys.discard(k))
+        button.bind("<Leave>", lambda _event, k=key: self.pressed_keys.discard(k))
+        return button
 
     def _start_remote_bridge(self) -> subprocess.Popen[str]:
         remote_repo = self.args.remote_repo
