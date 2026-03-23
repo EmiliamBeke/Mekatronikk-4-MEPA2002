@@ -2,10 +2,10 @@ mega_driver:
   swap_sides: true
   left_cmd_sign: 1
   right_cmd_sign: 1
-  left_cmd_scale: 0.937
-  right_cmd_scale: 1.0
+  left_cmd_scale: 1.0
+  right_cmd_scale: 0.95
   left_tick_sign: 1
   right_tick_sign: -1
-  left_m_per_tick: 0.000051019
-  right_m_per_tick: 0.000055084
-  track_width_eff_m: 0.186605297
+  left_m_per_tick: 0.000054302
+  right_m_per_tick: 0.000055104
+  track_width_eff_m: 0.246440429

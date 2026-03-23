@@ -316,7 +316,7 @@ Steg 3: kjør `straight`-kalibrering på `160 PWM`
 Bruk trimverdiene fra steg 2 direkte i kommandoen. Mål faktisk kjørt distanse og sett den inn som `--distance-m`.
 
 ```bash
-make mega-calibrate ARGS="straight --pwm 160 --duration 3.0 --left-cmd-scale <left_cmd_scale_fra_steg_2> --right-cmd-scale <right_cmd_scale_fra_steg_2> --distance-m <målt_distanse_meter>"
+make mega-calibrate ARGS="straight --pwm 160 --duration 11.15 --left-cmd-scale 1.0 --right-cmd-scale 0.95 --distance-m 4"
 ```
 
 Dette gjør scriptet:
@@ -336,7 +336,7 @@ Steg 4: kjør `spin`-kalibrering på `90 PWM`
 Bruk både trimverdiene fra steg 2 og meter-per-tick-verdiene fra steg 3. Mål faktisk rotasjon og sett den inn som `--angle-deg`.
 
 ```bash
-make mega-calibrate ARGS="spin --pwm 90 --duration 1.2 --left-cmd-scale <left_cmd_scale_fra_steg_2> --right-cmd-scale <right_cmd_scale_fra_steg_2> --left-m-per-tick <left_m_per_tick_fra_steg_3> --right-m-per-tick <right_m_per_tick_fra_steg_3> --angle-deg <målt_vinkel_grader>"
+make mega-calibrate ARGS="spin --pwm 90 --duration 18.8 --left-cmd-scale 1.0 --right-cmd-scale 0.95 --left-m-per-tick 0.000054302 --right-m-per-tick 0.000055104 --angle-deg 1440"
 ```
 
 Dette gjør scriptet:
