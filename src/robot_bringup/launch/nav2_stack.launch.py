@@ -40,7 +40,7 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[params_file],
             arguments=['--ros-args', '--log-level', log_level],
-            remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+            remappings=remappings + [('cmd_vel', 'cmd_vel_nav_auto')],
         ),
         Node(
             package='nav2_planner',
@@ -62,7 +62,7 @@ def generate_launch_description():
             respawn_delay=2.0,
             parameters=[params_file],
             arguments=['--ros-args', '--log-level', log_level],
-            remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
+            remappings=remappings + [('cmd_vel', 'cmd_vel_nav_auto')],
         ),
         Node(
             package='nav2_bt_navigator',
@@ -74,6 +74,20 @@ def generate_launch_description():
             parameters=[params_file],
             arguments=['--ros-args', '--log-level', log_level],
             remappings=remappings,
+        ),
+        Node(
+            package='mekk4_bringup',
+            executable='cmd_vel_mux_node',
+            name='cmd_vel_mux',
+            output='screen',
+            parameters=[
+                {
+                    'nav_input_topic': 'cmd_vel_nav_auto',
+                    'manual_input_topic': 'cmd_vel_manual',
+                    'output_topic': 'cmd_vel_nav',
+                    'active_source_topic': 'cmd_vel_mux_active',
+                }
+            ],
         ),
         Node(
             package='nav2_velocity_smoother',
@@ -94,7 +108,7 @@ def generate_launch_description():
             parameters=[
                 {
                     'input_topic': 'cmd_vel_smoothed',
-                    'output_topic': 'cmd_vel_smoothed_flipped',
+                    'output_topic': 'cmd_vel_nav_flipped',
                 }
             ],
         ),

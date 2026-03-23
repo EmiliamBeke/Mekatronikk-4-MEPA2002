@@ -47,8 +47,14 @@ DOCKER_GPIO_GID="${DOCKER_GPIO_GID:-}"
 COMPOSE_MEGA_DEVICE="${COMPOSE_MEGA_DEVICE:-/dev/null}"
 SOURCE_LAUNCH="${REPO_ROOT}/src/robot_bringup/launch/pi_robot.launch.py"
 INSTALLED_LAUNCH="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/launch/pi_robot.launch.py"
+SOURCE_NAV2_STACK_LAUNCH="${REPO_ROOT}/src/robot_bringup/launch/nav2_stack.launch.py"
+INSTALLED_NAV2_STACK_LAUNCH="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/launch/nav2_stack.launch.py"
 SOURCE_PKG_XML="${REPO_ROOT}/src/robot_bringup/package.xml"
 SOURCE_CMAKE="${REPO_ROOT}/src/robot_bringup/CMakeLists.txt"
+MEKK4_SETUP="${REPO_ROOT}/src/mekk4_bringup/setup.py"
+MEKK4_PKG_XML="${REPO_ROOT}/src/mekk4_bringup/package.xml"
+MEKK4_CMD_VEL_MUX="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/cmd_vel_mux_node.py"
+INSTALLED_CMD_VEL_MUX="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/cmd_vel_mux_node"
 
 if [[ -z "${DOCKER_LIDAR_GID}" && -e "${PORT_NAME}" ]]; then
   DOCKER_LIDAR_GID="$(stat -c '%g' "${PORT_NAME}")"
@@ -75,11 +81,23 @@ if [[ ! -f "${REPO_ROOT}/install/setup.bash" ]]; then
   needs_ws_build=1
 elif [[ ! -f "${INSTALLED_LAUNCH}" ]]; then
   needs_ws_build=1
+elif [[ ! -f "${INSTALLED_NAV2_STACK_LAUNCH}" ]]; then
+  needs_ws_build=1
+elif [[ ! -f "${INSTALLED_CMD_VEL_MUX}" ]]; then
+  needs_ws_build=1
 elif [[ "${SOURCE_LAUNCH}" -nt "${INSTALLED_LAUNCH}" ]]; then
+  needs_ws_build=1
+elif [[ "${SOURCE_NAV2_STACK_LAUNCH}" -nt "${INSTALLED_NAV2_STACK_LAUNCH}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_PKG_XML}" -nt "${INSTALLED_LAUNCH}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_CMAKE}" -nt "${INSTALLED_LAUNCH}" ]]; then
+  needs_ws_build=1
+elif [[ "${MEKK4_SETUP}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
+  needs_ws_build=1
+elif [[ "${MEKK4_PKG_XML}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
+  needs_ws_build=1
+elif [[ "${MEKK4_CMD_VEL_MUX}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
   needs_ws_build=1
 fi
 
