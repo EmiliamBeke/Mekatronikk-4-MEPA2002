@@ -53,6 +53,24 @@ int clamp_pwm(int speed) {
   return speed;
 }
 
+bool should_flip_pure_spin(int m1_speed, int m2_speed) {
+  if (m1_speed == 0 || m2_speed == 0) {
+    return false;
+  }
+
+  if ((m1_speed > 0) == (m2_speed > 0)) {
+    return false;
+  }
+
+  const int abs_m1 = abs(m1_speed);
+  const int abs_m2 = abs(m2_speed);
+  const int smaller = abs_m1 < abs_m2 ? abs_m1 : abs_m2;
+  const int larger = abs_m1 > abs_m2 ? abs_m1 : abs_m2;
+
+  // Treat nearly equal-and-opposite commands as an in-place spin.
+  return (smaller * 10) >= (larger * 8);
+}
+
 uint8_t read_encoder1_state() {
   const uint8_t a = static_cast<uint8_t>(digitalRead(kHallA1Pin));
   const uint8_t b = static_cast<uint8_t>(digitalRead(kHallB1Pin));
@@ -135,6 +153,11 @@ void apply_motor_output(int ina_pin, int inb_pin, int pwm_pin, int speed) {
 void apply_drive(int m1_speed, int m2_speed) {
   current_m1_speed = clamp_pwm(m1_speed);
   current_m2_speed = clamp_pwm(m2_speed);
+
+  if (should_flip_pure_spin(current_m1_speed, current_m2_speed)) {
+    current_m1_speed = -current_m1_speed;
+    current_m2_speed = -current_m2_speed;
+  }
 
   apply_motor_output(kIna1Pin, kInb1Pin, kPwm1Pin, current_m1_speed);
   apply_motor_output(kIna2Pin, kInb2Pin, kPwm2Pin, current_m2_speed);
