@@ -11,12 +11,12 @@ camera_stream:
 
   # Capture framerate.
   # Lower FPS usually reduces delay and makes the stream easier to keep stable.
-  fps: 8
+  fps: 6
 
   # Optional H.264 bitrate in bits/sec.
   # Leave empty to use the rpicam default.
   # Lower bitrate reduces bandwidth, but can increase compression artifacts.
-  bitrate_bps: 2600000
+  bitrate_bps: 2800000
 
   # Optional I-frame interval in frames.
   # Lower values recover faster from UDP packet loss, but use more bitrate.
@@ -130,4 +130,4 @@ teddy_detector:
   debug_stream_fps: auto
 
   # H264 bitrate for the annotated YOLO stream.
-  debug_stream_bitrate_bps: 1200000
+  debug_stream_bitrate_bps: 1400000
