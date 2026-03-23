@@ -1,5 +1,5 @@
 mega_driver:
-  swap_sides: false
+  swap_sides: true
   left_cmd_sign: 1
   right_cmd_sign: 1
   left_cmd_scale: 1.0
