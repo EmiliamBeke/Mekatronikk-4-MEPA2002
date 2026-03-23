@@ -194,7 +194,7 @@ behavior_server:
     transform_tolerance: 0.2
     simulate_ahead_time: 1.5
     max_rotational_vel: 0.5
-    min_rotational_vel: 0.1
+    min_rotational_vel: 0.03
     rotational_acc_lim: 1.0
 
 velocity_smoother:
