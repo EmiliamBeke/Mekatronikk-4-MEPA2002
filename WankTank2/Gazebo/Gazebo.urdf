@@ -1,0 +1,710 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="Gazebo">
+    <link name="Midsection">
+        <inertial>
+            <origin xyz="0.09218106044750891 0.09171079589706707 0.023717444279737952" rpy="0.0 0.0 0.0" />
+            <mass value="3.342899967628929" />
+            <inertia ixx="0.005133772281246302" iyy="0.029680610024049127" izz="0.03033761548743684" ixy="0.00010267079804601037" iyz="6.815405417486334e-06" ixz="-0.0006424929595211602" />
+        </inertial>
+        <visual name="Midsection_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/Midsection.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Midsection_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/Midsection.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Body-R">
+        <inertial>
+            <origin xyz="-0.004939649825130292 -0.013504541498416218 -0.04353440244908223" rpy="0.0 -0.0 0.0" />
+            <mass value="0.17531132738139585" />
+            <inertia ixx="6.791665160125454e-05" iyy="0.0014003099310863382" izz="0.0013431920719940013" ixy="-1.176754658865979e-05" iyz="-5.648185064282039e-06" ixz="-2.3850892921188148e-05" />
+        </inertial>
+        <visual name="Body-R_visual">
+            <origin xyz="0.07999813 -0.044500000000000005 -0.00700185000000003" rpy="3.141592653589793 -3.806478941571965e-16 3.141592653589793" />
+            <geometry>
+                <mesh filename="meshes/Body-R.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Body-R_collision">
+            <origin xyz="0.07999813 -0.044500000000000005 -0.00700185000000003" rpy="3.141592653589793 -3.806478941571965e-16 3.141592653589793" />
+            <geometry>
+                <mesh filename="meshes/Body-R.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Body-L">
+        <inertial>
+            <origin xyz="-0.004939625302575337 0.013504543620820186 -0.043534397321361384" rpy="0.0 -0.0 0.0" />
+            <mass value="0.1753116596229364" />
+            <inertia ixx="6.79166799741771e-05" iyy="0.001400311846833165" izz="0.0013431940071499011" ixy="1.1767551261003628e-05" iyz="5.648185609074033e-06" ixz="-2.3851048974988564e-05" />
+        </inertial>
+        <visual name="Body-L_visual">
+            <origin xyz="0.07999813 -0.1385 -0.00700185000000003" rpy="3.141592653589793 -3.806478941571965e-16 3.141592653589793" />
+            <geometry>
+                <mesh filename="meshes/Body-L.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Body-L_collision">
+            <origin xyz="0.07999813 -0.1385 -0.00700185000000003" rpy="3.141592653589793 -3.806478941571965e-16 3.141592653589793" />
+            <geometry>
+                <mesh filename="meshes/Body-L.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="R-FIXTURE">
+        <inertial>
+            <origin xyz="-0.09494159007344338 -0.0012712588979554695 0.013776665300094183" rpy="0.0 -0.0 0.0" />
+            <mass value="0.1336063441196063" />
+            <inertia ixx="1.9728072698204117e-05" iyy="0.0003918756278702305" izz="0.0003942707152908931" ixy="1.3318873767054597e-07" iyz="1.8013826305588445e-07" ixz="-2.989545846269234e-09" />
+        </inertial>
+        <visual name="R-FIXTURE_visual">
+            <origin xyz="-0.17500000000000002 -0.045 0.0158" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/R-FIXTURE.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="R-FIXTURE_collision">
+            <origin xyz="-0.17500000000000002 -0.045 0.0158" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/R-FIXTURE.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="L-FIXTURE">
+        <inertial>
+            <origin xyz="-0.09497905639327658 0.001282749519291224 0.01379177132301077" rpy="0.0 -0.0 0.0" />
+            <mass value="0.13375646810400504" />
+            <inertia ixx="1.977801525824066e-05" iyy="0.00039215677241567423" izz="0.0003945307937078886" ixy="-7.610122844224501e-08" iyz="-2.0366145113111592e-07" ixz="7.339309911094487e-08" />
+        </inertial>
+        <visual name="L-FIXTURE_visual">
+            <origin xyz="-0.17500000000000002 0.045 -0.1672" rpy="1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/L-FIXTURE.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="L-FIXTURE_collision">
+            <origin xyz="-0.17500000000000002 0.045 -0.1672" rpy="1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/L-FIXTURE.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Stepper-1">
+        <inertial>
+            <origin xyz="-3.794093270670373e-09 2.7762971111933156e-06 -0.0068548993159483285" rpy="0.0 -0.0 0.0" />
+            <mass value="0.6982155425981512" />
+            <inertia ixx="0.00030093223481357165" iyy="0.00030093805555665015" izz="0.0001739036568460372" ixy="0.0" iyz="-8.559222926252108e-08" ixz="3.469446951953614e-18" />
+        </inertial>
+        <visual name="Stepper-1_visual">
+            <origin xyz="-3.7940930308622e-09 -1.7763568394002505e-17 0.06829999853608373" rpy="3.141592653589793 2.7755575615628914e-17 0.0" />
+            <geometry>
+                <mesh filename="meshes/Stepper-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Stepper-1_collision">
+            <origin xyz="-3.7940930308622e-09 -1.7763568394002505e-17 0.06829999853608373" rpy="3.141592653589793 2.7755575615628914e-17 0.0" />
+            <geometry>
+                <mesh filename="meshes/Stepper-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="MR">
+        <inertial>
+            <origin xyz="3.9598274219779196e-15 -0.02034205235406933 0.00011506187875827131" rpy="0.0 0.0 0.0" />
+            <mass value="0.5167286386032199" />
+            <inertia ixx="0.0002635465775872852" iyy="7.642695737140835e-05" izz="0.0002631399490233211" ixy="7.238240174911797e-17" iyz="2.3521178218531448e-06" ixz="-2.7774167347267215e-16" />
+        </inertial>
+        <visual name="MR_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/MR.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="MR_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/MR.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="ML">
+        <inertial>
+            <origin xyz="3.95982742197792e-15 -0.02034205235406933 -0.00011506187875826688" rpy="0.0 0.0 0.0" />
+            <mass value="0.5167286386032199" />
+            <inertia ixx="0.0002635465775872852" iyy="7.642695737140835e-05" izz="0.00026313994902331893" ixy="7.194872088012377e-17" iyz="-2.352117821852711e-06" ixz="2.777416734726721e-16" />
+        </inertial>
+        <visual name="ML_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/ML.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="ML_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/ML.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Batterihold-v3">
+        <inertial>
+            <origin xyz="-0.030616171064774624 -0.018407909650133423 -0.013301759665409084" rpy="0.0 -0.0 0.0" />
+            <mass value="0.2268973458607451" />
+            <inertia ixx="0.0001286614107695143" iyy="0.00012736609243570694" izz="0.00023042986888545912" ixy="4.511530707178302e-09" iyz="-4.223290413417086e-06" ixz="-8.467046459055972e-10" />
+        </inertial>
+        <visual name="Batterihold-v3_visual">
+            <origin xyz="0.26688439992549234 0.1948782799999988 -0.010000000000000729" rpy="3.141592653589792 1.2912188607004323e-15 -1.5407439555097976e-33" />
+            <geometry>
+                <mesh filename="meshes/Batterihold-v3.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Batterihold-v3_collision">
+            <origin xyz="0.26688439992549234 0.1948782799999988 -0.010000000000000729" rpy="3.141592653589792 1.2912188607004323e-15 -1.5407439555097976e-33" />
+            <geometry>
+                <mesh filename="meshes/Batterihold-v3.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Unyaktig-batteri-mockup-v1">
+        <inertial>
+            <origin xyz="-1.0918401498148461e-07 -0.0008290689002619453 0.02145536055792763" rpy="0.0 0.0 0.0" />
+            <mass value="3.2441272496493183" />
+            <inertia ixx="0.004192071275435675" iyy="0.00217798928598565" izz="0.005337604984435251" ixy="-2.174781496470041e-09" iyz="6.829749386357163e-05" ixz="6.438660787339999e-09" />
+        </inertial>
+        <visual name="Unyaktig-batteri-mockup-v1_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/Unyaktig-batteri-mockup-v1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Unyaktig-batteri-mockup-v1_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/Unyaktig-batteri-mockup-v1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Lidar">
+        <inertial>
+            <origin xyz="-2.486899575160351e-16 1.7763568394002505e-17 0.030105451780265798" rpy="0.0 -0.0 0.0" />
+            <mass value="0.33873170539643604" />
+            <inertia ixx="6.66412086101362e-05" iyy="6.664120861013881e-05" izz="7.512110553573731e-05" ixy="8.673617379884035e-19" iyz="-8.673617379884035e-19" ixz="-2.6020852139652106e-18" />
+        </inertial>
+        <visual name="Lidar_visual">
+            <origin xyz="-0.21570500000000006 -0.0914999999999999 -0.06675000000000038" rpy="0.0 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/Lidar.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Lidar_collision">
+            <origin xyz="-0.21570500000000006 -0.0914999999999999 -0.06675000000000038" rpy="0.0 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/Lidar.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="IMU">
+        <inertial>
+            <origin xyz="-2.1316282072803005e-16 0.0 0.004824999925494024" rpy="0.0 -0.0 0.0" />
+            <mass value="0.007520791409999992" />
+            <inertia ixx="4.0604909505742874e-07" iyy="3.292239601112288e-07" izz="7.318604960664002e-07" ixy="0.0" iyz="6.776263578034403e-21" ixz="0.0" />
+        </inertial>
+        <visual name="IMU_visual">
+            <origin xyz="-0.21582000000000004 -0.09149999995566864 -0.06775000000000034" rpy="0.0 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/IMU.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="IMU_collision">
+            <origin xyz="-0.21582000000000004 -0.09149999995566864 -0.06775000000000034" rpy="0.0 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/IMU.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Drive-R">
+        <inertial>
+            <origin xyz="3.468719432439649e-05 -0.00013262225653649652 0.015437879033229535" rpy="0.0 -0.0 0.0" />
+            <mass value="0.2431521857252203" />
+            <inertia ixx="4.419056197472993e-05" iyy="4.458948248082411e-05" izz="4.7209875720485156e-05" ixy="-1.1717499915513997e-07" iyz="-1.4154759849866133e-07" ixz="4.138687373511053e-08" />
+        </inertial>
+        <visual name="Drive-R_visual">
+            <origin xyz="-9.14823772291129e-16 -0.03000000007450601 -6.661338147750939e-18" rpy="-1.5707963267948968 3.7717412030879655e-30 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="meshes/Drive-R.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Drive-R_collision">
+            <origin xyz="-9.14823772291129e-16 -0.03000000007450601 -6.661338147750939e-18" rpy="-1.5707963267948968 3.7717412030879655e-30 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="meshes/Drive-R.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Drive-L">
+        <inertial>
+            <origin xyz="3.468715518366139e-05 -0.0001326150756523159 -0.014937877711665343" rpy="0.0 -0.0 0.0" />
+            <mass value="0.2431524600963511" />
+            <inertia ixx="4.419062570802136e-05" iyy="4.458954575615667e-05" izz="4.7209984083190683e-05" ixy="-1.1717493858965505e-07" iyz="1.415571261051754e-07" ixz="-4.138692693677476e-08" />
+        </inertial>
+        <visual name="Drive-L_visual">
+            <origin xyz="-9.14823772291129e-16 -0.03000000007450604 0.0005000076293945455" rpy="1.5707963267948968 -3.771741203087959e-30 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="meshes/Drive-L.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Drive-L_collision">
+            <origin xyz="-9.14823772291129e-16 -0.03000000007450604 0.0005000076293945455" rpy="1.5707963267948968 -3.771741203087959e-30 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="meshes/Drive-L.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTRFO">
+        <inertial>
+            <origin xyz="0.03992928458075967 -0.023464187702015894 0.005219999999999994" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01958915848273168" />
+            <inertia ixx="7.370392750968643e-06" iyy="1.7084892790651413e-05" izz="2.437366404794202e-05" ixy="8.719843893117701e-06" iyz="-8.470329472543003e-22" ixz="-6.776263578034403e-21" />
+        </inertial>
+        <visual name="SLOTRFO_visual">
+            <origin xyz="-0.1035 -0.045 -0.01248" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/SLOTRFO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTRFO_collision">
+            <origin xyz="-0.1035 -0.045 -0.01248" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/SLOTRFO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTRFI">
+        <inertial>
+            <origin xyz="0.03992928458075967 0.023464187702015894 0.0025" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01958915848273168" />
+            <inertia ixx="7.370392750968641e-06" iyy="1.708489279065136e-05" izz="2.437366404794202e-05" ixy="-8.719843893117701e-06" iyz="3.3881317890172014e-21" ixz="-2.0328790734103208e-20" />
+        </inertial>
+        <visual name="SLOTRFI_visual">
+            <origin xyz="-0.1035 0.045 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTRFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTRFI_collision">
+            <origin xyz="-0.1035 0.045 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTRFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTRBO">
+        <inertial>
+            <origin xyz="-0.03991822730104473 -0.023481243012318877 0.005219999999999998" rpy="0.0 -0.0 0.0" />
+            <mass value="0.019588847580050583" />
+            <inertia ixx="7.377757013999288e-06" iyy="1.7076492952165545e-05" izz="2.437262976791462e-05" ixy="-8.72367879443103e-06" iyz="8.470329472543003e-22" ixz="8.470329472543003e-22" />
+        </inertial>
+        <visual name="SLOTRBO_visual">
+            <origin xyz="-0.05649393 -0.044996299999999996 -0.01248" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/SLOTRBO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTRBO_collision">
+            <origin xyz="-0.05649393 -0.044996299999999996 -0.01248" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/SLOTRBO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTRBI">
+        <inertial>
+            <origin xyz="-0.03991822730104472 0.023481243012318877 0.002499999999999998" rpy="0.0 -0.0 0.0" />
+            <mass value="0.019588847580050583" />
+            <inertia ixx="7.377757013999284e-06" iyy="1.707649295216554e-05" izz="2.437262976791462e-05" ixy="8.723678794431028e-06" iyz="-3.3881317890172014e-21" ixz="-3.3881317890172014e-21" />
+        </inertial>
+        <visual name="SLOTRBI_visual">
+            <origin xyz="-0.05649393 0.044996299999999996 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTRBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTRBI_collision">
+            <origin xyz="-0.05649393 0.044996299999999996 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTRBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTLFO">
+        <inertial>
+            <origin xyz="0.03992928458075967 0.02346418770201589 0.005220000000000056" rpy="0.0 -0.0 0.0" />
+            <mass value="0.019589158482731676" />
+            <inertia ixx="7.370392750968716e-06" iyy="1.7084892790651413e-05" izz="2.4373664047941965e-05" ixy="-8.719843893117687e-06" iyz="-1.3552527156068805e-20" ixz="-2.7836229468064333e-37" />
+        </inertial>
+        <visual name="SLOTLFO_visual">
+            <origin xyz="-0.1035 0.045 -0.01247999999999994" rpy="-1.5707963267948966 -1.1704190886730506e-97 -1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLFO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTLFO_collision">
+            <origin xyz="-0.1035 0.045 -0.01247999999999994" rpy="-1.5707963267948966 -1.1704190886730506e-97 -1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLFO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTLFI">
+        <inertial>
+            <origin xyz="0.03992928458075967 -0.02346418770201589 0.002499999999999929" rpy="0.0 -0.0 0.0" />
+            <mass value="0.019589158482731676" />
+            <inertia ixx="7.370392750968499e-06" iyy="1.708489279065152e-05" izz="2.4373664047941965e-05" ixy="8.719843893117687e-06" iyz="-1.3552527156068805e-20" ixz="-5.421010862427522e-20" />
+        </inertial>
+        <visual name="SLOTLFI_visual">
+            <origin xyz="-0.1035 -0.045 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTLFI_collision">
+            <origin xyz="-0.1035 -0.045 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTLBO">
+        <inertial>
+            <origin xyz="-0.039918227301044724 0.023481243012318877 0.005220000000000056" rpy="0.0 -0.0 0.0" />
+            <mass value="0.019588847580050587" />
+            <inertia ixx="7.377757013999264e-06" iyy="1.7076492952165507e-05" izz="2.437262976791464e-05" ixy="8.723678794431038e-06" iyz="-2.3291350295145e-37" ixz="-1.3552527156068805e-20" />
+        </inertial>
+        <visual name="SLOTLBO_visual">
+            <origin xyz="-0.05649393 0.044996299999999996 -0.01247999999999994" rpy="-1.5707963267948966 -1.1704190886730506e-97 -1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLBO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTLBO_collision">
+            <origin xyz="-0.05649393 0.044996299999999996 -0.01247999999999994" rpy="-1.5707963267948966 -1.1704190886730506e-97 -1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLBO.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTLBI">
+        <inertial>
+            <origin xyz="-0.039918227301044724 -0.023481243012318877 0.002499999999999929" rpy="0.0 -0.0 0.0" />
+            <mass value="0.019588847580050587" />
+            <inertia ixx="7.377757013999264e-06" iyy="1.7076492952165616e-05" izz="2.437262976791464e-05" ixy="-8.723678794431038e-06" iyz="-2.3291350295144658e-37" ixz="2.0328790734103208e-20" />
+        </inertial>
+        <visual name="SLOTLBI_visual">
+            <origin xyz="-0.05649393 -0.044996299999999996 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTLBI_collision">
+            <origin xyz="-0.05649393 -0.044996299999999996 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/SLOTLBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelRT">
+        <inertial>
+            <origin xyz="-2.7746693831431914e-14 -2.3980817331903383e-16 -0.01579978761128249" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14253267377489354" />
+            <inertia ixx="2.9642118226419945e-05" iyy="2.9641896767984045e-05" izz="3.313069220623084e-05" ixy="-3.2986090855308126e-11" iyz="-7.57949731185402e-20" ixz="5.4555234845611947e-17" />
+        </inertial>
+        <visual name="WheelRT_visual">
+            <origin xyz="0.0 0.0 -0.0008000000000000007" rpy="-3.141592653589793 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/WheelRT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelRT_collision">
+            <origin xyz="0.0 0.0 -0.0008000000000000007" rpy="-3.141592653589793 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="meshes/WheelRT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelRF">
+        <inertial>
+            <origin xyz="5.754779053290804e-10 5.108396536118374e-10 -0.015200212388717516" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14253267377489354" />
+            <inertia ixx="2.964211822641992e-05" iyy="2.9641896767983178e-05" izz="3.3130692206229106e-05" ixy="3.29860909639401e-11" iyz="-7.530699290073521e-20" ixz="-5.455523567279256e-17" />
+        </inertial>
+        <visual name="WheelRF_visual">
+            <origin xyz="5.755056520229118e-10 5.108394149008766e-10 -0.030200000000000015" rpy="-4.930380657631314e-32 -1.1704190886730506e-97 -2.8853058180580834e-129" />
+            <geometry>
+                <mesh filename="meshes/WheelRF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelRF_collision">
+            <origin xyz="5.755056520229118e-10 5.108394149008766e-10 -0.030200000000000015" rpy="-4.930380657631314e-32 -1.1704190886730506e-97 -2.8853058180580834e-129" />
+            <geometry>
+                <mesh filename="meshes/WheelRF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelRB">
+        <inertial>
+            <origin xyz="-2.7746693831431914e-14 2.410543080531005e-16 -0.015200212388717506" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14253267377489354" />
+            <inertia ixx="2.9642118226419924e-05" iyy="2.9641896767983483e-05" izz="3.313069220622944e-05" ixy="3.2986090963689213e-11" iyz="-7.579523112009865e-20" ixz="-5.4555235465997406e-17" />
+        </inertial>
+        <visual name="WheelRB_visual">
+            <origin xyz="0.0 4.440892098500638e-18 -0.0302" rpy="1.3994466596298774e-16 -1.1704190886730506e-97 -4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="meshes/WheelRB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelRB_collision">
+            <origin xyz="0.0 4.440892098500638e-18 -0.0302" rpy="1.3994466596298774e-16 -1.1704190886730506e-97 -4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="meshes/WheelRB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelLT">
+        <inertial>
+            <origin xyz="-2.7995383788947947e-14 2.042810365310288e-16 -0.015799740429180566" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14252315521285763" />
+            <inertia ixx="2.964081205260663e-05" iyy="2.9640792079174e-05" izz="3.3130011070523976e-05" ixy="-2.2707939695276735e-11" iyz="-1.1138582490473846e-37" ixz="-5.4643789493269423e-17" />
+        </inertial>
+        <visual name="WheelLT_visual">
+            <origin xyz="-2.486899575160351e-16 -1.4210854715202004e-16 -0.0007999923706054801" rpy="3.19228529882681e-32 5.593809258677645e-95 -1.7486234923433636e-63" />
+            <geometry>
+                <mesh filename="meshes/WheelLT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelLT_collision">
+            <origin xyz="-2.486899575160351e-16 -1.4210854715202004e-16 -0.0007999923706054801" rpy="3.19228529882681e-32 5.593809258677645e-95 -1.7486234923433636e-63" />
+            <geometry>
+                <mesh filename="meshes/WheelLT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelLF">
+        <inertial>
+            <origin xyz="5.754779053290804e-10 5.108397592955283e-10 0.015200259570819448" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14252315521285763" />
+            <inertia ixx="2.964081205260663e-05" iyy="2.9640792079172265e-05" izz="3.313001107052311e-05" ixy="-2.270793958664476e-11" iyz="3.3457801416544863e-20" ixz="-5.551115123125783e-17" />
+        </inertial>
+        <visual name="WheelLF_visual">
+            <origin xyz="5.755056520229118e-10 5.108394149008766e-10 0.030200007629394534" rpy="2.4651903288156526e-32 1.1704190886730506e-97 -5.006734889992618e-128" />
+            <geometry>
+                <mesh filename="meshes/WheelLF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelLF_collision">
+            <origin xyz="5.755056520229118e-10 5.108394149008766e-10 0.030200007629394534" rpy="2.4651903288156526e-32 1.1704190886730506e-97 -5.006734889992618e-128" />
+            <geometry>
+                <mesh filename="meshes/WheelLF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelLB">
+        <inertial>
+            <origin xyz="-2.7760016507727413e-14 3.467369688888637e-16 0.015200251941424874" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14252315521285763" />
+            <inertia ixx="2.9640812052605763e-05" iyy="2.9640792079172265e-05" izz="3.313001107052431e-05" ixy="-2.270793958672357e-11" iyz="3.39672268070281e-20" ixz="-5.431852884152377e-17" />
+        </inertial>
+        <visual name="WheelLB_visual">
+            <origin xyz="0.0 4.440892098500638e-18 0.03019999999999996" rpy="-1.3994466596298774e-16 1.1704190886730506e-97 -4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="meshes/WheelLB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelLB_collision">
+            <origin xyz="0.0 4.440892098500638e-18 0.03019999999999996" rpy="-1.3994466596298774e-16 1.1704190886730506e-97 -4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="meshes/WheelLB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="MR_Revolute-23" type="continuous">
+        <origin xyz="8.881784197001253e-17 -0.05850000000000005 0.007000000074505981" rpy="1.5707963267948966 -2.2401343147145722e-14 5.55111512312572e-17" />
+        <parent link="MR" />
+        <child link="Drive-R" />
+        <axis xyz="2.688924019593644e-45 1.5326701953552687e-46 1.0" />
+    </joint>
+    <joint name="Body-R_Revolute-24" type="continuous">
+        <origin xyz="-0.14000187 -0.028700000000000003 -0.052001849999999954" rpy="1.5707963267948966 -3.806478941571965e-16 3.141592653589793" />
+        <parent link="Body-R" />
+        <child link="WheelRT" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+    <joint name="SLOTRFO_Revolute-25" type="continuous">
+        <origin xyz="0.07651517000000001 -0.04496365 0.00272" rpy="-3.944304526105059e-31 -0.0 0.0" />
+        <parent link="SLOTRFO" />
+        <child link="WheelRF" />
+        <axis xyz="0.0 -3.944304526105059e-31 1.0" />
+    </joint>
+    <joint name="SLOTRBO_Revolute-26" type="continuous">
+        <origin xyz="-0.07649393 -0.044996299999999996 0.00272" rpy="-3.944304526105059e-31 -0.0 0.0" />
+        <parent link="SLOTRBO" />
+        <child link="WheelRB" />
+        <axis xyz="0.0 -3.944304526105059e-31 1.0" />
+    </joint>
+    <joint name="R-FIXTURE_Revolute-27" type="continuous">
+        <origin xyz="-0.11850607 -3.700000000002035e-06 0.0" rpy="3.141592653589793 -0.0 0.0" />
+        <parent link="R-FIXTURE" />
+        <child link="SLOTRBI" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+    <joint name="R-FIXTURE_Revolute-28" type="continuous">
+        <origin xyz="-0.07150000000000001 0.0 0.0" rpy="3.141592653589793 -0.0 0.0" />
+        <parent link="R-FIXTURE" />
+        <child link="SLOTRFI" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+    <joint name="ML_Revolute-29" type="continuous">
+        <origin xyz="8.881784197001253e-17 -0.059000000000000004 -0.007000000074505977" rpy="-1.5707963267948966 2.2401343147145722e-14 5.55111512312572e-17" />
+        <parent link="ML" />
+        <child link="Drive-L" />
+        <axis xyz="-3.404038803619725e-45 1.5326701953552687e-46 -1.0" />
+    </joint>
+    <joint name="SLOTLBO_Revolute-30" type="continuous">
+        <origin xyz="-0.07649393 0.044996299999999996 0.00272000000000002" rpy="-3.141592653589793 5.9636863764438586e-161 1.903778834633546e-192" />
+        <parent link="SLOTLBO" />
+        <child link="WheelLB" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 -1.0" />
+    </joint>
+    <joint name="L-FIXTURE_Revolute-31" type="continuous">
+        <origin xyz="-0.11850607 3.700000000002035e-06 0.0" rpy="3.141592653589793 -0.0 0.0" />
+        <parent link="L-FIXTURE" />
+        <child link="SLOTLBI" />
+        <axis xyz="0.0 -3.19228529882681e-32 1.0" />
+    </joint>
+    <joint name="L-FIXTURE_Revolute-32" type="continuous">
+        <origin xyz="-0.07150000000000001 0.0 0.0" rpy="3.141592653589793 -0.0 0.0" />
+        <parent link="L-FIXTURE" />
+        <child link="SLOTLFI" />
+        <axis xyz="0.0 -3.19228529882681e-32 1.0" />
+    </joint>
+    <joint name="SLOTLFO_Revolute-33" type="continuous">
+        <origin xyz="0.07651517000000001 0.04496365 0.00272000000000002" rpy="-3.141592653589793 5.9636863764438586e-161 1.903778834633546e-192" />
+        <parent link="SLOTLFO" />
+        <child link="WheelLF" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 -1.0" />
+    </joint>
+    <joint name="Body-L_Revolute-34" type="continuous">
+        <origin xyz="-0.14000187 0.028699999999999993 -0.052001849999999954" rpy="-1.5707963267948966 -3.806478941571965e-16 3.141592653589793" />
+        <parent link="Body-L" />
+        <child link="WheelLT" />
+        <axis xyz="0.0 -3.19228529882681e-32 1.0" />
+    </joint>
+    <joint name="Midsection_Rigid-35" type="fixed">
+        <origin xyz="0.07999813 0.044500000000000005 -0.00700185" rpy="3.141592653589793 3.806478941571965e-16 3.141592653589793" />
+        <parent link="Midsection" />
+        <child link="Body-R" />
+    </joint>
+    <joint name="Midsection_Rigid-36" type="fixed">
+        <origin xyz="0.07999813 0.1385 -0.00700185" rpy="3.141592653589793 3.806478941571965e-16 3.141592653589793" />
+        <parent link="Midsection" />
+        <child link="Body-L" />
+    </joint>
+    <joint name="Body-R_Rigid-37" type="fixed">
+        <origin xyz="-0.09500187 -0.028700000000000003 -0.05200184999999996" rpy="-1.5707963267948966 -3.806478941571965e-16 3.141592653589793" />
+        <parent link="Body-R" />
+        <child link="R-FIXTURE" />
+    </joint>
+    <joint name="Body-L_Rigid-38" type="fixed">
+        <origin xyz="-0.09500187 0.028699999999999993 -0.05200184999999996" rpy="1.5707963267948966 -3.806478941571965e-16 3.141592653589793" />
+        <parent link="Body-L" />
+        <child link="L-FIXTURE" />
+    </joint>
+    <joint name="Midsection_Rigid-39" type="fixed">
+        <origin xyz="0.07864322 0.09150000000000001 0.05855968" rpy="3.141592653589793 -0.0 0.0" />
+        <parent link="Midsection" />
+        <child link="Stepper-1" />
+    </joint>
+    <joint name="MR_Rigid-40" type="fixed">
+        <origin xyz="2.486899575160351e-16 -0.02900000000000004 7.450597472313803e-11" rpy="1.5707963267948966 -2.2401343147145722e-14 5.55111512312572e-17" />
+        <parent link="MR" />
+        <child link="Body-R" />
+    </joint>
+    <joint name="ML_Rigid-41" type="fixed">
+        <origin xyz="2.486899575160351e-16 -0.028999999999999988 -7.450597472313803e-11" rpy="1.5707963267948966 2.2401343147145722e-14 5.55111512312572e-17" />
+        <parent link="ML" />
+        <child link="Body-L" />
+    </joint>
+    <joint name="Midsection_Rigid-42" type="fixed">
+        <origin xyz="-0.0815 0.08337828 0.07886560000000001" rpy="-3.141592653589793 -1.5707963267948966 0" />
+        <parent link="Midsection" />
+        <child link="Batterihold-v3" />
+    </joint>
+    <joint name="Unyaktig-batteri-mockup-v1_Rigid-43" type="fixed">
+        <origin xyz="-0.020004152433555574 -0.0025056793333441975 0.04221603932986469" rpy="-1.2246063538221623e-16 -1.5707963267948792 0" />
+        <parent link="Unyaktig-batteri-mockup-v1" />
+        <child link="Batterihold-v3" />
+    </joint>
+    <joint name="Midsection_Rigid-44" type="fixed">
+        <origin xyz="0.21350000000000002 0.09150000000000001 0.06675" rpy="0.0 -0.0 0.0" />
+        <parent link="Midsection" />
+        <child link="Lidar" />
+    </joint>
+    <joint name="Midsection_Rigid-45" type="fixed">
+        <origin xyz="0.21350000000000002 0.09150000000000001 0.06675" rpy="0.0 -0.0 0.0" />
+        <parent link="Midsection" />
+        <child link="IMU" />
+    </joint>
+    <joint name="R-FIXTURE_Revolute-46" type="continuous">
+        <origin xyz="-0.07150000000000001 0.0 0.028280000000000003" rpy="0.0 -0.0 0.0" />
+        <parent link="R-FIXTURE" />
+        <child link="SLOTRFO" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+    <joint name="SLOTRFI_Revolute-47" type="continuous">
+        <origin xyz="0.07651517000000001 0.04496365 0.0" rpy="-3.944304526105059e-31 5.9636863764438586e-161 0.0" />
+        <parent link="SLOTRFI" />
+        <child link="WheelRF" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 1.0" />
+    </joint>
+    <joint name="R-FIXTURE_Revolute-48" type="continuous">
+        <origin xyz="-0.11850607 -3.700000000002035e-06 0.028280000000000003" rpy="0.0 -0.0 0.0" />
+        <parent link="R-FIXTURE" />
+        <child link="SLOTRBO" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+    <joint name="SLOTRBI_Revolute-49" type="continuous">
+        <origin xyz="-0.07649393 0.044996299999999996 0.0" rpy="-3.944304526105059e-31 5.9636863764438586e-161 0.0" />
+        <parent link="SLOTRBI" />
+        <child link="WheelRB" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 1.0" />
+    </joint>
+    <joint name="L-FIXTURE_Revolute-50" type="continuous">
+        <origin xyz="-0.11850607 3.700000000002035e-06 0.028279999999999996" rpy="0.0 -0.0 0.0" />
+        <parent link="L-FIXTURE" />
+        <child link="SLOTLBO" />
+        <axis xyz="0.0 -3.19228529882681e-32 1.0" />
+    </joint>
+    <joint name="SLOTLBI_Revolute-51" type="continuous">
+        <origin xyz="-0.07649393 -0.044996299999999996 0.0" rpy="4.26353305598774e-31 -5.9636863764438586e-161 -1.903778834633546e-192" />
+        <parent link="SLOTLBI" />
+        <child link="WheelLB" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 -1.0" />
+    </joint>
+    <joint name="L-FIXTURE_Revolute-52" type="continuous">
+        <origin xyz="-0.07150000000000001 0.0 0.028279999999999996" rpy="0.0 -0.0 0.0" />
+        <parent link="L-FIXTURE" />
+        <child link="SLOTLFO" />
+        <axis xyz="0.0 -3.19228529882681e-32 1.0" />
+    </joint>
+    <joint name="SLOTLFI_Revolute-53" type="continuous">
+        <origin xyz="0.07651517000000001 -0.04496365 0.0" rpy="3.19228529882681e-32 -5.9636863764438586e-161 -1.903778834633546e-192" />
+        <parent link="SLOTLFI" />
+        <child link="WheelLF" />
+        <axis xyz="-5.9636863764438586e-161 0.0 -1.0" />
+    </joint>
+</robot>
