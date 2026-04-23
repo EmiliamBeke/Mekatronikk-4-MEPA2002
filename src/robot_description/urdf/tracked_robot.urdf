@@ -1,239 +1,492 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <robot name="tracked_robot">
-  <material name="blue_body">
-    <color rgba="0.2 0.2 0.9 1.0"/>
-  </material>
-  <material name="dark_gray">
-    <color rgba="0.2 0.2 0.2 1.0"/>
-  </material>
-  <material name="rubber_track">
-    <color rgba="0.08 0.08 0.08 1.0"/>
-  </material>
-  <material name="light_gray">
-    <color rgba="0.4 0.4 0.4 1.0"/>
-  </material>
-  <material name="red_camera">
-    <color rgba="0.9 0.2 0.2 1.0"/>
-  </material>
-  <material name="green_lidar">
-    <color rgba="0.2 0.9 0.2 1.0"/>
-  </material>
-
-  <link name="chassis">
-    <inertial>
-      <origin xyz="-0.048 0 0.022" rpy="0 0 0"/>
-      <mass value="5.0"/>
-      <inertia ixx="0.0417" ixy="0.0" ixz="0.0" iyy="0.0667" iyz="0.0" izz="0.0917"/>
-    </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.297 0.16 0.085"/>
-      </geometry>
-      <material name="blue_body"/>
-    </visual>
-    <visual>
-      <origin xyz="0 0.096 -0.02" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.19 0.038 0.09"/>
-      </geometry>
-      <material name="rubber_track"/>
-    </visual>
-    <visual>
-      <origin xyz="0 -0.096 -0.02" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.19 0.038 0.09"/>
-      </geometry>
-      <material name="rubber_track"/>
-    </visual>
-    <visual>
-      <origin xyz="0.095 0.096 -0.02" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.045" length="0.038"/>
-      </geometry>
-      <material name="rubber_track"/>
-    </visual>
-    <visual>
-      <origin xyz="-0.095 0.096 -0.02" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.045" length="0.038"/>
-      </geometry>
-      <material name="rubber_track"/>
-    </visual>
-    <visual>
-      <origin xyz="0.095 -0.096 -0.02" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.045" length="0.038"/>
-      </geometry>
-      <material name="rubber_track"/>
-    </visual>
-    <visual>
-      <origin xyz="-0.095 -0.096 -0.02" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.045" length="0.038"/>
-      </geometry>
-      <material name="rubber_track"/>
-    </visual>
-    <visual>
-      <origin xyz="-0.06 0.096 -0.055" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.04"/>
-      </geometry>
-      <material name="light_gray"/>
-    </visual>
-    <visual>
-      <origin xyz="0 0.096 -0.055" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.04"/>
-      </geometry>
-      <material name="light_gray"/>
-    </visual>
-    <visual>
-      <origin xyz="0.06 0.096 -0.055" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.04"/>
-      </geometry>
-      <material name="light_gray"/>
-    </visual>
-    <visual>
-      <origin xyz="-0.06 -0.096 -0.055" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.04"/>
-      </geometry>
-      <material name="light_gray"/>
-    </visual>
-    <visual>
-      <origin xyz="0 -0.096 -0.055" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.04"/>
-      </geometry>
-      <material name="light_gray"/>
-    </visual>
-    <visual>
-      <origin xyz="0.06 -0.096 -0.055" rpy="1.5708 0 0"/>
-      <geometry>
-        <cylinder radius="0.02" length="0.04"/>
-      </geometry>
-      <material name="light_gray"/>
-    </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.297 0.21 0.085"/>
-      </geometry>
-    </collision>
-  </link>
-  <link name="caster_wheel">
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.2"/>
-      <inertia ixx="0.00008" ixy="0.0" ixz="0.0" iyy="0.00008" iyz="0.0" izz="0.00008"/>
-    </inertial>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.04"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="caster_joint" type="fixed">
-    <origin xyz="0.11 0 -0.07" rpy="0 0 0"/>
-    <parent link="chassis"/>
-    <child link="caster_wheel"/>
-  </joint>
-
-  <link name="left_wheel">
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.5"/>
-      <inertia ixx="0.00065" ixy="0.0" ixz="0.0" iyy="0.00065" iyz="0.0" izz="0.00113"/>
-    </inertial>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.05" length="0.03"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="left_wheel_joint" type="continuous">
-    <origin xyz="-0.035 0.093 -0.02" rpy="-1.5708 0 0"/>
-    <parent link="chassis"/>
-    <child link="left_wheel"/>
-    <axis xyz="0 0 1"/>
-  </joint>
-
-  <link name="right_wheel">
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.5"/>
-      <inertia ixx="0.00065" ixy="0.0" ixz="0.0" iyy="0.00065" iyz="0.0" izz="0.00113"/>
-    </inertial>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.05" length="0.03"/>
-      </geometry>
-    </collision>
-  </link>
-  <joint name="right_wheel_joint" type="continuous">
-    <origin xyz="-0.035 -0.093 -0.02" rpy="-1.5708 0 0"/>
-    <parent link="chassis"/>
-    <child link="right_wheel"/>
-    <axis xyz="0 0 1"/>
-  </joint>
-
-  <link name="imu_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.03 0.02 0.01"/>
-      </geometry>
-      <material name="light_gray"/>
-    </visual>
-  </link>
-  <joint name="imu_joint" type="fixed">
-    <origin xyz="0.11 0 0.03" rpy="0 0 0"/>
-    <parent link="chassis"/>
-    <child link="imu_link"/>
-  </joint>
-
-  <link name="camera_link">
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.1"/>
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
-    </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.04 0.05 0.03"/>
-      </geometry>
-      <material name="red_camera"/>
-    </visual>
-  </link>
-  <joint name="camera_joint" type="fixed">
-    <origin xyz="0.125 0 0.06" rpy="0 0 0"/>
-    <parent link="chassis"/>
-    <child link="camera_link"/>
-  </joint>
-
-  <link name="lidar_link">
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="0.2"/>
-      <inertia ixx="0.00005" ixy="0.0" ixz="0.0" iyy="0.00005" iyz="0.0" izz="0.00005"/>
-    </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder radius="0.035" length="0.04"/>
-      </geometry>
-      <material name="green_lidar"/>
-    </visual>
-  </link>
-  <joint name="lidar_joint" type="fixed">
-    <origin xyz="0.11 0.0 0.065" rpy="0 0 0"/>
-    <parent link="chassis"/>
-    <child link="lidar_link"/>
-  </joint>
+    <link name="base_link" />
+    <link name="chassis">
+        <inertial>
+            <origin xyz="0.08257938609421497 0.09189374070773236 0.03364587454560363" rpy="0.0 0.0 0.0" />
+            <mass value="1.1414461681926555" />
+            <inertia ixx="0.004778764775752391" iyy="0.009075327720076305" izz="0.012750827888958392" ixy="7.02043897293815e-05" iyz="-3.248183205623381e-06" ixz="-3.5812458097435503e-06" />
+        </inertial>
+        <visual name="Midsection_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Midsection.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Midsection_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Midsection.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Stepper-1">
+        <inertial>
+            <origin xyz="-3.794093998976678e-09 2.7762971111933156e-06 -0.007854899315948342" rpy="0.0 -0.0 0.0" />
+            <mass value="0.24015056879172078" />
+            <inertia ixx="0.00010350535464925337" iyy="0.00010350735668827491" izz="5.981399662220244e-05" ixy="0.0" iyz="-2.943936547880957e-08" ixz="1.3010426069826053e-18" />
+        </inertial>
+        <visual name="Stepper-1_visual">
+            <origin xyz="-3.794093759168505e-09 -1.7763568394002505e-17 0.06729999853608372" rpy="3.141592653589793 2.7755575615628914e-17 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Stepper-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Stepper-1_collision">
+            <origin xyz="-3.794093759168505e-09 -1.7763568394002505e-17 0.06729999853608372" rpy="3.141592653589793 2.7755575615628914e-17 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Stepper-1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="MR">
+        <inertial>
+            <origin xyz="3.721467578543525e-15 0.00011506180425229218 -0.008657947645930699" rpy="0.0 -0.0 0.0" />
+            <mass value="0.1777283215577954" />
+            <inertia ixx="9.064659356505344e-05" iyy="9.050673405897698e-05" izz="2.628697896850992e-05" ixy="-9.557242150459722e-17" iyz="-8.090086775800831e-07" ixz="-2.4936649967166602e-17" />
+        </inertial>
+        <visual name="MR_visual">
+            <origin xyz="-2.3980817331903383e-16 -7.450597916403013e-11 -0.02900000000000003" rpy="-1.5707963267948966 -5.5511151231257186e-17 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/MR.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="MR_collision">
+            <origin xyz="-2.3980817331903383e-16 -7.450597916403013e-11 -0.02900000000000003" rpy="-1.5707963267948966 -5.5511151231257186e-17 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/MR.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="ML">
+        <inertial>
+            <origin xyz="3.721467578543525e-15 0.00011506180425228773 0.008657947645930655" rpy="0.0 -0.0 0.0" />
+            <mass value="0.1777283215577954" />
+            <inertia ixx="9.064659356505366e-05" iyy="9.050673405897698e-05" izz="2.628697896850992e-05" ixy="-9.546400128734867e-17" iyz="8.090086775799747e-07" ixz="2.45029690981724e-17" />
+        </inertial>
+        <visual name="ML_visual">
+            <origin xyz="-2.3980817331903383e-16 -7.450597916403013e-11 0.028999999999999988" rpy="1.5707963267948966 5.5511151231257186e-17 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/ML.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="ML_collision">
+            <origin xyz="-2.3980817331903383e-16 -7.450597916403013e-11 0.028999999999999988" rpy="1.5707963267948966 5.5511151231257186e-17 -2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/ML.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Unyaktig-batteri-mockup-v1">
+        <inertial>
+            <origin xyz="-0.027499890890492883 -0.04482906890026122 0.015544639442071748" rpy="0.0 -0.0 0.0" />
+            <mass value="0.43806049485710546" />
+            <inertia ixx="0.0005660631276384418" iyy="0.00029409791632417377" izz="0.0007207466603186387" ixy="2.936647630798194e-10" iyz="-9.222336751012789e-06" ixz="8.694242574931972e-10" />
+        </inertial>
+        <visual name="Unyaktig-batteri-mockup-v1_visual">
+            <origin xyz="-0.02750000007450786 -0.043999999999999664 0.036999999999999304" rpy="3.1415926535897745 1.5458845676136565e-15 -3.141592653589793" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Unyaktig-batteri-mockup-v1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Unyaktig-batteri-mockup-v1_collision">
+            <origin xyz="-0.02750000007450786 -0.043999999999999664 0.036999999999999304" rpy="3.1415926535897745 1.5458845676136565e-15 -3.141592653589793" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Unyaktig-batteri-mockup-v1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="lidar_link">
+        <inertial>
+            <origin xyz="0.0 0.0 -0.0015445497456131133" rpy="0.0 0.0 0.0" />
+            <mass value="0.04573956786244869" />
+            <inertia ixx="8.998685493854033e-06" iyy="8.998685493852732e-06" izz="1.0143741639219873e-05" ixy="-3.2526065174565133e-19" iyz="1.0842021724855044e-19" ixz="-1.6263032587282567e-19" />
+        </inertial>
+        <visual name="Lidar_visual">
+            <origin xyz="-0.2157050018310547 -0.0915 -0.09840000152587891" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Lidar.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Lidar_collision">
+            <origin xyz="-0.2157050018310547 -0.0915 -0.09840000152587891" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Lidar.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="imu_link">
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <mass value="0.001015546355999999" />
+            <inertia ixx="4.4455719454504483e-08" iyy="5.482955933259348e-08" izz="9.882447462806674e-08" ixy="0.0" iyz="3.3881317890172014e-21" ixz="-8.470329472543003e-22" />
+        </inertial>
+        <visual name="IMU_visual">
+            <origin xyz="-0.21581999969482422 -0.0915 -0.07257500076293945" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/IMU.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="IMU_collision">
+            <origin xyz="-0.21581999969482422 -0.0915 -0.07257500076293945" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/IMU.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="right_wheel">
+        <inertial>
+            <origin xyz="3.468719432439649e-05 0.00013262225653649652 -0.018737879033229536" rpy="0.0 -0.0 0.0" />
+            <mass value="0.03283328877308707" />
+            <inertia ixx="5.967133209326591e-06" iyy="6.021000182124053e-06" izz="6.374836721492267e-06" ixy="1.5822356573807345e-08" iyz="-1.911343368262203e-08" ixz="-5.588546007543416e-09" />
+        </inertial>
+        <visual name="Drive-R_visual">
+            <origin xyz="-9.14823772291129e-16 0.03000000007450601 -0.003299999999999994" rpy="1.5707963267948963 -3.771741203087963e-30 2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Drive-R.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Drive-R_collision">
+            <origin xyz="-9.14823772291129e-16 0.03000000007450601 -0.003299999999999994" rpy="1.5707963267948963 -3.771741203087963e-30 2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Drive-R.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="left_wheel">
+        <inertial>
+            <origin xyz="3.468715518366139e-05 0.0001326150756523159 0.01873787771166537" rpy="0.0 -0.0 0.0" />
+            <mass value="0.03283332582192767" />
+            <inertia ixx="5.967141815350864e-06" iyy="6.021008726309323e-06" izz="6.374851353908531e-06" ixy="1.5822348395534832e-08" iyz="1.9114720212958045e-08" ixz="5.588553191504704e-09" />
+        </inertial>
+        <visual name="Drive-L_visual">
+            <origin xyz="-9.14823772291129e-16 0.03000000007450604 0.00329999237060548" rpy="-1.5707963267948963 3.771741203087963e-30 2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Drive-L.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Drive-L_collision">
+            <origin xyz="-9.14823772291129e-16 0.03000000007450604 0.00329999237060548" rpy="-1.5707963267948963 3.771741203087963e-30 2.2401343147145716e-14" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Drive-L.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTRFI">
+        <inertial>
+            <origin xyz="0.03992928458075967 0.023464187702015894 0.0025000000000000022" rpy="0.0 -0.0 0.0" />
+            <mass value="0.02181145797447015" />
+            <inertia ixx="8.20652974372558e-06" iyy="1.9023094913960545e-05" izz="2.7138743582792572e-05" ixy="-9.709069880992396e-06" iyz="1.6940658945086007e-21" ixz="0.0" />
+        </inertial>
+        <visual name="SLOTRFI_visual">
+            <origin xyz="-0.1035 0.045 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTRFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTRFI_collision">
+            <origin xyz="-0.1035 0.045 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTRFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTRBI">
+        <inertial>
+            <origin xyz="-0.03991822730104472 0.023481243012318877 0.0025" rpy="0.0 -0.0 0.0" />
+            <mass value="0.021811111801316826" />
+            <inertia ixx="8.214729448360543e-06" iyy="1.9013742152621295e-05" izz="2.7137591968476358e-05" ixy="9.713339834135387e-06" iyz="-3.3881317890172014e-21" ixz="-1.6940658945086007e-21" />
+        </inertial>
+        <visual name="SLOTRBI_visual">
+            <origin xyz="-0.05649393 0.044996299999999996 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTRBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTRBI_collision">
+            <origin xyz="-0.05649393 0.044996299999999996 0.020199999999999996" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTRBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTLFI">
+        <inertial>
+            <origin xyz="0.03992928458075967 -0.02346418770201589 0.002499999999999929" rpy="0.0 -0.0 0.0" />
+            <mass value="0.021811457974470146" />
+            <inertia ixx="8.206529743725525e-06" iyy="1.9023094913960545e-05" izz="2.7138743582792518e-05" ixy="9.709069880992382e-06" iyz="-2.5907465935955674e-37" ixz="-1.0842021724855044e-19" />
+        </inertial>
+        <visual name="SLOTLFI_visual">
+            <origin xyz="-0.1035 -0.045 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTLFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTLFI_collision">
+            <origin xyz="-0.1035 -0.045 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTLFI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="SLOTLBI">
+        <inertial>
+            <origin xyz="-0.03991822730104472 -0.023481243012318877 0.002499999999999929" rpy="0.0 -0.0 0.0" />
+            <mass value="0.021811111801316833" />
+            <inertia ixx="8.214729448360533e-06" iyy="1.9013742152621384e-05" izz="2.7137591968476375e-05" ixy="-9.713339834135401e-06" iyz="-1.3552527156068805e-20" ixz="-6.776263578034403e-21" />
+        </inertial>
+        <visual name="SLOTLBI_visual">
+            <origin xyz="-0.05649393 -0.044996299999999996 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTLBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="SLOTLBI_collision">
+            <origin xyz="-0.05649393 -0.044996299999999996 0.020199999999999944" rpy="1.5707963267948966 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/SLOTLBI.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelRT">
+        <inertial>
+            <origin xyz="-2.7746693831431914e-14 -2.3980817331903383e-16 -0.01579978761128249" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01924645021673722" />
+            <inertia ixx="4.00262997707072e-06" iyy="4.002600073129119e-06" izz="4.4736985654272475e-06" ixy="-4.4541727890669985e-12" iyz="-1.0234783267301038e-20" ixz="7.366694139131638e-18" />
+        </inertial>
+        <visual name="WheelRT_visual">
+            <origin xyz="0.0 0.0 -0.0008000000000000007" rpy="-3.141592653589793 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelRT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelRT_collision">
+            <origin xyz="0.0 0.0 -0.0008000000000000007" rpy="-3.141592653589793 1.1704190886730506e-97 1.868155825118626e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelRT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelRF">
+        <inertial>
+            <origin xyz="5.754779053290804e-10 -5.108396536118374e-10 -0.015799787611282486" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14253267377489354" />
+            <inertia ixx="2.964211822641992e-05" iyy="2.9641896767983178e-05" izz="3.3130692206229106e-05" ixy="-3.29860909639401e-11" iyz="-7.530699290073521e-20" ixz="5.455523567279256e-17" />
+        </inertial>
+        <visual name="WheelRF_visual">
+            <origin xyz="5.755056520229118e-10 -5.108394149008766e-10 -0.0007999999999999896" rpy="3.141592653589793 1.1704190886730506e-97 2.8853058180580834e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelRF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelRF_collision">
+            <origin xyz="5.755056520229118e-10 -5.108394149008766e-10 -0.0007999999999999896" rpy="3.141592653589793 1.1704190886730506e-97 2.8853058180580834e-129" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelRF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelRB">
+        <inertial>
+            <origin xyz="-2.7746693831431914e-14 -2.410543080531005e-16 -0.015799787611282496" rpy="0.0 -0.0 0.0" />
+            <mass value="0.14253267377489354" />
+            <inertia ixx="2.9642118226419924e-05" iyy="2.9641896767983483e-05" izz="3.313069220622944e-05" ixy="-3.2986090963689213e-11" iyz="-7.579523112009865e-20" ixz="5.4555235465997406e-17" />
+        </inertial>
+        <visual name="WheelRB_visual">
+            <origin xyz="0.0 -4.4408920985006255e-18 -0.0008000000000000007" rpy="-3.141592653589793 1.1704190886730506e-97 4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelRB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelRB_collision">
+            <origin xyz="0.0 -4.4408920985006255e-18 -0.0008000000000000007" rpy="-3.141592653589793 1.1704190886730506e-97 4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelRB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelLT">
+        <inertial>
+            <origin xyz="-2.7995383788947947e-14 2.042810365310288e-16 -0.015799740429180566" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01924516490772345" />
+            <inertia ixx="4.002453602007972e-06" iyy="4.002450904958465e-06" izz="4.473606590414897e-06" ixy="-3.0662950477322592e-12" iyz="-2.710505431213761e-20" ixz="-7.26415455565288e-18" />
+        </inertial>
+        <visual name="WheelLT_visual">
+            <origin xyz="-2.486899575160351e-16 -1.4210854715202004e-16 -0.0007999923706054801" rpy="3.19228529882681e-32 5.593809258677645e-95 -1.7486234923433636e-63" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelLT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelLT_collision">
+            <origin xyz="-2.486899575160351e-16 -1.4210854715202004e-16 -0.0007999923706054801" rpy="3.19228529882681e-32 5.593809258677645e-95 -1.7486234923433636e-63" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelLT.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelLF">
+        <inertial>
+            <origin xyz="5.754779053290804e-10 5.108397592955283e-10 -0.015799740429180566" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01924516490772345" />
+            <inertia ixx="4.00245360200808e-06" iyy="4.002450904958248e-06" izz="4.4736065904146805e-06" ixy="-3.066295026979952e-12" iyz="4.5263323118901674e-21" ixz="-7.37257477290143e-18" />
+        </inertial>
+        <visual name="WheelLF_visual">
+            <origin xyz="5.755056520229118e-10 5.108394149008766e-10 -0.0007999923706054801" rpy="2.4651903288156526e-32 1.1704190886730506e-97 -5.006734889992618e-128" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelLF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelLF_collision">
+            <origin xyz="5.755056520229118e-10 5.108394149008766e-10 -0.0007999923706054801" rpy="2.4651903288156526e-32 1.1704190886730506e-97 -5.006734889992618e-128" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelLF.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="WheelLB">
+        <inertial>
+            <origin xyz="-2.800870646524345e-14 2.0738994258592987e-16 -0.01579974042918053" rpy="0.0 -0.0 0.0" />
+            <mass value="0.01924516490772345" />
+            <inertia ixx="4.002453602007972e-06" iyy="4.002450904958357e-06" izz="4.4736065904147465e-06" ixy="-3.0662950269970688e-12" iyz="4.520721652747073e-21" ixz="-7.331917191433224e-18" />
+        </inertial>
+        <visual name="WheelLB_visual">
+            <origin xyz="-2.486899575160351e-16 -1.3700526893601949e-16 -0.0007999923706054446" rpy="-3.944304526105059e-31 1.1704190886730506e-97 -4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelLB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="WheelLB_collision">
+            <origin xyz="-2.486899575160351e-16 -1.3700526893601949e-16 -0.0007999923706054446" rpy="-3.944304526105059e-31 1.1704190886730506e-97 -4.803304891404735e-128" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/WheelLB.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="camera_link">
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <mass value="0.034782271109813245" />
+            <inertia ixx="2.2440872644762314e-06" iyy="2.244087254398789e-06" izz="1.7244102341688861e-06" ixy="2.710505431213761e-20" iyz="0.0" ixz="-1.5504091066542713e-17" />
+        </inertial>
+        <visual name="Camera_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Camera.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="Camera_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="package://robot_description/meshes/Camera.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="chassis_to_base_link" type="fixed">
+        <origin xyz="-0.06325 -0.0915 0.023066925048828266" rpy="0.0 0.0 0.0" />
+        <parent link="base_link" />
+        <child link="chassis" />
+    </joint>
+    <joint name="right_wheel_joint" type="continuous">
+        <origin xyz="-0.06 0.0183 0.045250000000000005" rpy="-1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="right_wheel" />
+        <axis xyz="0.0 -3.081487911019579e-33 1.0" />
+    </joint>
+    <joint name="Midsection_Revolute-55" type="continuous">
+        <origin xyz="0.22 0.0158 0.045" rpy="-1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="WheelRT" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+    <joint name="Midsection_Revolute-56" type="fixed">
+        <origin xyz="0.05649393 0.0158 0.044996299999999996" rpy="-1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="SLOTRBI" />
+    </joint>
+    <joint name="Midsection_Revolute-57" type="fixed">
+        <origin xyz="0.1035 0.0158 0.045" rpy="-1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="SLOTRFI" />
+    </joint>
+    <joint name="SLOTRBI_Revolute-58" type="continuous">
+        <origin xyz="-0.07649393 0.044996299999999996 0.0" rpy="-3.944304526105059e-31 5.9636863764438586e-161 0.0" />
+        <parent link="SLOTRBI" />
+        <child link="WheelRB" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 1.0" />
+    </joint>
+    <joint name="SLOTRFI_Revolute-59" type="continuous">
+        <origin xyz="0.07651517000000001 0.04496365 0.0" rpy="-3.944304526105059e-31 5.9636863764438586e-161 0.0" />
+        <parent link="SLOTRFI" />
+        <child link="WheelRF" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 1.0" />
+    </joint>
+    <joint name="left_wheel_joint" type="continuous">
+        <origin xyz="-0.06 0.16469999999999999 0.045250000000000005" rpy="-1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="left_wheel" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+    <joint name="Midsection_Revolute-61" type="continuous">
+        <origin xyz="0.22 0.1672 0.045" rpy="1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="WheelLT" />
+        <axis xyz="0.0 -3.19228529882681e-32 -1.0" />
+    </joint>
+    <joint name="Midsection_Revolute-62" type="fixed">
+        <origin xyz="0.1035 0.1672 0.045" rpy="1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="SLOTLFI" />
+    </joint>
+    <joint name="Midsection_Revolute-63" type="fixed">
+        <origin xyz="0.05649393 0.1672 0.044996299999999996" rpy="1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="SLOTLBI" />
+    </joint>
+    <joint name="SLOTLFI_Revolute-64" type="continuous">
+        <origin xyz="0.07651517000000001 -0.04496365 0.0" rpy="4.26353305598774e-31 -5.9636863764438586e-161 -1.903778834633546e-192" />
+        <parent link="SLOTLFI" />
+        <child link="WheelLF" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 -1.0" />
+    </joint>
+    <joint name="SLOTLBI_Revolute-65" type="continuous">
+        <origin xyz="-0.07649393 -0.044996299999999996 0.0" rpy="4.26353305598774e-31 -5.9636863764438586e-161 -1.903778834633546e-192" />
+        <parent link="SLOTLBI" />
+        <child link="WheelLB" />
+        <axis xyz="-5.9636863764438586e-161 -3.944304526105059e-31 -1.0" />
+    </joint>
+    <joint name="Midsection_Rigid-66" type="fixed">
+        <origin xyz="-0.06 0.044500000000000005 0.03825" rpy="1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="MR" />
+    </joint>
+    <joint name="Midsection_Rigid-67" type="fixed">
+        <origin xyz="-0.06 0.1385 0.03825" rpy="1.5707963267948966 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="ML" />
+    </joint>
+    <joint name="Midsection_Rigid-68" type="fixed">
+        <origin xyz="0.07864322 0.09150000000000001 0.05855968" rpy="3.141592653589793 -0.0 0.0" />
+        <parent link="chassis" />
+        <child link="Stepper-1" />
+    </joint>
+    <joint name="Midsection_Rigid-69" type="fixed">
+        <origin xyz="0.219 0.0915 0.045" rpy="0.0 0.0 0.0" />
+        <parent link="chassis" />
+        <child link="camera_link" />
+    </joint>
+    <joint name="Midsection_Rigid-70" type="fixed">
+        <origin xyz="0.21356999969482422 0.0915 0.07157500076293945" rpy="0.0 0.0 0.0" />
+        <parent link="chassis" />
+        <child link="imu_link" />
+    </joint>
+    <joint name="Midsection_Rigid-71" type="fixed">
+        <origin xyz="0.2135050018310547 0.0915 0.09840000152587891" rpy="0.0 0.0 0.0" />
+        <parent link="chassis" />
+        <child link="lidar_link" />
+    </joint>
+    <joint name="Midsection_Rigid-72" type="fixed">
+        <origin xyz="-0.1085 0.1385 0.07575" rpy="-1.393221043589796e-15 -1.5707963267948966 0" />
+        <parent link="chassis" />
+        <child link="Unyaktig-batteri-mockup-v1" />
+    </joint>
 </robot>

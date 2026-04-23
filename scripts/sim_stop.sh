@@ -7,6 +7,7 @@ patterns=(
   "ros2 launch robot_bringup pi_robot.launch.py"
   "ros2 launch robot_bringup nav2_stack.launch.py"
   "ros2 run ros_gz_bridge parameter_bridge"
+  "lib/ros_gz_bridge/parameter_bridge"
   "gz sim "
   "robot_state_publisher"
   "ekf_node"

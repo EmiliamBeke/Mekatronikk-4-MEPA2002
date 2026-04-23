@@ -18,6 +18,7 @@ def generate_launch_description():
     headless = LaunchConfiguration('headless')
     autostart = LaunchConfiguration('autostart')
     rviz_enabled = LaunchConfiguration('rviz')
+    gz_verbosity = LaunchConfiguration('gz_verbosity')
     keyboard_teleop_enabled = LaunchConfiguration('keyboard_teleop')
     use_nav2 = LaunchConfiguration('use_nav2')
     use_ekf = LaunchConfiguration('use_ekf')
@@ -34,6 +35,16 @@ def generate_launch_description():
         'worlds',
         'tracked_robot_world.sdf'
     )
+    gz_models_path = os.path.join(
+        get_package_share_directory('robot_gz'),
+        'models'
+    )
+    existing_gz_resource_path = os.environ.get('GZ_SIM_RESOURCE_PATH', '')
+    gz_resource_path = (
+        gz_models_path
+        if not existing_gz_resource_path
+        else gz_models_path + os.pathsep + existing_gz_resource_path
+    )
 
     default_rviz_config = os.path.join(
         robot_bringup_share,
@@ -44,13 +55,13 @@ def generate_launch_description():
     default_ekf_params = os.path.join(robot_bringup_share, 'config', 'ekf.yaml')
 
     gz_gui = ExecuteProcess(
-        cmd=['gz', 'sim', '-v', '4', world],
+        cmd=['gz', 'sim', '-v', gz_verbosity, world],
         output='screen',
         condition=UnlessCondition(headless),
     )
 
     gz_headless = ExecuteProcess(
-        cmd=['gz', 'sim', '-s', '-v', '4', world],
+        cmd=['gz', 'sim', '-s', '-v', gz_verbosity, world],
         output='screen',
         condition=IfCondition(headless),
     )
@@ -132,6 +143,45 @@ def generate_launch_description():
             '--child-frame-id', 'base_laser',
         ],
     )
+    # Gazebo can publish lidar scans with scoped frame ids like
+    # "tracked_robot/chassis/lidar". Provide an alias frame so Nav2's
+    # collision_monitor can resolve transforms reliably.
+    lidar_scoped_frame_alias_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='lidar_scoped_frame_alias_tf',
+        arguments=[
+            '--x', '0', '--y', '0', '--z', '0',
+            '--roll', '0', '--pitch', '0', '--yaw', '0',
+            '--frame-id', 'lidar_link',
+            '--child-frame-id', 'tracked_robot/chassis/lidar',
+        ],
+    )
+    lidar_scoped_base_laser_alias_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='lidar_scoped_base_laser_alias_tf',
+        arguments=[
+            '--x', '0', '--y', '0', '--z', '0',
+            '--roll', '0', '--pitch', '0', '--yaw', '0',
+            '--frame-id', 'base_laser',
+            '--child-frame-id', 'tracked_robot/base_laser',
+        ],
+    )
+    # Gazebo IMU messages can use scoped frame ids like
+    # "tracked_robot/chassis/imu". Provide an alias to imu_link so EKF
+    # can resolve the sensor->base transform.
+    imu_scoped_frame_alias_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='imu_scoped_frame_alias_tf',
+        arguments=[
+            '--x', '0', '--y', '0', '--z', '0',
+            '--roll', '0', '--pitch', '0', '--yaw', '0',
+            '--frame-id', 'imu_link',
+            '--child-frame-id', 'tracked_robot/chassis/imu',
+        ],
+    )
 
     # Liten delay så gz rekker å starte før bridge/node/rviz starter
     start_rest = TimerAction(
@@ -140,6 +190,9 @@ def generate_launch_description():
             bridge,
             sim_cmd_vel_calibrator,
             lidar_static_tf,
+            lidar_scoped_frame_alias_tf,
+            lidar_scoped_base_laser_alias_tf,
+            imu_scoped_frame_alias_tf,
             shared_core_stack,
             keyboard_teleop,
         ]
@@ -175,6 +228,11 @@ def generate_launch_description():
             'rviz',
             default_value='true',
             description='Run RViz visualizer.'
+        ),
+        DeclareLaunchArgument(
+            'gz_verbosity',
+            default_value='2',
+            description='Gazebo verbosity level (0-4).'
         ),
         DeclareLaunchArgument(
             'use_nav2',
@@ -217,6 +275,7 @@ def generate_launch_description():
             description='Run local keyboard teleop window for sim.'
         ),
         SetEnvironmentVariable('ROS_USE_SIM_TIME', 'true'),
+        SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', gz_resource_path),
         gz_gui,
         gz_headless,
         start_rest,

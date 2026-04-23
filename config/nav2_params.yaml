@@ -1,7 +1,7 @@
 bt_navigator:
   ros__parameters:
     global_frame: odom
-    robot_base_frame: chassis
+    robot_base_frame: base_link
     odom_topic: /odom
     bt_loop_duration: 10
     default_server_timeout: 20
@@ -72,13 +72,13 @@ local_costmap:
       update_frequency: 10.0
       publish_frequency: 5.0
       global_frame: odom
-      robot_base_frame: chassis
+      robot_base_frame: base_link
       rolling_window: true
       width: 5
       height: 5
       resolution: 0.05
       transform_tolerance: 0.2
-      footprint: "[[0.22, 0.14], [0.22, -0.14], [-0.16, -0.14], [-0.16, 0.14]]"
+      footprint: "[[0.180, 0.106], [0.180, -0.106], [-0.209, -0.106], [-0.209, 0.106]]"
       footprint_padding: 0.03
       plugins: ["obstacle_layer", "inflation_layer"]
       obstacle_layer:
@@ -108,14 +108,14 @@ global_costmap:
       update_frequency: 5.0
       publish_frequency: 2.0
       global_frame: odom
-      robot_base_frame: chassis
+      robot_base_frame: base_link
       rolling_window: true
       width: 8
       height: 8
       resolution: 0.05
       transform_tolerance: 0.2
       track_unknown_space: true
-      footprint: "[[0.22, 0.14], [0.22, -0.14], [-0.16, -0.14], [-0.16, 0.14]]"
+      footprint: "[[0.180, 0.106], [0.180, -0.106], [-0.209, -0.106], [-0.209, 0.106]]"
       footprint_padding: 0.03
       plugins: ["obstacle_layer", "inflation_layer"]
       obstacle_layer:
@@ -190,7 +190,7 @@ behavior_server:
       plugin: "nav2_behaviors::Wait"
     local_frame: odom
     global_frame: odom
-    robot_base_frame: chassis
+    robot_base_frame: base_link
     transform_tolerance: 0.2
     simulate_ahead_time: 1.5
     max_rotational_vel: 0.5
@@ -213,7 +213,7 @@ velocity_smoother:
 
 collision_monitor:
   ros__parameters:
-    base_frame_id: "chassis"
+    base_frame_id: "base_link"
     odom_frame_id: "odom"
     cmd_vel_in_topic: "cmd_vel_nav_flipped"
     cmd_vel_out_topic: "cmd_vel"
