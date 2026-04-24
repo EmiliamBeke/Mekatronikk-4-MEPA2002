@@ -18,6 +18,7 @@ def generate_launch_description():
     autostart = LaunchConfiguration('autostart')
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
+    bond_timeout = LaunchConfiguration('bond_timeout')
 
     remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
     navigation_nodes = [
@@ -35,6 +36,7 @@ def generate_launch_description():
         DeclareLaunchArgument('autostart', default_value='true'),
         DeclareLaunchArgument('use_respawn', default_value='false'),
         DeclareLaunchArgument('log_level', default_value='info'),
+        DeclareLaunchArgument('bond_timeout', default_value='10.0'),
         SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
         SetParameter('use_sim_time', use_sim_time),
         Node(
@@ -136,6 +138,10 @@ def generate_launch_description():
             name='lifecycle_manager_navigation',
             output='screen',
             arguments=['--ros-args', '--log-level', log_level],
-            parameters=[{'autostart': autostart}, {'node_names': navigation_nodes}],
+            parameters=[
+                {'autostart': autostart},
+                {'node_names': navigation_nodes},
+                {'bond_timeout': bond_timeout},
+            ],
         ),
     ])

@@ -5,10 +5,10 @@
     <!-- ========================= -->
     <!--        Physics             -->
     <!-- ========================= -->
-    <physics name="2_5ms" type="ignored">
-      <max_step_size>0.0025</max_step_size>
+    <physics name="5ms" type="ignored">
+      <max_step_size>0.005</max_step_size>
       <real_time_factor>1.0</real_time_factor>
-      <real_time_update_rate>400</real_time_update_rate>
+      <real_time_update_rate>200</real_time_update_rate>
     </physics>
 
     <!-- ========================= -->
@@ -166,7 +166,7 @@
     <include>
       <uri>model://tracked_robot</uri>
       <name>tracked_robot</name>
-      <pose>0 0 0.001 0 0 0</pose>
+      <pose>0 0 0.031 0 0 0</pose>
     </include>
 
     <!-- ========================= -->

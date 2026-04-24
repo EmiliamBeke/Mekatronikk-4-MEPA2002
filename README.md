@@ -22,7 +22,7 @@ Kort bruk av repoet.
 | Kommando | Hva den gjør |
 |---|---|
 | `make sim` | Starter simulering med Gazebo GUI + RViz + et eget keyboard-teleop-vindu. |
-| `make sim-headless` | Starter simulering uten GUI. |
+| `make sim-headless` | Starter simulering med Gazebo server-only/headless + RViz. |
 | `make sim-topics` | Viser sentrale sim-topics. |
 
 Taster i sim-teleop-vinduet:

@@ -489,4 +489,54 @@
         <parent link="chassis" />
         <child link="Unyaktig-batteri-mockup-v1" />
     </joint>
+    <link name="left_track_rviz">
+        <visual name="left_track_rviz_visual">
+            <origin xyz="0 0 0.0035" rpy="0 0 0" />
+            <geometry>
+                <box size="0.21 0.03 0.007" />
+            </geometry>
+            <material name="pseudo_track_black">
+                <color rgba="0.02 0.02 0.02 1.0" />
+            </material>
+        </visual>
+        <visual name="left_track_rviz_contact_patch">
+            <origin xyz="0 0 0.0075" rpy="0 0 0" />
+            <geometry>
+                <box size="0.21 0.03 0.001" />
+            </geometry>
+            <material name="pseudo_track_left_blue">
+                <color rgba="0.0 0.25 1.0 0.75" />
+            </material>
+        </visual>
+    </link>
+    <joint name="left_track_rviz_joint" type="fixed">
+        <origin xyz="0.080 0.1835 -0.030" rpy="0 0 0" />
+        <parent link="chassis" />
+        <child link="left_track_rviz" />
+    </joint>
+    <link name="right_track_rviz">
+        <visual name="right_track_rviz_visual">
+            <origin xyz="0 0 0.0035" rpy="0 0 0" />
+            <geometry>
+                <box size="0.21 0.03 0.007" />
+            </geometry>
+            <material name="pseudo_track_black">
+                <color rgba="0.02 0.02 0.02 1.0" />
+            </material>
+        </visual>
+        <visual name="right_track_rviz_contact_patch">
+            <origin xyz="0 0 0.0075" rpy="0 0 0" />
+            <geometry>
+                <box size="0.21 0.03 0.001" />
+            </geometry>
+            <material name="pseudo_track_right_green">
+                <color rgba="0.0 0.8 0.25 0.75" />
+            </material>
+        </visual>
+    </link>
+    <joint name="right_track_rviz_joint" type="fixed">
+        <origin xyz="0.080 -0.0005 -0.030" rpy="0 0 0" />
+        <parent link="chassis" />
+        <child link="right_track_rviz" />
+    </joint>
 </robot>

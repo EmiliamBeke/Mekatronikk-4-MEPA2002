@@ -14,7 +14,7 @@ class SimCmdVelCalibrator(Node):
 
         self.declare_parameter("input_topic", "/cmd_vel")
         self.declare_parameter("output_topic", "/sim_cmd_vel")
-        self.declare_parameter("track_width_eff_m", 0.186605297)
+        self.declare_parameter("track_width_eff_m", 0.184)
         self.declare_parameter("max_track_speed_mps", 0.45)
         self.declare_parameter("swap_sides", False)
         self.declare_parameter("left_cmd_sign", 1)

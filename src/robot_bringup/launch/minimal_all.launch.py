@@ -71,12 +71,20 @@ def generate_launch_description():
             'ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
             '/model/tracked_robot/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/wheel/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
             '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
             '/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             '/lidar/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
             '/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU',
             '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
+        ],
+        output='screen'
+    )
+    # TrackedVehicle advertises /wheel/odom after the model plugin is initialized.
+    # Starting this bridge separately avoids missing the Gazebo-side odom topic.
+    odom_bridge = ExecuteProcess(
+        cmd=[
+            'ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
+            '/wheel/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
         ],
         output='screen'
     )
@@ -183,8 +191,8 @@ def generate_launch_description():
         ],
     )
 
-    # Liten delay så gz rekker å starte før bridge/node/rviz starter
-    start_rest = TimerAction(
+    # Give Gazebo a short head start, then bring up bridge/TF before Nav2.
+    start_sim_io = TimerAction(
         period=1.0,
         actions=[
             bridge,
@@ -193,8 +201,16 @@ def generate_launch_description():
             lidar_scoped_frame_alias_tf,
             lidar_scoped_base_laser_alias_tf,
             imu_scoped_frame_alias_tf,
-            shared_core_stack,
             keyboard_teleop,
+        ]
+    )
+
+    # Nav2 is sensitive to startup races between /clock, /tf and the first scan.
+    start_core_stack = TimerAction(
+        period=3.0,
+        actions=[
+            odom_bridge,
+            shared_core_stack,
         ]
     )
 
@@ -261,7 +277,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'sim_track_width_eff_m',
-            default_value='0.186605297',
+            default_value='0.184',
             description='Effective track width for sim cmd_vel conversion.'
         ),
         DeclareLaunchArgument(
@@ -278,6 +294,7 @@ def generate_launch_description():
         SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', gz_resource_path),
         gz_gui,
         gz_headless,
-        start_rest,
+        start_sim_io,
+        start_core_stack,
         autostart_sim,
     ])
