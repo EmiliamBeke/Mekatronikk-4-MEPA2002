@@ -25,22 +25,45 @@ Bruk dette for:
 
 ```bash
 cd ~/Mekatronikk-4-MEPA2002
-make build
 make ws
 ```
 
+Dette er normal Pi-build for kodeendringer. `make ws` bygger ROS-workspacet i
+det Docker-imaget som allerede finnes.
+
+`make build` er **ikke** en vanlig operatørkommando. Ikke bygg Docker-imaget på
+nytt bare fordi du har endret Python-kode, launch-filer, YAML-konfig eller
+Arduino-sketcher.
+
 | Kommando | Effekt |
 |---|---|
-| `make build` | `docker compose build` |
+| `make build` | Bygger Docker-imaget på nytt med `docker compose build`. Bruk sjelden. |
 | `make ws` | Kjører [`scripts/ws_build.sh`](../../scripts/ws_build.sh) i container |
 | `make shell` | Åpner shell i container |
 | `make up` | Starter compose service detached |
 | `make down` | Stopper compose service |
 
-Kjør `make build` etter endringer i:
+Kjør `make build` bare etter endringer i:
 
 - [`docker/Dockerfile`](../../docker/Dockerfile)
-- Docker dependencies.
+- apt-pakker i Dockerfile.
+- pip-pakker i Dockerfile.
+- base image eller Docker runtime-oppsett.
+- systembiblioteker som må finnes inne i containeren.
+
+Eksempler som **ikke** krever `make build`:
+
+- endringer i `src/**/*.py`
+- endringer i launch-filer
+- endringer i `config/*.yaml`
+- endringer i `README.md` eller `docs/`
+- endringer i Arduino-sketcher
+
+For de fleste repoendringer er dette riktig:
+
+```bash
+make ws
+```
 
 Kjør `make ws` etter endringer i:
 
@@ -48,6 +71,9 @@ Kjør `make ws` etter endringer i:
 - Launch-filer.
 - Package metadata.
 - Config som installeres av `robot_bringup`.
+
+`make pi-bringup` sjekker også om installasjonen mangler eller er stale for
+noen sentrale launch/node-filer, og kjører `make ws` automatisk ved behov.
 
 ## Docker Image
 

@@ -170,38 +170,12 @@ Hvis sim ikke starter rent, stopp gamle prosesser først:
 make sim-stop
 ```
 
-## Diskplass På Pi
+## Pi Diskplass, Ytelse og Throttling
 
-```bash
-df -h
-docker system df
-du -h --max-depth=1 ~/Mekatronikk-4-MEPA2002
-docker compose down --remove-orphans
-docker container prune -f
-docker builder prune -af
-docker system prune -af
-sudo apt clean
-rm -rf ~/Mekatronikk-4-MEPA2002/build ~/Mekatronikk-4-MEPA2002/log
-```
+Se [Pi drift og vedlikehold](pi-maintenance.md) for forklaring av hver kommando:
 
-Slett `install` bare hvis du er klar for ny build:
-
-```bash
-rm -rf ~/Mekatronikk-4-MEPA2002/install
-make ws
-```
-
-## Pi Ytelse
-
-```bash
-cpupower frequency-info
-sudo cpupower frequency-set -g performance
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-watch -n1 'vcgencmd measure_temp; vcgencmd measure_clock arm; vcgencmd get_throttled'
-```
-
-Tilbake til dynamisk governor:
-
-```bash
-sudo cpupower frequency-set -g ondemand
-```
+- hva kommandoen gjør
+- når den bør brukes
+- hva som slettes
+- risiko ved Docker prune og `rm -rf`
+- CPU governor, temperatur og throttling

@@ -29,6 +29,7 @@ Viktig kildegrunnlag:
 | [LiDAR og RViz](lidar-rviz.md) | Praktisk LiDAR/RViz-oppsett på fysisk robot |
 | [ROS interfaces](ros-interfaces.md) | Topics, frames, nodes og command chain |
 | [Bygg og miljø](build-and-environment.md) | Docker, colcon, ROS setup og workspace-build |
+| [Pi drift og vedlikehold](pi-maintenance.md) | Diskplass, Docker-opprydding, CPU governor og throttling |
 | [Fysisk robot bringup](physical-robot.md) | `make pi-bringup`, env-vars og Pi-runtime |
 | [PC-verktøy](pc-tools.md) | RViz, UDP camera bridge og ROS keyboard teleop |
 | [Simulering](simulation.md) | Gazebo, bridge, sim sensors og sim commands |
@@ -36,7 +37,7 @@ Viktig kildegrunnlag:
 | [Kamera og teddy-deteksjon](vision.md) | Pi camera, H264/UDP, YOLO/NCNN og debugstream |
 | [Arduino Mega](arduino-mega.md) | Firmware, upload, serial commands og ROS Mega-driver |
 | [Kalibrering](calibration.md) | Straight-trim, meter-per-tick og track width |
-| [Feilsøking](troubleshooting.md) | Konkrete sjekker for ROS, LiDAR, kamera, Mega, Nav2 og disk |
+| [Feilsøking](troubleshooting.md) | Konkrete sjekker for ROS, LiDAR, kamera, Mega og Nav2 |
 
 ## Anbefalt Leseorden
 

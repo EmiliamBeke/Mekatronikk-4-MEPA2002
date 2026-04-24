@@ -47,6 +47,7 @@ Start her:
 - [LiDAR og RViz](docs/wiki/lidar-rviz.md)
 - [ROS interfaces](docs/wiki/ros-interfaces.md)
 - [Bygg og miljø](docs/wiki/build-and-environment.md)
+- [Pi drift og vedlikehold](docs/wiki/pi-maintenance.md)
 - [Fysisk robot bringup](docs/wiki/physical-robot.md)
 - [PC-verktøy](docs/wiki/pc-tools.md)
 - [Simulering](docs/wiki/simulation.md)
@@ -70,7 +71,7 @@ Start her:
 
 | Kommando | Bruk |
 |---|---|
-| `make build` | Bygg Docker-image |
+| `make build` | Bygg Docker-image. Ikke vanlig drift; bruk ved Dockerfile/dependency-endringer |
 | `make ws` | Bygg ROS workspace i Docker |
 | `make shell` | Åpne shell i Docker-container |
 | `make sim-build` | Bygg workspace lokalt på PC |
