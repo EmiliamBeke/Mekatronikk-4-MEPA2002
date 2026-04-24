@@ -1,0 +1,813 @@
+<sdf version='1.11' xmlns:gz='https://gazebosim.org/schemas'>
+  <model name='tracked_robot'>
+    <link name='chassis'>
+      <inertial>
+        <pose>0.024502869656905589 0.092120284697621083 0.042184654068990343 0 0 0</pose>
+        <mass>2.2566512602853339</mass>
+        <inertia>
+          <ixx>0.0067024018372325231</ixx>
+          <ixy>0.00019462982784389411</ixy>
+          <ixz>2.9480684579116179e-05</ixz>
+          <iyy>0.02974959762314237</iyy>
+          <iyz>-5.1918003863352102e-06</iyz>
+          <izz>0.033923564017673817</izz>
+        </inertia>
+      </inertial>
+      <!-- DART in Gazebo Sim doesn't support mesh collisions for this model.
+           Keep visual meshes, but add primitive collision proxies for stable contact. -->
+      <collision name='chassis_proxy_collision_main'>
+        <pose>0.06325 0.0915 0.058 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.42 0.21 0.056</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='chassis_proxy_collision_belly'>
+        <pose>0.02 0.0915 0.040 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.26 0.15 0.020</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='chassis_fixed_joint_lump__Midsection_visual_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/Midsection.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='chassis_fixed_joint_lump__MR_visual_visual_1'>
+        <pose>-0.060000000000000241 0.073500000000000038 0.038249999925494008 -6.2176217361230648e-31 2.2401343147145719e-14 -5.551115123126256e-17</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/MR.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='chassis_fixed_joint_lump__ML_visual_visual_2'>
+        <pose>-0.060000000000000241 0.1095 0.038249999925494022 3.1415926535897931 2.2401343147145719e-14 5.5511151231254431e-17</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/ML.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='chassis_fixed_joint_lump__Stepper-1_visual_visual_3'>
+        <pose>0.078643216205906238 0.091500000000000026 -0.008740318536083716 -2.4492935982947059e-16 -2.775557561562891e-17 3.3990776836172283e-33</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/Stepper-1.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='chassis_fixed_joint_lump__Camera_visual_visual_4'>
+        <pose>0.21899999999999989 0.091500000000000026 0.044999999999999853 2.2204460492503131e-16 -2.2204460492503131e-16 -2.4651903288156619e-32</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/Camera.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='chassis_fixed_joint_lump__IMU_visual_visual_5'>
+        <pose>-0.002250000000000002 4.4331385784524002e-11 -0.001000000000000334 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/IMU.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='chassis_fixed_joint_lump__Lidar_visual_visual_6'>
+        <pose>-0.002199999999999952 1.52655665885959e-16 -3.7470027081099028e-16 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/Lidar.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='chassis_fixed_joint_lump__Unyaktig-batteri-mockup-v1_visual_visual_7'>
+        <pose>-0.14549999999999941 0.094500000000000389 0.04824999992549215 -1.712031933413185e-14 1.5707963267948966 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/Unyaktig-batteri-mockup-v1.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <!-- Sensor mounting from Fusion export:
+           Camera.stl -> camera_link, IMU.stl -> imu_link, Lidar.stl -> lidar_link -->
+      <sensor name='camera' type='camera'>
+        <pose relative_to='camera_link'>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>15</update_rate>
+        <visualize>false</visualize>
+        <topic>/camera</topic>
+        <gz:frame_id>camera_link</gz:frame_id>
+        <camera>
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+        </camera>
+      </sensor>
+      <sensor name='imu' type='imu'>
+        <pose relative_to='imu_link'>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <topic>/imu/data</topic>
+        <gz:frame_id>imu_link</gz:frame_id>
+      </sensor>
+      <sensor name='lidar' type='gpu_lidar'>
+        <pose relative_to='lidar_link'>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <visualize>false</visualize>
+        <topic>/lidar</topic>
+        <gz:frame_id>base_laser</gz:frame_id>
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.14159</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.08</min>
+            <max>10.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </lidar>
+      </sensor>
+    </link>
+    <joint name='Midsection_Revolute-55' type='revolute'>
+      <pose relative_to='chassis'>0.22 0.015800000000000002 0.044999999999999998 -1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>WheelRT</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='WheelRT'>
+      <pose relative_to='Midsection_Revolute-55'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-2.7746693831431911e-14 -2.3980817331903378e-16 -0.015799787611282489 0 0 0</pose>
+        <mass>0.01924645021673722</mass>
+        <inertia>
+          <ixx>4.0026299770707199e-06</ixx>
+          <ixy>-4.4541727890669993e-12</ixy>
+          <ixz>7.3666941391316375e-18</ixz>
+          <iyy>4.0026000731291193e-06</iyy>
+          <iyz>-1.023478326730104e-20</iyz>
+          <izz>4.4736985654272466e-06</izz>
+        </inertia>
+      </inertial>
+      <visual name='WheelRT_visual_visual'>
+        <pose>0 0 -0.00080000000000000069 -3.1415926535897931 1.1704190886730509e-97 1.4426529090290212e-129</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/WheelRT.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='Midsection_Revolute-56' type='fixed'>
+      <pose relative_to='chassis'>0.056493929999999998 0.015800000000000002 0.044996300000000003 -1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>SLOTRBI</child>
+    </joint>
+    <link name='SLOTRBI'>
+      <pose relative_to='Midsection_Revolute-56'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.039918227301044718 0.023481243012318881 0.0025000000000000001 0 0 0</pose>
+        <mass>0.02181111180131683</mass>
+        <inertia>
+          <ixx>8.2147294483605434e-06</ixx>
+          <ixy>9.7133398341353873e-06</ixy>
+          <ixz>-1.6940658945086011e-21</ixz>
+          <iyy>1.9013742152621299e-05</iyy>
+          <iyz>-3.388131789017201e-21</iyz>
+          <izz>2.7137591968476362e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name='SLOTRBI_visual_visual'>
+        <pose>-0.056493929999999998 0.044996300000000003 0.020199999999999999 1.5707963267948959 1.1704190886730506e-97 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/SLOTRBI.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='SLOTRBI_Revolute-58' type='revolute'>
+      <pose relative_to='SLOTRBI'>-0.076493930000000002 0.044996300000000003 0 -3.944304526105059e-31 5.9636863764438593e-161 0</pose>
+      <parent>SLOTRBI</parent>
+      <child>WheelRB</child>
+      <axis>
+        <xyz>-5.9636863764438593e-161 -3.944304526105059e-31 1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='WheelRB'>
+      <pose relative_to='SLOTRBI_Revolute-58'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-2.7746693831431911e-14 -2.4105430805310051e-16 -0.015799787611282499 0 0 0</pose>
+        <mass>0.14253267377489351</mass>
+        <inertia>
+          <ixx>2.9642118226419921e-05</ixx>
+          <ixy>-3.2986090963689207e-11</ixy>
+          <ixz>5.4555235465997412e-17</ixz>
+          <iyy>2.964189676798348e-05</iyy>
+          <iyz>-7.5795231120098652e-20</iyz>
+          <izz>3.3130692206229439e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name='WheelRB_visual_visual'>
+        <pose>0 -4.4408920985006247e-18 -0.00080000000000000069 -3.1415926535897931 1.1704190886730509e-97 4.76075459979577e-128</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/WheelRB.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='Midsection_Revolute-57' type='fixed'>
+      <pose relative_to='chassis'>0.10349999999999999 0.015800000000000002 0.044999999999999998 -1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>SLOTRFI</child>
+    </joint>
+    <link name='SLOTRFI'>
+      <pose relative_to='Midsection_Revolute-57'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.039929284580759672 0.023464187702015891 0.0025000000000000018 0 0 0</pose>
+        <mass>0.02181145797447015</mass>
+        <inertia>
+          <ixx>8.2065297437255796e-06</ixx>
+          <ixy>-9.7090698809923956e-06</ixy>
+          <ixz>0</ixz>
+          <iyy>1.9023094913960549e-05</iyy>
+          <iyz>1.6940658945086011e-21</iyz>
+          <izz>2.7138743582792569e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name='SLOTRFI_visual_visual'>
+        <pose>-0.10349999999999999 0.044999999999999998 0.020199999999999999 1.5707963267948959 1.1704190886730506e-97 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/SLOTRFI.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='SLOTRFI_Revolute-59' type='revolute'>
+      <pose relative_to='SLOTRFI'>0.076515170000000007 0.044963650000000001 0 -3.944304526105059e-31 5.9636863764438593e-161 0</pose>
+      <parent>SLOTRFI</parent>
+      <child>WheelRF</child>
+      <axis>
+        <xyz>-5.9636863764438593e-161 -3.944304526105059e-31 1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='WheelRF'>
+      <pose relative_to='SLOTRFI_Revolute-59'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>5.754779053290804e-10 -5.1083965361183737e-10 -0.015799787611282489 0 0 0</pose>
+        <mass>0.14253267377489351</mass>
+        <inertia>
+          <ixx>2.9642118226419921e-05</ixx>
+          <ixy>-3.2986090963940101e-11</ixy>
+          <ixz>5.4555235672792559e-17</ixz>
+          <iyy>2.9641896767983181e-05</iyy>
+          <iyz>-7.5306992900735211e-20</iyz>
+          <izz>3.3130692206229113e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name='WheelRF_visual_visual'>
+        <pose>5.7550565202291183e-10 -5.1083941490087662e-10 -0.00079999999999998963 3.1415926535897931 1.1704190886730509e-97 2.8853058180580424e-129</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/WheelRF.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='Midsection_Revolute-61' type='revolute'>
+      <pose relative_to='chassis'>0.22 0.16719999999999999 0.044999999999999998 1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>WheelLT</child>
+      <axis>
+        <xyz>0 -3.1922852988268101e-32 -1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='WheelLT'>
+      <pose relative_to='Midsection_Revolute-61'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-2.799538378894795e-14 2.0428103653102881e-16 -0.015799740429180569 0 0 0</pose>
+        <mass>0.019245164907723451</mass>
+        <inertia>
+          <ixx>4.0024536020079717e-06</ixx>
+          <ixy>-3.0662950477322588e-12</ixy>
+          <ixz>-7.2641545556528797e-18</ixz>
+          <iyy>4.0024509049584652e-06</iyy>
+          <iyz>-2.7105054312137611e-20</iyz>
+          <izz>4.4736065904148973e-06</izz>
+        </inertia>
+      </inertial>
+      <visual name='WheelLT_visual_visual'>
+        <pose>-2.4868995751603509e-16 -1.4210854715201999e-16 -0.00079999237060548014 3.1922852988268101e-32 5.5938092586776452e-95 -1.7486234923433641e-63</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/WheelLT.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='Midsection_Revolute-62' type='fixed'>
+      <pose relative_to='chassis'>0.10349999999999999 0.16719999999999999 0.044999999999999998 1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>SLOTLFI</child>
+    </joint>
+    <link name='SLOTLFI'>
+      <pose relative_to='Midsection_Revolute-62'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.039929284580759672 -0.023464187702015891 0.0024999999999999289 0 0 0</pose>
+        <mass>0.02181145797447015</mass>
+        <inertia>
+          <ixx>8.2065297437255253e-06</ixx>
+          <ixy>9.709069880992382e-06</ixy>
+          <ixz>-1.084202172485504e-19</ixz>
+          <iyy>1.9023094913960549e-05</iyy>
+          <iyz>-2.590746593595567e-37</iyz>
+          <izz>2.7138743582792521e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name='SLOTLFI_visual_visual'>
+        <pose>-0.10349999999999999 -0.044999999999999998 0.02019999999999994 1.5707963267948959 1.1704190886730506e-97 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/SLOTLFI.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='SLOTLFI_Revolute-64' type='revolute'>
+      <pose relative_to='SLOTLFI'>0.076515170000000007 -0.044963650000000001 0 4.2635330559877404e-31 -5.9636863764438593e-161 -1.9037788346335455e-192</pose>
+      <parent>SLOTLFI</parent>
+      <child>WheelLF</child>
+      <axis>
+        <xyz>-5.9636863764438593e-161 -3.944304526105059e-31 -1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='WheelLF'>
+      <pose relative_to='SLOTLFI_Revolute-64'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>5.754779053290804e-10 5.1083975929552825e-10 -0.015799740429180569 0 0 0</pose>
+        <mass>0.019245164907723451</mass>
+        <inertia>
+          <ixx>4.0024536020080801e-06</ixx>
+          <ixy>-3.066295026979952e-12</ixy>
+          <ixz>-7.3725747729014302e-18</ixz>
+          <iyy>4.0024509049582484e-06</iyy>
+          <iyz>4.5263323118901667e-21</iyz>
+          <izz>4.4736065904146796e-06</izz>
+        </inertia>
+      </inertial>
+      <visual name='WheelLF_visual_visual'>
+        <pose>5.7550565202291183e-10 5.1083941490087662e-10 -0.00079999237060548014 2.4651903288156531e-32 1.1704190886730509e-97 -5.0067348899926178e-128</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/WheelLF.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='Midsection_Revolute-63' type='fixed'>
+      <pose relative_to='chassis'>0.056493929999999998 0.16719999999999999 0.044996300000000003 1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>SLOTLBI</child>
+    </joint>
+    <link name='SLOTLBI'>
+      <pose relative_to='Midsection_Revolute-63'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.039918227301044718 -0.023481243012318881 0.0024999999999999289 0 0 0</pose>
+        <mass>0.02181111180131683</mass>
+        <inertia>
+          <ixx>8.2147294483605332e-06</ixx>
+          <ixy>-9.7133398341354009e-06</ixy>
+          <ixz>-6.7762635780344027e-21</ixz>
+          <iyy>1.901374215262138e-05</iyy>
+          <iyz>-1.3552527156068811e-20</iyz>
+          <izz>2.7137591968476379e-05</izz>
+        </inertia>
+      </inertial>
+      <visual name='SLOTLBI_visual_visual'>
+        <pose>-0.056493929999999998 -0.044996300000000003 0.02019999999999994 1.5707963267948959 1.1704190886730506e-97 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/SLOTLBI.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='SLOTLBI_Revolute-65' type='revolute'>
+      <pose relative_to='SLOTLBI'>-0.076493930000000002 -0.044996300000000003 0 4.2635330559877404e-31 -5.9636863764438593e-161 -1.9037788346335455e-192</pose>
+      <parent>SLOTLBI</parent>
+      <child>WheelLB</child>
+      <axis>
+        <xyz>-5.9636863764438593e-161 -3.944304526105059e-31 -1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='WheelLB'>
+      <pose relative_to='SLOTLBI_Revolute-65'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-2.8008706465243449e-14 2.0738994258592989e-16 -0.015799740429180531 0 0 0</pose>
+        <mass>0.019245164907723451</mass>
+        <inertia>
+          <ixx>4.0024536020079717e-06</ixx>
+          <ixy>-3.0662950269970692e-12</ixy>
+          <ixz>-7.3319171914332237e-18</ixz>
+          <iyy>4.0024509049583568e-06</iyy>
+          <iyz>4.5207216527470728e-21</iyz>
+          <izz>4.4736065904147474e-06</izz>
+        </inertia>
+      </inertial>
+      <visual name='WheelLB_visual_visual'>
+        <pose>-2.4868995751603509e-16 -1.3700526893601951e-16 -0.00079999237060544457 -3.944304526105059e-31 1.1704190886730509e-97 -4.8033048914047346e-128</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/WheelLB.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='left_wheel_joint' type='revolute'>
+      <pose relative_to='chassis'>-0.059999999999999998 0.16470000000000001 0.045250000000000012 -1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>left_wheel</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='left_wheel'>
+      <pose relative_to='left_wheel_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>3.4687155183661387e-05 0.00013261507565231589 0.018737877711665369 0 0 0</pose>
+        <mass>0.032833325821927668</mass>
+        <inertia>
+          <ixx>5.9671418153508637e-06</ixx>
+          <ixy>1.5822348395534829e-08</ixy>
+          <ixz>5.588553191504704e-09</ixz>
+          <iyy>6.021008726309323e-06</iyy>
+          <iyz>1.9114720212958049e-08</iyz>
+          <izz>6.3748513539085307e-06</izz>
+        </inertia>
+      </inertial>
+      <visual name='left_wheel_fixed_joint_lump__Drive-L_visual_visual'>
+        <pose>-9.1482377229112901e-16 0.030000000074506039 0.0032999923706054802 -1.5707963267948959 4.7331654313260708e-30 2.2401343147145716e-14</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/Drive-L.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='right_wheel_joint' type='revolute'>
+      <pose relative_to='chassis'>-0.059999999999999998 0.0183 0.045250000000000012 -1.5707963267948959 0 0</pose>
+      <parent>chassis</parent>
+      <child>right_wheel</child>
+      <axis>
+        <xyz>0 -3.0814879110195787e-33 1</xyz>
+        <limit>
+          <lower>-inf</lower>
+          <upper>inf</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='right_wheel'>
+      <pose relative_to='right_wheel_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>3.4687194324396488e-05 0.00013262225653649649 -0.01873787903322954 0 0 0</pose>
+        <mass>0.032833288773087069</mass>
+        <inertia>
+          <ixx>5.967133209326591e-06</ixx>
+          <ixy>1.5822356573807341e-08</ixy>
+          <ixz>-5.5885460075434162e-09</ixz>
+          <iyy>6.0210001821240527e-06</iyy>
+          <iyz>-1.9113433682622029e-08</iyz>
+          <izz>6.3748367214922668e-06</izz>
+        </inertia>
+      </inertial>
+      <visual name='right_wheel_fixed_joint_lump__Drive-R_visual_visual'>
+        <pose>-9.1482377229112901e-16 0.030000000074506011 -0.0032999999999999939 1.5707963267948959 -4.7331654313260708e-30 2.2401343147145716e-14</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>meshes/Drive-R.stl</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <link name='left_track'>
+      <pose relative_to='chassis'>0.080 0.1835 -0.030 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.0035 0 0 0</pose>
+        <mass>0.02</mass>
+        <inertia>
+          <ixx>1.5816666666666667e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>7.358166666666666e-05</iyy>
+          <iyz>0</iyz>
+          <izz>7.5e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_track_collision'>
+        <pose>0 0 0.0035 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.21 0.03 0.007</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.7</mu>
+              <mu2>150</mu2>
+              <fdir1>1 0 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='left_track_visual'>
+        <pose>0 0 0.0035 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.21 0.03 0.007</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.02 0.02 0.02 1</ambient>
+          <diffuse>0.02 0.02 0.02 1</diffuse>
+        </material>
+      </visual>
+      <visual name='left_track_contact_patch_visual'>
+        <pose>0 0 0.0075 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.21 0.03 0.001</size>
+          </box>
+        </geometry>
+        <transparency>0.25</transparency>
+        <material>
+          <ambient>0.0 0.25 1.0 1</ambient>
+          <diffuse>0.0 0.25 1.0 1</diffuse>
+        </material>
+      </visual>
+    </link>
+    <joint name='left_track_joint' type='fixed'>
+      <parent>chassis</parent>
+      <child>left_track</child>
+    </joint>
+    <link name='right_track'>
+      <pose relative_to='chassis'>0.080 -0.0005 -0.030 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.0035 0 0 0</pose>
+        <mass>0.02</mass>
+        <inertia>
+          <ixx>1.5816666666666667e-06</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>7.358166666666666e-05</iyy>
+          <iyz>0</iyz>
+          <izz>7.5e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_track_collision'>
+        <pose>0 0 0.0035 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.21 0.03 0.007</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.7</mu>
+              <mu2>150</mu2>
+              <fdir1>1 0 0</fdir1>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='right_track_visual'>
+        <pose>0 0 0.0035 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.21 0.03 0.007</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.02 0.02 0.02 1</ambient>
+          <diffuse>0.02 0.02 0.02 1</diffuse>
+        </material>
+      </visual>
+      <visual name='right_track_contact_patch_visual'>
+        <pose>0 0 0.0075 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.21 0.03 0.001</size>
+          </box>
+        </geometry>
+        <transparency>0.25</transparency>
+        <material>
+          <ambient>0.0 0.8 0.25 1</ambient>
+          <diffuse>0.0 0.8 0.25 1</diffuse>
+        </material>
+      </visual>
+    </link>
+    <joint name='right_track_joint' type='fixed'>
+      <parent>chassis</parent>
+      <child>right_track</child>
+    </joint>
+    <plugin filename='gz-sim-tracked-vehicle-system' name='gz::sim::systems::TrackedVehicle'>
+      <left_track>
+        <link>left_track</link>
+      </left_track>
+      <right_track>
+        <link>right_track</link>
+      </right_track>
+      <tracks_separation>0.184</tracks_separation>
+      <tracks_height>0.007</tracks_height>
+      <steering_efficiency>0.7</steering_efficiency>
+      <topic>/model/tracked_robot/cmd_vel</topic>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <odom_topic>/wheel/odom</odom_topic>
+      <tf_topic>tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+    </plugin>
+    <plugin filename='gz-sim-track-controller-system' name='gz::sim::systems::TrackController'>
+      <link>left_track</link>
+      <min_velocity>-0.5555555555555556</min_velocity>
+      <max_velocity>0.5555555555555556</max_velocity>
+    </plugin>
+    <plugin filename='gz-sim-track-controller-system' name='gz::sim::systems::TrackController'>
+      <link>right_track</link>
+      <min_velocity>-0.5555555555555556</min_velocity>
+      <max_velocity>0.5555555555555556</max_velocity>
+    </plugin>
+    <plugin filename='gz-sim-joint-state-publisher-system' name='gz::sim::systems::JointStatePublisher'>
+      <joint_name>left_wheel_joint</joint_name>
+      <joint_name>right_wheel_joint</joint_name>
+      <joint_name>Midsection_Revolute-61</joint_name>
+      <joint_name>SLOTLFI_Revolute-64</joint_name>
+      <joint_name>SLOTLBI_Revolute-65</joint_name>
+      <joint_name>Midsection_Revolute-55</joint_name>
+      <joint_name>SLOTRFI_Revolute-59</joint_name>
+      <joint_name>SLOTRBI_Revolute-58</joint_name>
+      <topic>/joint_states</topic>
+      <update_rate>30</update_rate>
+    </plugin>
+    <frame name='Midsection_Rigid-66' attached_to='chassis'>
+      <pose>-0.059999999999999998 0.044499999999999998 0.038249999999999999 1.5707963267948959 0 0</pose>
+    </frame>
+    <frame name='MR' attached_to='Midsection_Rigid-66'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='Midsection_Rigid-67' attached_to='chassis'>
+      <pose>-0.059999999999999998 0.13850000000000001 0.038249999999999999 1.5707963267948959 0 0</pose>
+    </frame>
+    <frame name='ML' attached_to='Midsection_Rigid-67'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='Midsection_Rigid-68' attached_to='chassis'>
+      <pose>0.07864322 0.091500000000000012 0.058559680000000003 3.1415926535897931 0 0</pose>
+    </frame>
+    <frame name='Stepper-1' attached_to='Midsection_Rigid-68'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='base_link' attached_to='chassis'>
+      <pose>0.06325 0.0915 -0.023066925048828266 0 0 0</pose>
+    </frame>
+    <frame name='Midsection_Rigid-69' attached_to='chassis'>
+      <pose>0.23499999999999999 0.091500000000000012 0.044999999999999998 1.5707963267948959 -5.5511151231257827e-17 1.5707963267948959</pose>
+    </frame>
+    <frame name='camera_link' attached_to='chassis'>
+      <pose>0.219 0.0915 0.045 0 0 0</pose>
+    </frame>
+    <frame name='Midsection_Rigid-70' attached_to='chassis'>
+      <pose>0.23499999999999999 0.091500000000000012 0.066750000000000004 0 0 1.5707963267948959</pose>
+    </frame>
+    <frame name='imu_link' attached_to='chassis'>
+      <pose>0.21356999969482422 0.0915 0.07157500076293945 0 0 0</pose>
+    </frame>
+    <frame name='Midsection_Rigid-71' attached_to='chassis'>
+      <pose>0.23499999999999999 0.091500000000000012 0.066750000000000004 0 0 1.5707963267948959</pose>
+    </frame>
+    <frame name='lidar_link' attached_to='chassis'>
+      <pose>0.2135050018310547 0.0915 0.09840000152587891 0 0 0</pose>
+    </frame>
+    <frame name='Midsection_Rigid-72' attached_to='chassis'>
+      <pose>-0.1085 0.13850000000000001 0.075749999999999998 -1.393221043589796e-15 -1.5707963267948966 0</pose>
+    </frame>
+    <frame name='Unyaktig-batteri-mockup-v1' attached_to='Midsection_Rigid-72'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+  </model>
+</sdf>

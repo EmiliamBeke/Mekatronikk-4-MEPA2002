@@ -89,8 +89,8 @@ runs/
 __pycache__/
 *.pyc
 
-# Local models (ikke commit store binfiler)
-models/
+# Local model dumps at repo root. Gazebo runtime models under src/robot_gz/models are tracked.
+/models/
 
 # External ROS dependency fetched by setup script
 src/ldlidar_stl_ros2/
