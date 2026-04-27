@@ -82,22 +82,22 @@
       </link>
     </model>
 
-
+    
     <model name="lidar_obstacle_box1">
       <static>true</static>
-      <pose>2 0 0.2 0 0 0</pose> <!-- x y z roll pitch yaw -->
+      <pose>1 0.5 0.05 0 0 0</pose> <!-- x y z roll pitch yaw -->
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.4 0.4 0.4</size>
+              <size>0.1 0.1 0.2</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.4 0.4 0.4</size>
+              <size>0.1 0.1 0.2</size>
             </box>
           </geometry>
           <material>
@@ -111,19 +111,19 @@
 
     <model name="lidar_obstacle_box3">
       <static>true</static>
-      <pose>0 2 0.2 0 0 0</pose> <!-- x y z roll pitch yaw -->
+      <pose>1 -0.5 0.05 0 0 0</pose> <!-- x y z roll pitch yaw -->
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.4 0.4 0.4</size>
+              <size>0.1 0.1 0.2</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.4 0.4 0.4</size>
+              <size>0.1 0.1 0.2</size>
             </box>
           </geometry>
           <material>
@@ -137,19 +137,19 @@
 
     <model name="lidar_obstacle_box2">
       <static>true</static>
-      <pose>0 -2 0.2 0 0 0</pose> <!-- x y z roll pitch yaw -->
+      <pose>-1 0 0.05 0 0 0</pose> <!-- x y z roll pitch yaw -->
       <link name="link">
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.4 0.4 0.4</size>
+              <size>0.1 0.1 0.2</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.4 0.4 0.4</size>
+              <size>0.1 0.1 0.2</size>
             </box>
           </geometry>
           <material>
@@ -159,6 +159,44 @@
         </visual>
       </link>
     </model>
+
+
+    <model name="arena_wall_north">
+      <static>true</static>
+      <pose>0 1.25 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>5.0 0.05 0.30</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>5.0 0.05 0.30</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <model name="arena_wall_south">
+      <static>true</static>
+      <pose>0 -1.25 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>5.0 0.05 0.30</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>5.0 0.05 0.30</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <model name="arena_wall_east">
+      <static>true</static>
+      <pose>2.5 0 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.05 2.5 0.30</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.05 2.5 0.30</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <model name="arena_wall_west">
+      <static>true</static>
+      <pose>-2.5 0 0.15 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.05 2.5 0.30</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.05 2.5 0.30</size></box></geometry></visual>
+        </link>
+    </model>
+
 
     <!-- ========================= -->
     <!--   Tracked Robot            -->
