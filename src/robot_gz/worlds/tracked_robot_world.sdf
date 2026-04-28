@@ -208,6 +208,15 @@
     </include>
 
     <!-- ========================= -->
+    <!--   Overhead Camera         -->
+    <!-- ========================= -->
+    <include>
+      <uri>model://overhead_camera</uri>
+      <name>overhead_camera</name>
+      <pose>0 0 3.0 0 -1.5707963267948966 0</pose>
+    </include>
+
+    <!-- ========================= -->
     <!--     GUI Configuration      -->
     <!-- ========================= -->
     <gui fullscreen="0">

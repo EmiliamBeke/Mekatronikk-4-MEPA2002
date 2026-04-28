@@ -76,6 +76,8 @@ def generate_launch_description():
             '/lidar/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
             '/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU',
             '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/overhead_camera@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/overhead_camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
         ],
         output='screen'
     )
@@ -191,6 +193,18 @@ def generate_launch_description():
         ],
     )
 
+    overhead_camera_static_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='overhead_camera_static_tf',
+        arguments=[
+            '--x', '0', '--y', '0', '--z', '3.0',
+            '--roll', '0', '--pitch', '-1.5707963267948966', '--yaw', '0',
+            '--frame-id', 'world',
+            '--child-frame-id', 'overhead_camera_link',
+        ],
+    )
+
     # Give Gazebo a short head start, then bring up bridge/TF before Nav2.
     start_sim_io = TimerAction(
         period=1.0,
@@ -201,6 +215,7 @@ def generate_launch_description():
             lidar_scoped_frame_alias_tf,
             lidar_scoped_base_laser_alias_tf,
             imu_scoped_frame_alias_tf,
+            overhead_camera_static_tf,
             keyboard_teleop,
         ]
     )

@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
       Splitter Ratio: 0.5
-    Tree Height: 601
+    Tree Height: 141
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -195,12 +195,22 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        left_track_rviz:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         left_wheel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
         lidar_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_track_rviz:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -388,6 +398,20 @@ Visualization Manager:
         {}
       Update Interval: 0
       Value: false
+    - Class: rviz_default_plugins/Image
+      Enabled: true
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Overhead
+      Normalize Range: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /overhead_camera
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -435,22 +459,64 @@ Visualization Manager:
       Target Frame: odom
       Value: Orbit (rviz)
       Yaw: 1.9699997901916504
-    Saved: ~
+    Saved:
+      - Class: rviz_default_plugins/Orbit
+        Distance: 4.13463830947876
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.05999999865889549
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: 0
+          Y: 0
+          Z: 0.10000000149011612
+        Focal Shape Fixed Size: true
+        Focal Shape Size: 0.05000000074505806
+        Invert Z Axis: false
+        Name: Orbit
+        Near Clip Distance: 0.009999999776482582
+        Pitch: 0.709999680519104
+        Target Frame: odom
+        Value: Orbit (rviz)
+        Yaw: 1.9699997901916504
+      - Class: rviz_default_plugins/Orbit
+        Distance: 4.13463830947876
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.05999999865889549
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: 0
+          Y: 0
+          Z: 0.10000000149011612
+        Focal Shape Fixed Size: true
+        Focal Shape Size: 0.05000000074505806
+        Invert Z Axis: false
+        Name: Orbit
+        Near Clip Distance: 0.009999999776482582
+        Pitch: 0.709999680519104
+        Target Frame: odom
+        Value: Orbit (rviz)
+        Yaw: 1.9699997901916504
 Window Geometry:
   Camera:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1917
+  Height: 1011
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002c1000006ecfc0200000005fb0000000c00430061006d00650072006101000000650000021c0000002400fffffffb000000100044006900730070006c006100790073010000028c000002c00000016700fffffffb0000001200530065006c0065006300740069006f006e000000031f00000119000000a400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000003a700000153000000a400fffffffb0000000a005600690065007700730100000557000001fa0000011e00ffffff00000931000006ec00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Overhead:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd0000000100000000000002c100000395fc0200000006fb0000000c00430061006d006500720061010000003f000000d70000001700fffffffb000000100044006900730070006c006100790073010000011c000000cd000000cc00fffffffb0000001200530065006c0065006300740069006f006e000000031f000001190000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000003a7000001530000005d00fffffffb0000000a0056006900650077007301000001ef000000a9000000a900fffffffb00000010004f0076006500720068006500610064010000029e000001360000001700ffffff000004770000039500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Tool Properties:
     collapsed: false
   Views:
     collapsed: false
-  Width: 3069
-  X: 1
-  Y: 1
+  Width: 1854
+  X: 66
+  Y: 32
