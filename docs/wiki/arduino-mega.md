@@ -61,6 +61,32 @@ Denne bruker [`mega_dfr0601_test`](../../arduino/mega_dfr0601_test) og er
 ment for å sjekke at venstre og høyre motor faktisk beveger seg som forventet
 før du justerer ROS-kalibrering.
 
+### Motor-test prosedyre
+
+Testen kjører denne rekkefølgen automatisk:
+
+1. M1 forward, pause, M1 reverse
+2. M2 forward, pause, M2 reverse
+3. BOTH forward, pause, BOTH reverse
+
+Mens hvert steg går leses `ENC1` og `ENC2` kontinuerlig. Etter hvert steg får du:
+
+- `delta` (start til slutt)
+- `span` (min/max under hele steget)
+
+Diagnose i output:
+
+- `M1 dominant encoder` og `M2 dominant encoder`: viser hvilken encoder som faktisk følger hver motor.
+- Warning om M1/M2 har samme fortegn i forward og reverse: tyder på byttet retning eller at én retning ikke tar.
+- Warning om `BOTH` uten encoderbevegelse: tyder på driver/wiring/power-problem for felles kjøring.
+
+Nyttige overstyringer:
+
+```bash
+PWM_VALUE=170 STEP_DURATION=2.0 make mega-motor-test
+INTER_STEP_PAUSE=1.0 SAMPLE_PERIOD=0.10 make mega-motor-test
+```
+
 Krav:
 
 ```bash

@@ -45,7 +45,28 @@ def read_encoder_count(ser: serial.Serial, timeout: float) -> int:
         raise RuntimeError(f"failed to parse encoder reply: {reply!r}") from exc
 
 
-def read_encoder_pair(ser: serial.Serial, timeout: float) -> tuple[int, int]:
+def read_encoder_count_quiet(ser: serial.Serial, label: str, timeout: float) -> int:
+    send_command(ser, label)
+    reply = read_line(ser, timeout)
+    if reply is None:
+        raise RuntimeError(f"timeout waiting for reply to {label!r}")
+    expected_prefix = f"{label} "
+    if not reply.startswith(expected_prefix):
+        raise RuntimeError(
+            f"unexpected reply to {label!r}: expected prefix {expected_prefix!r}, got {reply!r}"
+        )
+    try:
+        return int(reply.split()[1])
+    except (IndexError, ValueError) as exc:
+        raise RuntimeError(f"failed to parse encoder reply: {reply!r}") from exc
+
+
+def read_encoder_pair(ser: serial.Serial, timeout: float, quiet: bool = False) -> tuple[int, int]:
+    if quiet:
+        enc1 = read_encoder_count_quiet(ser, "ENC1", timeout)
+        enc2 = read_encoder_count_quiet(ser, "ENC2", timeout)
+        return enc1, enc2
+
     enc1 = read_encoder_count(ser, timeout)
     reply = expect_reply(ser, "ENC2", "ENC2 ", timeout)
     try:
@@ -55,29 +76,71 @@ def read_encoder_pair(ser: serial.Serial, timeout: float) -> tuple[int, int]:
     return enc1, enc2
 
 
-def run_step(ser: serial.Serial, command: str, timeout: float, duration: float) -> None:
-    expect_reply(ser, command, "OK", timeout)
-    time.sleep(max(0.0, duration))
-    expect_reply(ser, "STOP", "OK STOP", timeout)
-    time.sleep(0.2)
-
-
 def run_step_with_delta(
     ser: serial.Serial,
     label: str,
     command: str,
     timeout: float,
     duration: float,
+    sample_period: float,
+    inter_step_pause: float,
     prev_enc1: int,
     prev_enc2: int,
-) -> tuple[int, int, int, int]:
+) -> tuple[int, int, int, int, int, int]:
     print(f"[mega-motor-test] Step: {label}")
-    run_step(ser, command, timeout, duration)
+    expect_reply(ser, command, "OK", timeout)
+
+    min1 = prev_enc1
+    max1 = prev_enc1
+    min2 = prev_enc2
+    max2 = prev_enc2
+    deadline = time.monotonic() + max(0.0, duration)
+
+    while True:
+        now = time.monotonic()
+        if now >= deadline:
+            break
+        time.sleep(min(sample_period, max(0.0, deadline - now)))
+        enc1_now, enc2_now = read_encoder_pair(ser, timeout, quiet=True)
+        min1 = min(min1, enc1_now)
+        max1 = max(max1, enc1_now)
+        min2 = min(min2, enc2_now)
+        max2 = max(max2, enc2_now)
+
+    expect_reply(ser, "STOP", "OK STOP", timeout)
+    time.sleep(max(0.0, inter_step_pause))
+
     enc1_now, enc2_now = read_encoder_pair(ser, timeout)
+    min1 = min(min1, enc1_now)
+    max1 = max(max1, enc1_now)
+    min2 = min(min2, enc2_now)
+    max2 = max(max2, enc2_now)
+
     delta1 = enc1_now - prev_enc1
     delta2 = enc2_now - prev_enc2
-    print(f"[mega-motor-test] Encoder delta after {label}: ENC1={delta1} ENC2={delta2}")
-    return enc1_now, enc2_now, delta1, delta2
+    span1 = max1 - min1
+    span2 = max2 - min2
+    print(
+        f"[mega-motor-test] Encoder delta after {label}: ENC1={delta1} ENC2={delta2} "
+        f"(span ENC1={span1} ENC2={span2})"
+    )
+    return enc1_now, enc2_now, delta1, delta2, span1, span2
+
+
+def sign(value: int) -> int:
+    if value > 0:
+        return 1
+    if value < 0:
+        return -1
+    return 0
+
+
+def dominant_encoder_name(delta1_a: int, delta2_a: int, delta1_b: int, delta2_b: int) -> str:
+    enc1_score = abs(delta1_a) + abs(delta1_b)
+    enc2_score = abs(delta2_a) + abs(delta2_b)
+    if enc1_score == 0 and enc2_score == 0:
+        return "none"
+    return "ENC1" if enc1_score >= enc2_score else "ENC2"
 
 
 def main() -> int:
@@ -86,6 +149,18 @@ def main() -> int:
     parser.add_argument("--baudrate", type=int, default=115200, help="Serial baudrate")
     parser.add_argument("--pwm", type=int, default=140, help="PWM magnitude to use for the test (0-255)")
     parser.add_argument("--step-duration", type=float, default=1.5, help="Seconds per motor step")
+    parser.add_argument(
+        "--inter-step-pause",
+        type=float,
+        default=0.6,
+        help="Seconds to pause after STOP before next step",
+    )
+    parser.add_argument(
+        "--sample-period",
+        type=float,
+        default=0.15,
+        help="Seconds between continuous encoder samples while a motor command is active",
+    )
     parser.add_argument("--reply-timeout", type=float, default=2.0, help="Seconds to wait for a reply")
     parser.add_argument(
         "--post-open-wait",
@@ -114,28 +189,88 @@ def main() -> int:
 
             current_enc1, current_enc2 = initial_enc1, initial_enc2
             failures: list[str] = []
+            step_results: dict[str, tuple[int, int, int, int]] = {}
 
             steps = [
-                ("M1 forward", f"M1 {pwm}"),
-                ("M1 reverse", f"M1 {-pwm}"),
-                ("M2 forward", f"M2 {pwm}"),
-                ("M2 reverse", f"M2 {-pwm}"),
-                ("both forward", f"BOTH {pwm} {pwm}"),
-                ("both reverse", f"BOTH {-pwm} {-pwm}"),
+                ("m1_forward", "M1 forward", f"M1 {pwm}"),
+                ("m1_reverse", "M1 reverse", f"M1 {-pwm}"),
+                ("m2_forward", "M2 forward", f"M2 {pwm}"),
+                ("m2_reverse", "M2 reverse", f"M2 {-pwm}"),
+                ("both_forward", "both forward", f"BOTH {pwm} {pwm}"),
+                ("both_reverse", "both reverse", f"BOTH {-pwm} {-pwm}"),
             ]
 
-            for label, command in steps:
-                current_enc1, current_enc2, delta1, delta2 = run_step_with_delta(
+            for key, label, command in steps:
+                current_enc1, current_enc2, delta1, delta2, span1, span2 = run_step_with_delta(
                     ser,
                     label,
                     command,
                     args.reply_timeout,
                     args.step_duration,
+                    max(0.02, args.sample_period),
+                    max(0.0, args.inter_step_pause),
                     current_enc1,
                     current_enc2,
                 )
-                if delta1 == 0 and delta2 == 0:
+                step_results[key] = (delta1, delta2, span1, span2)
+                if delta1 == 0 and delta2 == 0 and span1 == 0 and span2 == 0:
                     failures.append(label)
+
+            m1_f = step_results["m1_forward"]
+            m1_r = step_results["m1_reverse"]
+            m2_f = step_results["m2_forward"]
+            m2_r = step_results["m2_reverse"]
+            both_f = step_results["both_forward"]
+            both_r = step_results["both_reverse"]
+
+            m1_dom = dominant_encoder_name(m1_f[0], m1_f[1], m1_r[0], m1_r[1])
+            m2_dom = dominant_encoder_name(m2_f[0], m2_f[1], m2_r[0], m2_r[1])
+
+            print("[mega-motor-test] Diagnostic summary:")
+            print(f"[mega-motor-test]   M1 dominant encoder: {m1_dom}")
+            print(f"[mega-motor-test]   M2 dominant encoder: {m2_dom}")
+
+            if m1_dom == "ENC1":
+                m1_signs = (sign(m1_f[0]), sign(m1_r[0]))
+            elif m1_dom == "ENC2":
+                m1_signs = (sign(m1_f[1]), sign(m1_r[1]))
+            else:
+                m1_signs = (0, 0)
+
+            if m2_dom == "ENC1":
+                m2_signs = (sign(m2_f[0]), sign(m2_r[0]))
+            elif m2_dom == "ENC2":
+                m2_signs = (sign(m2_f[1]), sign(m2_r[1]))
+            else:
+                m2_signs = (0, 0)
+
+            if m1_signs[0] != 0 and m1_signs[1] != 0 and m1_signs[0] == m1_signs[1]:
+                print(
+                    "[mega-motor-test]   Warning: M1 forward/reverse produced same encoder sign. "
+                    "Direction may be swapped or one direction not effective.",
+                    file=sys.stderr,
+                )
+            if m2_signs[0] != 0 and m2_signs[1] != 0 and m2_signs[0] == m2_signs[1]:
+                print(
+                    "[mega-motor-test]   Warning: M2 forward/reverse produced same encoder sign. "
+                    "Direction may be swapped or one direction not effective.",
+                    file=sys.stderr,
+                )
+
+            if (both_f[0] == 0 and both_f[1] == 0 and both_f[2] == 0 and both_f[3] == 0) or (
+                both_r[0] == 0 and both_r[1] == 0 and both_r[2] == 0 and both_r[3] == 0
+            ):
+                print(
+                    "[mega-motor-test]   Warning: BOTH command did not move encoders in at least one direction.",
+                    file=sys.stderr,
+                )
+
+            if m1_dom == m2_dom and m1_dom != "none":
+                print(
+                    "[mega-motor-test]   Warning: M1 and M2 appear to affect the same encoder. "
+                    "Check motor/encoder wiring mapping.",
+                    file=sys.stderr,
+                )
 
             if failures:
                 print(
@@ -144,7 +279,7 @@ def main() -> int:
                     file=sys.stderr,
                 )
                 print(
-                    "[mega-motor-test] Try higher PWM, for example: PWM_VALUE=140 STEP_DURATION=1.2 make mega-motor-test",
+                    "[mega-motor-test] Try higher PWM/duration, for example: PWM_VALUE=170 STEP_DURATION=2.0 make mega-motor-test",
                     file=sys.stderr,
                 )
                 raise RuntimeError("one or more motor steps produced zero encoder movement")

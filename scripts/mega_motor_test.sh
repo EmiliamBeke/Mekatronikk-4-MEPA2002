@@ -32,6 +32,8 @@ MEGA_PORT="${MEGA_PORT:-}"
 MEGA_BAUDRATE="${MEGA_BAUDRATE:-115200}"
 PWM_VALUE="${PWM_VALUE:-140}"
 STEP_DURATION="${STEP_DURATION:-1.5}"
+INTER_STEP_PAUSE="${INTER_STEP_PAUSE:-0.6}"
+SAMPLE_PERIOD="${SAMPLE_PERIOD:-0.15}"
 
 if [[ -z "${MEGA_PORT}" ]]; then
   MEGA_PORT="$(detect_mega_port)" || {
@@ -54,10 +56,12 @@ fi
 
 echo "[mega-motor-test] Using ${MEGA_PORT} @ ${MEGA_BAUDRATE}" >&2
 echo "[mega-motor-test] Lift the robot off the floor before running this test." >&2
-echo "[mega-motor-test] PWM=${PWM_VALUE} duration=${STEP_DURATION}s" >&2
+echo "[mega-motor-test] PWM=${PWM_VALUE} duration=${STEP_DURATION}s pause=${INTER_STEP_PAUSE}s sample=${SAMPLE_PERIOD}s" >&2
 
 python3 "${SCRIPT_DIR}/mega_motor_test.py" \
   --port "${MEGA_PORT}" \
   --baudrate "${MEGA_BAUDRATE}" \
   --pwm "${PWM_VALUE}" \
-  --step-duration "${STEP_DURATION}"
+  --step-duration "${STEP_DURATION}" \
+  --inter-step-pause "${INTER_STEP_PAUSE}" \
+  --sample-period "${SAMPLE_PERIOD}"
