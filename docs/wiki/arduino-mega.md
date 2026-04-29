@@ -80,34 +80,38 @@ være:
 | Venstre | `M1` | `8` | `9` | `10` | `3` | `2` |
 | Høyre | `M2` | `30` | `31` | `44` | `18` | `19` |
 
-### Terminal Block Shield v1.1.0 kobling
+### Terminal Block Shield v1.1.0 på Arduino Mega
 
 Shieldet matcher DFRobot `DFR0921` / `Terminal Block Shield for Arduino Mega`:
 [DFRobot wiki](https://wiki.dfrobot.com/Terminal_Block_Shield_for_Arduino_Mega_SKU_DFR0921).
 
 På terminal block shieldet skal terminalnummeret følge pin-merkingen på Arduino
-Mega/shield-silkscreen. Retningspinnene er lagt i ryddige blokker, mens PWM og
-encoder Hall A/B bruker Mega-pins med riktig hardware-støtte.
+Mega/shield-silkscreen. DFRobot-skjemaet viser at terminalene ligger i fysiske
+rekker, så skru inn ledningene innerst/fjernest fra skrutrekker-tilgangen først.
+Da slipper du å løsne en tidligere ledning for å komme til neste terminal.
 
-Koble `M1 = venstre` slik:
+Retningspinnene er lagt i ryddige blokker, mens PWM og encoder Hall A/B bruker
+Mega-pins med riktig hardware-støtte.
 
-| Terminal | Signal | Side | Går til |
-|---:|---|---|---|
-| `8` | `M1 INA` | Venstre / `M1` | Venstre motor-driver INA |
-| `9` | `M1 INB` | Venstre / `M1` | Venstre motor-driver INB |
-| `10` | `M1 PWM` | Venstre / `M1` | Venstre motor-driver PWM |
-| `3` | `ENC1 Hall A` | Venstre / `M1` | Venstre encoder Hall A |
-| `2` | `ENC1 Hall B` | Venstre / `M1` | Venstre encoder Hall B |
+Koble `M1 = venstre` i denne skru-rekkefølgen:
 
-Koble `M2 = høyre` slik:
+| Steg | Terminal | Signal | Går til |
+|---:|---:|---|---|
+| 1 | `10` | `M1 PWM` | Venstre motor-driver PWM |
+| 2 | `9` | `M1 INB` | Venstre motor-driver INB |
+| 3 | `8` | `M1 INA` | Venstre motor-driver INA |
+| 4 | `3` | `ENC1 Hall A` | Venstre encoder Hall A |
+| 5 | `2` | `ENC1 Hall B` | Venstre encoder Hall B |
 
-| Terminal | Signal | Side | Går til |
-|---:|---|---|---|
-| `30` | `M2 INA` | Høyre / `M2` | Høyre motor-driver INA |
-| `31` | `M2 INB` | Høyre / `M2` | Høyre motor-driver INB |
-| `44` | `M2 PWM` | Høyre / `M2` | Høyre motor-driver PWM |
-| `18` | `ENC2 Hall A` | Høyre / `M2` | Høyre encoder Hall A |
-| `19` | `ENC2 Hall B` | Høyre / `M2` | Høyre encoder Hall B |
+Koble `M2 = høyre` i denne skru-rekkefølgen:
+
+| Steg | Terminal | Signal | Går til |
+|---:|---:|---|---|
+| 1 | `44` | `M2 PWM` | Høyre motor-driver PWM |
+| 2 | `31` | `M2 INB` | Høyre motor-driver INB |
+| 3 | `30` | `M2 INA` | Høyre motor-driver INA |
+| 4 | `19` | `ENC2 Hall B` | Høyre encoder Hall B |
+| 5 | `18` | `ENC2 Hall A` | Høyre encoder Hall A |
 
 Ikke bruk `11-13` eller `32-35` for motor/encoder i denne firmwareversjonen.
 Encoder 5V/GND skal tas fra shieldets `5V`/`GND` terminaler, ikke fra digitale

@@ -93,6 +93,10 @@ Usikkert: eksakt fysisk kameramodell er ikke dokumentert i repoet.
 
 Fra [`mega_keyboard_drive.ino`](../../arduino/mega_keyboard_drive/mega_keyboard_drive.ino):
 
+Megaen har et Terminal Block Shield v1.1.0 montert. Tabellen under viser
+firmware-pinnene. Skru-rekkefølge for shield-terminalene ligger i
+[`arduino-mega.md`](arduino-mega.md).
+
 | Signal | Pin |
 |---|---:|
 | `M1 INA` | `8` |
