@@ -45,6 +45,16 @@ def read_encoder_count(ser: serial.Serial, timeout: float) -> int:
         raise RuntimeError(f"failed to parse encoder reply: {reply!r}") from exc
 
 
+def read_encoder_pair(ser: serial.Serial, timeout: float) -> tuple[int, int]:
+    enc1 = read_encoder_count(ser, timeout)
+    reply = expect_reply(ser, "ENC2", "ENC2 ", timeout)
+    try:
+        enc2 = int(reply.split()[1])
+    except (IndexError, ValueError) as exc:
+        raise RuntimeError(f"failed to parse encoder reply: {reply!r}") from exc
+    return enc1, enc2
+
+
 def run_step(ser: serial.Serial, command: str, timeout: float, duration: float) -> None:
     expect_reply(ser, command, "OK", timeout)
     time.sleep(max(0.0, duration))
@@ -80,30 +90,57 @@ def main() -> int:
             expect_reply(ser, "PING", "PONG", args.reply_timeout)
             expect_reply(ser, "STOP", "OK STOP", args.reply_timeout)
             expect_reply(ser, "RESET ENC1", "OK RESET ENC1", args.reply_timeout)
-            initial_enc = read_encoder_count(ser, args.reply_timeout)
-            print(f"[mega-motor-test] Initial ENC1={initial_enc}")
+            expect_reply(ser, "RESET ENC2", "OK RESET ENC2", args.reply_timeout)
+            initial_enc1, initial_enc2 = read_encoder_pair(ser, args.reply_timeout)
+            print(f"[mega-motor-test] Initial ENC1={initial_enc1} ENC2={initial_enc2}")
 
             print("[mega-motor-test] Step 1: M1 forward")
             run_step(ser, f"M1 {pwm}", args.reply_timeout, args.step_duration)
-            enc_after_m1_forward = read_encoder_count(ser, args.reply_timeout)
-            delta_forward = enc_after_m1_forward - initial_enc
-            print(f"[mega-motor-test] ENC1 delta after M1 forward: {delta_forward}")
-            if delta_forward == 0:
-                raise RuntimeError("encoder count did not change during M1 forward step")
+            enc1_after_m1_forward, enc2_after_m1_forward = read_encoder_pair(ser, args.reply_timeout)
+            delta1_forward = enc1_after_m1_forward - initial_enc1
+            delta2_forward = enc2_after_m1_forward - initial_enc2
+            print(
+                "[mega-motor-test] Encoder delta after M1 forward: "
+                f"ENC1={delta1_forward} ENC2={delta2_forward}"
+            )
+            if delta1_forward == 0 and delta2_forward == 0:
+                raise RuntimeError("encoder counts did not change during M1 forward step")
 
             print("[mega-motor-test] Step 2: M1 reverse")
             run_step(ser, f"M1 {-pwm}", args.reply_timeout, args.step_duration)
-            enc_after_m1_reverse = read_encoder_count(ser, args.reply_timeout)
-            delta_reverse = enc_after_m1_reverse - enc_after_m1_forward
-            print(f"[mega-motor-test] ENC1 delta after M1 reverse: {delta_reverse}")
-            if delta_reverse == 0:
-                raise RuntimeError("encoder count did not change during M1 reverse step")
+            enc1_after_m1_reverse, enc2_after_m1_reverse = read_encoder_pair(ser, args.reply_timeout)
+            delta1_reverse = enc1_after_m1_reverse - enc1_after_m1_forward
+            delta2_reverse = enc2_after_m1_reverse - enc2_after_m1_forward
+            print(
+                "[mega-motor-test] Encoder delta after M1 reverse: "
+                f"ENC1={delta1_reverse} ENC2={delta2_reverse}"
+            )
+            if delta1_reverse == 0 and delta2_reverse == 0:
+                raise RuntimeError("encoder counts did not change during M1 reverse step")
 
             print("[mega-motor-test] Step 3: M2 forward")
             run_step(ser, f"M2 {pwm}", args.reply_timeout, args.step_duration)
+            enc1_after_m2_forward, enc2_after_m2_forward = read_encoder_pair(ser, args.reply_timeout)
+            delta1_m2_forward = enc1_after_m2_forward - enc1_after_m1_reverse
+            delta2_m2_forward = enc2_after_m2_forward - enc2_after_m1_reverse
+            print(
+                "[mega-motor-test] Encoder delta after M2 forward: "
+                f"ENC1={delta1_m2_forward} ENC2={delta2_m2_forward}"
+            )
+            if delta1_m2_forward == 0 and delta2_m2_forward == 0:
+                raise RuntimeError("encoder counts did not change during M2 forward step")
 
             print("[mega-motor-test] Step 4: M2 reverse")
             run_step(ser, f"M2 {-pwm}", args.reply_timeout, args.step_duration)
+            enc1_after_m2_reverse, enc2_after_m2_reverse = read_encoder_pair(ser, args.reply_timeout)
+            delta1_m2_reverse = enc1_after_m2_reverse - enc1_after_m2_forward
+            delta2_m2_reverse = enc2_after_m2_reverse - enc2_after_m2_forward
+            print(
+                "[mega-motor-test] Encoder delta after M2 reverse: "
+                f"ENC1={delta1_m2_reverse} ENC2={delta2_m2_reverse}"
+            )
+            if delta1_m2_reverse == 0 and delta2_m2_reverse == 0:
+                raise RuntimeError("encoder counts did not change during M2 reverse step")
 
             print("[mega-motor-test] Step 5: both forward")
             run_step(ser, f"BOTH {pwm} {pwm}", args.reply_timeout, args.step_duration)
