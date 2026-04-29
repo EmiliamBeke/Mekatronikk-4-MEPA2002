@@ -151,8 +151,11 @@ Nyttige overstyringer:
 
 ```bash
 PWM_VALUE=170 STEP_DURATION=2.0 make mega-motor-test
-INTER_STEP_PAUSE=1.0 SAMPLE_PERIOD=0.10 make mega-motor-test
+INTER_STEP_PAUSE=5.0 SAMPLE_PERIOD=0.10 make mega-motor-test
 ```
+
+Default er `STEP_DURATION=2.5` og `INTER_STEP_PAUSE=3.0`, slik at det er tid
+til å se hvilken side som faktisk roterer mellom hvert steg.
 
 Etter motor-testen, last tilbake runtime-firmware før ROS-bringup:
 

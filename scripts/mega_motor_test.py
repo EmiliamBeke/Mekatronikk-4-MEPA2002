@@ -165,11 +165,11 @@ def main() -> int:
     parser.add_argument("--port", required=True, help="Serial device path, for example /dev/ttyACM0")
     parser.add_argument("--baudrate", type=int, default=115200, help="Serial baudrate")
     parser.add_argument("--pwm", type=int, default=140, help="PWM magnitude to use for the test (0-255)")
-    parser.add_argument("--step-duration", type=float, default=1.5, help="Seconds per motor step")
+    parser.add_argument("--step-duration", type=float, default=2.5, help="Seconds per motor step")
     parser.add_argument(
         "--inter-step-pause",
         type=float,
-        default=0.6,
+        default=3.0,
         help="Seconds to pause after STOP before next step",
     )
     parser.add_argument(
