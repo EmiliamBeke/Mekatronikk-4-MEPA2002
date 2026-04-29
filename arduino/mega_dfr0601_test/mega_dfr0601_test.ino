@@ -12,8 +12,8 @@ constexpr int kIna1Pin = 4;
 constexpr int kInb1Pin = 5;
 constexpr int kPwm1Pin = 6;
 
-constexpr int kIna2Pin = 11;
-constexpr int kInb2Pin = 12;
+constexpr int kIna2Pin = 12;
+constexpr int kInb2Pin = 11;
 constexpr int kPwm2Pin = 10;
 constexpr int kHallA2Pin = 18;
 constexpr int kHallB2Pin = 19;

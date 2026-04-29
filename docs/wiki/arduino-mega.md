@@ -78,7 +78,7 @@ være:
 | Side | Motor | INA | INB | PWM | Hall A | Hall B |
 |---|---|---:|---:|---:|---:|---:|
 | Venstre | `M1` | `4` | `5` | `6` | `3` | `2` |
-| Høyre | `M2` | `11` | `12` | `10` | `18` | `19` |
+| Høyre | `M2` | `12` | `11` | `10` | `18` | `19` |
 
 ### Terminal Block Shield v1.1.0 på Arduino Mega
 
@@ -100,8 +100,8 @@ Koble `M2 = høyre` i denne skru-rekkefølgen. Denne ligger nær terminalraden
 | Steg | Terminal | Signal | Går til |
 |---:|---:|---|---|
 | 1 | `10` | `M2 PWM` | Høyre motor-driver PWM |
-| 2 | `12` | `M2 INB` | Høyre motor-driver INB |
-| 3 | `11` | `M2 INA` | Høyre motor-driver INA |
+| 2 | `12` | `M2 INA` | Høyre motor-driver INA |
+| 3 | `11` | `M2 INB` | Høyre motor-driver INB |
 | 4 | `19` | `ENC2 Hall B` | Høyre encoder Hall B |
 | 5 | `18` | `ENC2 Hall A` | Høyre encoder Hall A |
 

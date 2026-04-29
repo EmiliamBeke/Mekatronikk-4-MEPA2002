@@ -102,8 +102,8 @@ firmware-pinnene. Skru-rekkefølge for shield-terminalene ligger i
 | `M1 INA` | `4` |
 | `M1 INB` | `5` |
 | `M1 PWM` | `6` |
-| `M2 INA` | `11` |
-| `M2 INB` | `12` |
+| `M2 INA` | `12` |
+| `M2 INB` | `11` |
 | `M2 PWM` | `10` |
 | `ENC1 Hall A` | `3` |
 | `ENC1 Hall B` | `2` |
