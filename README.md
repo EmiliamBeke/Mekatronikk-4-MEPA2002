@@ -83,6 +83,7 @@ Start her:
 | `make pc-camera-rviz` | Start PC RViz med rå kamerastream |
 | `make pc-ros-keyboard` | Manuell ROS teleop via `/cmd_vel_manual` |
 | `make mega-upload` | Last opp Arduino sketch |
+| `make mega-motor-test` | Kjør direkte motor-/encoder-test på Mega |
 | `make mega-calibrate ARGS="snapshot"` | Test Mega/encoder-kontakt |
 
 ## Prosjektstatus Kort

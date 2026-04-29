@@ -21,7 +21,7 @@ Kjør på Pi-host, ikke i Docker:
 make mega-upload
 ```
 
-Default sketch i [`Makefile`](../../Makefile) er `mega_smoketest`.
+Default sketch i [`Makefile`](../../Makefile) er `mega_keyboard_drive`.
 
 Runtime firmware:
 
@@ -35,6 +35,16 @@ Overstyr port eller board:
 MEGA_PORT=/dev/ttyACM0 make mega-upload
 MEGA_FQBN=arduino:avr:mega make mega-upload
 ```
+
+Motor-/encoder-test:
+
+```bash
+make mega-motor-test
+```
+
+Denne bruker [`mega_dfr0601_test`](../../arduino/mega_dfr0601_test) og er
+ment for å sjekke at venstre og høyre motor faktisk beveger seg som forventet
+før du justerer ROS-kalibrering.
 
 Krav:
 
