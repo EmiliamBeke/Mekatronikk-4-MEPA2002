@@ -28,13 +28,8 @@ install(DIRECTORY launch rviz
 )
 
 install(FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../config/apriltag_overhead.yaml
   ${CMAKE_CURRENT_SOURCE_DIR}/../../config/ekf.yaml
   ${CMAKE_CURRENT_SOURCE_DIR}/../../config/nav2_params.yaml
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../config/overhead_odom.yaml
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../config/plotjuggler_sim_monitor.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../config/robot_calibration.yaml
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../config/slam_params.yaml
   DESTINATION share/${PROJECT_NAME}/config
 )
 
