@@ -16,6 +16,31 @@ up:
 
 down:
 	docker compose down
+
+# Docker Buildx helpers (use on Pi for faster cacheable builds)
+.PHONY: docker-buildx-setup docker-buildx-build docker-buildx-clean
+
+docker-buildx-setup:
+	@echo "Setting up buildx builder (idempotent)"
+	-docker buildx create --name mekk4-builder --use 2>/dev/null || true
+	-docker buildx inspect --bootstrap 2>/dev/null || true
+	@mkdir -p $(HOME)/.buildx-cache
+
+docker-buildx-build: docker-buildx-setup
+	@echo "Building image with buildx and local cache at $(HOME)/.buildx-cache"
+	DOCKER_BUILDKIT=1 docker buildx build \
+	  --builder mekk4-builder \
+	  --cache-to=type=local,dest=$(HOME)/.buildx-cache \
+	  --cache-from=type=local,src=$(HOME)/.buildx-cache \
+	  --load \
+	  -t mekk4/ros2-jazzy-dev:local \
+	  docker/
+
+docker-buildx-clean:
+	@echo "Removing buildx builder and cache (safe to run)"
+	-docker buildx rm mekk4-builder 2>/dev/null || true
+	-rm -rf $(HOME)/.buildx-cache 2>/dev/null || true
+
 # Build ROS workspace + fix console_script shebang to venv python (PEP668-safe)
 ws:
 	docker compose run --rm ros bash -lc '/ws/scripts/ws_build.sh'
