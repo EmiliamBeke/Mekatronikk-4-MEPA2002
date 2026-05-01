@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO_URL="https://github.com/ldrobotSensorTeam/ldlidar_stl_ros2.git"
 REPO_TAG="v3.0.3"
-WS_ROOT="/ws"
+WS_ROOT="${1:-.}"
 SRC_DIR="${WS_ROOT}/src"
 PKG_DIR="${SRC_DIR}/ldlidar_stl_ros2"
 
