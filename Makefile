@@ -42,6 +42,24 @@ docker-buildx-clean:
 	-docker buildx rm mekk4-builder 2>/dev/null || true
 	-rm -rf $(HOME)/.buildx-cache 2>/dev/null || true
 
+# Short aliases for convenience
+.PHONY: bd bxs bxb bxc pb
+
+bd: build
+	@:
+
+bxs: docker-buildx-setup
+	@:
+
+bxb: docker-buildx-build
+	@:
+
+bxc: docker-buildx-clean
+	@:
+
+pb: pi-bringup
+	@:
+
 # Build ROS workspace + fix console_script shebang to venv python (PEP668-safe)
 ws:
 	docker compose run --rm ros bash -lc '/ws/scripts/ws_build.sh'
