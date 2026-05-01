@@ -48,6 +48,26 @@ Reference: [Makefile](Makefile), [src/robot_bringup/launch/minimal_all.launch.py
 
 Reference: [scripts/pi_bringup.sh](scripts/pi_bringup.sh), [README.md](README.md)
 
+### Pi Repository Setup (Sparse Checkout)
+Pi runs from `main` branch using **git sparse checkout** to exclude simulation-only code.
+
+**Key fact:** Pi clones only these directories:
+- `src/mekk4_bringup`, `src/mekk4_perception`, `src/robot_bringup`, `src/robot_description`
+- `config`, `scripts`, `docker`
+
+**Pi does NOT clone** (by design):
+- `src/robot_gz` (Gazebo world/models)
+- `src/robot_sim_control` (sim adapter)
+- `models/` (sim asset models)
+- `arduino/` (not needed at runtime)
+- `docs/wiki/` (documentation accessed on PC)
+
+When adding new files/directories:
+- Hardware and control code: will auto-appear on Pi via `git pull`.
+- Simulation-only code: won't appear on Pi unless added to sparse-checkout list.
+
+Setup reference: [scripts/pi_sparse_checkout_setup.sh](scripts/pi_sparse_checkout_setup.sh)
+
 ## Architecture Boundaries
 Primary packages in [src](src):
 - [src/robot_bringup](src/robot_bringup): launch orchestration.

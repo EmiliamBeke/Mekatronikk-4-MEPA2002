@@ -18,6 +18,15 @@ startet sim uten Nav2.
 
 ### Fysisk robot på Pi
 
+**Første gang (første gangs setup med sparse checkout):**
+
+```bash
+ssh gruppe5@gruppe5pi5
+bash ~/pi_sparse_checkout_setup.sh
+```
+
+**Senere oppstarting:**
+
 ```bash
 ssh gruppe5@gruppe5pi5
 cd ~/Mekatronikk-4-MEPA2002

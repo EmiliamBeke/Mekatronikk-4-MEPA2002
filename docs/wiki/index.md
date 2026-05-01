@@ -30,6 +30,7 @@ Viktig kildegrunnlag:
 | [ROS interfaces](ros-interfaces.md) | Topics, frames, nodes og command chain |
 | [Bygg og miljø](build-and-environment.md) | Docker, colcon, ROS setup og workspace-build |
 | [Pi drift og vedlikehold](pi-maintenance.md) | Diskplass, Docker-opprydding, CPU governor og throttling |
+| [Pi Sparse Checkout](pi-sparse-checkout.md) | Git sparse checkout setup for å holde Pi ren |
 | [Fysisk robot bringup](physical-robot.md) | `make pi-bringup`, env-vars og Pi-runtime |
 | [PC-verktøy](pc-tools.md) | RViz, UDP camera bridge og ROS keyboard teleop |
 | [Simulering](simulation.md) | Gazebo, bridge, sim sensors og sim commands |
