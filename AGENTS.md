@@ -51,22 +51,28 @@ Reference: [scripts/pi_bringup.sh](scripts/pi_bringup.sh), [README.md](README.md
 ### Pi Repository Setup (Sparse Checkout)
 Pi runs from `main` branch using **git sparse checkout** to exclude simulation-only code.
 
+**First-time setup:**
+1. Run: `bash scripts/pi_sparse_checkout_setup.sh`
+2. After clone completes, run: `bash scripts/setup_ldlidar_driver.sh` (fetches LiDAR driver from external repo)
+
 **Key fact:** Pi clones only these directories:
 - `src/mekk4_bringup`, `src/mekk4_perception`, `src/robot_bringup`, `src/robot_description`
-- `config`, `scripts`, `docker`
+- `config`, `scripts`, `docker`, `arduino`
+
+**External dependencies (fetched by setup scripts):**
+- `src/ldlidar_stl_ros2` — LiDAR driver (git-ignored, cloned by `setup_ldlidar_driver.sh`)
 
 **Pi does NOT clone** (by design):
 - `src/robot_gz` (Gazebo world/models)
 - `src/robot_sim_control` (sim adapter)
-- `models/` (sim asset models)
-- `arduino/` (not needed at runtime)
+- `models/` (sim asset models except YOLO)
 - `docs/wiki/` (documentation accessed on PC)
 
 When adding new files/directories:
 - Hardware and control code: will auto-appear on Pi via `git pull`.
 - Simulation-only code: won't appear on Pi unless added to sparse-checkout list.
 
-Setup reference: [scripts/pi_sparse_checkout_setup.sh](scripts/pi_sparse_checkout_setup.sh)
+Setup reference: [scripts/pi_sparse_checkout_setup.sh](scripts/pi_sparse_checkout_setup.sh), [scripts/setup_ldlidar_driver.sh](scripts/setup_ldlidar_driver.sh)
 
 ## Architecture Boundaries
 Primary packages in [src](src):
