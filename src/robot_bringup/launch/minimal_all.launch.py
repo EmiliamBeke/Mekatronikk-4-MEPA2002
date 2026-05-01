@@ -22,6 +22,7 @@ def generate_launch_description():
     keyboard_teleop_enabled = LaunchConfiguration('keyboard_teleop')
     use_nav2 = LaunchConfiguration('use_nav2')
     use_ekf = LaunchConfiguration('use_ekf')
+    use_teddy = LaunchConfiguration('use_teddy')
     use_overhead_apriltag = LaunchConfiguration('use_overhead_apriltag')
     params_file = LaunchConfiguration('params_file')
     ekf_params_file = LaunchConfiguration('ekf_params_file')
@@ -58,6 +59,8 @@ def generate_launch_description():
     default_ekf_params = os.path.join(robot_bringup_share, 'config', 'ekf.yaml')
     default_apriltag_params = os.path.join(robot_bringup_share, 'config', 'apriltag_overhead.yaml')
     default_overhead_odom_params = os.path.join(robot_bringup_share, 'config', 'overhead_odom.yaml')
+    workspace_root = os.path.abspath(os.path.join(robot_bringup_share, '..', '..', '..', '..'))
+    default_teddy_model = os.path.join(workspace_root, 'models', 'yolo26n_ncnn_model')
 
     gz_gui = ExecuteProcess(
         cmd=['gz', 'sim', '-v', gz_verbosity, world],
@@ -119,7 +122,7 @@ def generate_launch_description():
         launch_arguments={
             'use_nav2': use_nav2,
             'use_lidar': 'false',
-            'use_teddy': 'false',
+            'use_teddy': use_teddy,
             'use_imu': 'false',
             'use_mega_driver': 'false',
             'use_ekf': use_ekf,
@@ -269,6 +272,24 @@ def generate_launch_description():
         ],
     )
 
+    sim_camera_udp_stream = Node(
+        package='mekk4_perception',
+        executable='sim_camera_udp_stream',
+        name='sim_camera_udp_stream',
+        output='screen',
+        condition=IfCondition(use_teddy),
+        parameters=[
+            {'use_sim_time': True},
+            {
+                'image_topic': '/camera',
+                'host': '127.0.0.1',
+                'port': 5600,
+                'fps': 15,
+                'bitrate_kbps': 1400,
+            },
+        ],
+    )
+
     # Give Gazebo a short head start, then bring up bridge/TF before Nav2.
     start_sim_io = TimerAction(
         period=1.0,
@@ -284,6 +305,7 @@ def generate_launch_description():
             overhead_camera_info,
             overhead_apriltag_detector,
             overhead_apriltag_odom,
+            sim_camera_udp_stream,
             keyboard_teleop,
         ]
     )
@@ -344,6 +366,11 @@ def generate_launch_description():
             description='Run EKF from the shared pi_robot core stack.'
         ),
         DeclareLaunchArgument(
+            'use_teddy',
+            default_value='true',
+            description='Run teddy_detector in sim using a local UDP camera adapter.'
+        ),
+        DeclareLaunchArgument(
             'use_overhead_apriltag',
             default_value='true',
             description='Run simulated overhead AprilTag detection and /overhead/odom publisher.'
@@ -390,6 +417,23 @@ def generate_launch_description():
         ),
         SetEnvironmentVariable('ROS_USE_SIM_TIME', 'true'),
         SetEnvironmentVariable('GZ_SIM_RESOURCE_PATH', gz_resource_path),
+        SetEnvironmentVariable(
+            'MEKK4_CAM_SOURCE_GST',
+            'udpsrc port=5600 caps=application/x-rtp,media=video,encoding-name=H264,payload=96,clock-rate=90000 ! '
+            'rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false',
+        ),
+        SetEnvironmentVariable('MEKK4_CAM_WIDTH', '640'),
+        SetEnvironmentVariable('MEKK4_CAM_HEIGHT', '480'),
+        SetEnvironmentVariable('MEKK4_CAM_FPS', '15'),
+        SetEnvironmentVariable('MEKK4_NCNN_MODEL', default_teddy_model),
+        SetEnvironmentVariable('MEKK4_CONF', '0.3'),
+        SetEnvironmentVariable('MEKK4_IMGSZ', '640'),
+        SetEnvironmentVariable('MEKK4_CENTER_TOL', '0.10'),
+        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE', '1'),
+        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE_TOPIC', '/teddy_detector/debug_image'),
+        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE_SCALE', '1.0'),
+        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE_FPS', '5.0'),
+        SetEnvironmentVariable('MEKK4_DEBUG_STREAM', '0'),
         gz_gui,
         gz_headless,
         start_sim_io,
