@@ -60,7 +60,7 @@ reduserer nettverks- og CPU-belastning ved rebuilds.
 
 | Kommando | Effekt |
 |---|---|
-| `make build` | Bygger Docker-imaget på nytt med `docker compose build`. Bruk sjelden. |
+| `make build` | Bygger Docker-imaget på nytt ved å bruke Buildx (`make docker-buildx-build`). Bruk sjelden. |
 | `make ws` | Kjører [`scripts/ws_build.sh`](../../scripts/ws_build.sh) i container |
 | `make shell` | Åpner shell i container |
 | `make up` | Starter compose service detached |
