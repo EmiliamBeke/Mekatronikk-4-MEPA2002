@@ -6,7 +6,8 @@ MEGA_UPLOAD_DEFAULT_SKETCH := mega_keyboard_drive
 MEGA_UPLOAD_SKETCH := $(firstword $(filter-out mega-upload,$(MAKECMDGOALS)))
 
 build:
-	docker compose build
+	@echo "Building docker image with buildx (uses local cache)."
+	$(MAKE) docker-buildx-build
 
 shell:
 	docker compose run --rm ros
