@@ -5,8 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # --- Python venv for pip packages (PEP 668 safe) ---
 # Install venv first so pip layer can be cached independently from apt changes
-RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt \
-  apt-get update && apt-get install -y python3-venv && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3-venv && rm -rf /var/lib/apt/lists/*
 RUN python3 -m venv /opt/venv
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -17,8 +16,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Basic dev tooling for ROS 2 workspaces.
 # This image is intended for headless SSH use on the Pi, so no GUI tools are included.
-RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt \
-  apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gstreamer1.0-libav \
     gstreamer1.0-plugins-bad \

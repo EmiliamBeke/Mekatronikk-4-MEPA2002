@@ -61,9 +61,9 @@ make docker-buildx-build
 make docker-buildx-clean
 ```
 
-`docker/Dockerfile` bruker BuildKit cache-mount for apt. Pip kjøres med
-`--no-cache-dir` for å unngå at `ultralytics`/Python wheels fyller Pi-disken
-under build.
+`docker/Dockerfile` bruker ikke apt/pip cache-mounts. Pi-en har raskt nettverk,
+men tregt SD-kort, så default build prioriterer lavere disk-I/O og mindre
+cache-vekst over å cache nedlastede pakker. Buildx layer-cache beholdes.
 
 `make build` er en kort alias for `make docker-buildx-build`.
 
