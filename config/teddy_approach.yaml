@@ -2,7 +2,7 @@ teddy_approach:
   ros__parameters:
     enabled: true
     status_topic: /teddy_detector/status
-    cmd_vel_topic: /cmd_vel_manual
+    cmd_vel_topic: /cmd_vel_teddy
     publish_period_s: 0.05
     lost_timeout_s: 0.5
 

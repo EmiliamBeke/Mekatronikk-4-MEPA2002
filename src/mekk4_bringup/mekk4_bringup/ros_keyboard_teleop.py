@@ -230,7 +230,7 @@ def main() -> int:
     parser.add_argument("--speed-step", type=float, default=0.02, help="Linear speed increment for E/Q")
     parser.add_argument("--turn-speed-step", type=float, default=0.10, help="Angular speed increment for P/O")
     parser.add_argument("--max-speed", type=float, default=0.40, help="Maximum linear speed in m/s")
-    parser.add_argument("--max-turn-speed", type=float, default=1.80, help="Maximum angular speed in rad/s")
+    parser.add_argument("--max-turn-speed", type=float, default=3.70, help="Maximum angular speed in rad/s")
     parser.add_argument("--send-period", type=float, default=0.03, help="Seconds between repeated cmd_vel publishes")
     args = parser.parse_args(remove_ros_args(args=sys.argv)[1:])
 

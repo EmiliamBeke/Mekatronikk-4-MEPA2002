@@ -91,6 +91,7 @@ def generate_launch_description():
             parameters=[
                 {
                     'nav_input_topic': 'cmd_vel_nav_auto',
+                    'assist_input_topic': 'cmd_vel_teddy',
                     'manual_input_topic': 'cmd_vel_manual',
                     'output_topic': 'cmd_vel_nav',
                     'active_source_topic': 'cmd_vel_mux_active',
