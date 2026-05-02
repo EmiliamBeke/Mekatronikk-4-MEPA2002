@@ -1,0 +1,24 @@
+teddy_approach:
+  ros__parameters:
+    enabled: true
+    status_topic: /teddy_detector/status
+    cmd_vel_topic: /cmd_vel_manual
+    publish_period_s: 0.05
+    lost_timeout_s: 0.5
+
+    # Centering controller. dx > 0 means teddy is right of image center.
+    angular_kp: 1.2
+    max_angular_speed: 0.8
+    center_tolerance: 0.10
+
+    # Drive forward only after the teddy is centered unless this is true.
+    linear_speed: 0.08
+    drive_when_not_centered: false
+
+    # Optional Nav2 goal used as a rough teddy search/approach position.
+    use_nav_goal: false
+    send_goal_on_start: false
+    goal_frame: odom
+    goal_x: 0.0
+    goal_y: 0.0
+    goal_yaw: 0.0

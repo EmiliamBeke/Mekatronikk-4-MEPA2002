@@ -21,11 +21,17 @@ def generate_launch_description():
 
     default_ekf_params_path = os.path.join(robot_bringup_share, 'config', 'ekf.yaml')
     default_nav2_params_path = os.path.join(robot_bringup_share, 'config', 'nav2_params.yaml')
+    default_teddy_approach_params_path = os.path.join(
+        robot_bringup_share,
+        'config',
+        'teddy_approach.yaml',
+    )
     default_rviz_config_path = os.path.join(robot_bringup_share, 'rviz', 'rviz.rviz')
 
     use_nav2 = LaunchConfiguration('use_nav2')
     use_lidar = LaunchConfiguration('use_lidar')
     use_teddy = LaunchConfiguration('use_teddy')
+    use_teddy_approach = LaunchConfiguration('use_teddy_approach')
     use_imu = LaunchConfiguration('use_imu')
     use_mega_driver = LaunchConfiguration('use_mega_driver')
     use_ekf = LaunchConfiguration('use_ekf')
@@ -62,6 +68,7 @@ def generate_launch_description():
     tf_pitch = LaunchConfiguration('tf_pitch')
     tf_yaw = LaunchConfiguration('tf_yaw')
     params_file = LaunchConfiguration('params_file')
+    teddy_approach_params_file = LaunchConfiguration('teddy_approach_params_file')
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
     rviz_config = LaunchConfiguration('rviz_config')
@@ -121,6 +128,18 @@ def generate_launch_description():
         name='teddy_detector',
         output='screen',
         condition=IfCondition(use_teddy),
+    )
+
+    teddy_approach_node = Node(
+        package='mekk4_bringup',
+        executable='teddy_approach_node',
+        name='teddy_approach',
+        output='screen',
+        condition=IfCondition(use_teddy_approach),
+        parameters=[
+            teddy_approach_params_file,
+            {'enabled': ParameterValue(use_teddy_approach, value_type=bool)},
+        ],
     )
 
     imu_node = Node(
@@ -184,6 +203,7 @@ def generate_launch_description():
         DeclareLaunchArgument('use_nav2', default_value='true'),
         DeclareLaunchArgument('use_lidar', default_value='true'),
         DeclareLaunchArgument('use_teddy', default_value='false'),
+        DeclareLaunchArgument('use_teddy_approach', default_value='false'),
         DeclareLaunchArgument('use_imu', default_value='false'),
         DeclareLaunchArgument('use_mega_driver', default_value='false'),
         DeclareLaunchArgument('use_ekf', default_value='false'),
@@ -220,6 +240,10 @@ def generate_launch_description():
         DeclareLaunchArgument('tf_pitch', default_value='0.0'),
         DeclareLaunchArgument('tf_yaw', default_value='0.0'),
         DeclareLaunchArgument('params_file', default_value=default_nav2_params_path),
+        DeclareLaunchArgument(
+            'teddy_approach_params_file',
+            default_value=default_teddy_approach_params_path,
+        ),
         DeclareLaunchArgument('rviz_config', default_value=default_rviz_config_path),
         DeclareLaunchArgument('use_respawn', default_value='false'),
         DeclareLaunchArgument('log_level', default_value='info'),
@@ -233,5 +257,6 @@ def generate_launch_description():
         lidar_launch,
         nav2_launch,
         teddy_detector,
+        teddy_approach_node,
         rviz_node,
     ])

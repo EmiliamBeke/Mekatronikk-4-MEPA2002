@@ -10,6 +10,7 @@ eval "$(python3 "${SCRIPT_DIR}/robot_calibration_env.py")"
 
 WITH_NAV2="${WITH_NAV2:-1}"
 WITH_TEDDY="${WITH_TEDDY:-1}"
+WITH_TEDDY_APPROACH="${WITH_TEDDY_APPROACH:-0}"
 WITH_IMU="${WITH_IMU:-1}"
 WITH_MEGA_DRIVER="${WITH_MEGA_DRIVER:-1}"
 WITH_EKF="${WITH_EKF:-1}"
@@ -35,6 +36,7 @@ RIGHT_M_PER_TICK="${RIGHT_M_PER_TICK:-0.0}"
 TRACK_WIDTH_EFF_M="${TRACK_WIDTH_EFF_M:-0.35}"
 EKF_PARAMS_FILE="${EKF_PARAMS_FILE:-/ws/config/ekf.yaml}"
 PARAMS_FILE="${PARAMS_FILE:-/ws/config/nav2_params.yaml}"
+TEDDY_APPROACH_PARAMS_FILE="${TEDDY_APPROACH_PARAMS_FILE:-/ws/config/teddy_approach.yaml}"
 WIDTH="${WIDTH:-1296}"
 HEIGHT="${HEIGHT:-972}"
 FPS="${FPS:-15}"
@@ -50,12 +52,16 @@ SOURCE_LAUNCH="${REPO_ROOT}/src/robot_bringup/launch/pi_robot.launch.py"
 INSTALLED_LAUNCH="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/launch/pi_robot.launch.py"
 SOURCE_NAV2_STACK_LAUNCH="${REPO_ROOT}/src/robot_bringup/launch/nav2_stack.launch.py"
 INSTALLED_NAV2_STACK_LAUNCH="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/launch/nav2_stack.launch.py"
+SOURCE_TEDDY_APPROACH_PARAMS="${REPO_ROOT}/config/teddy_approach.yaml"
+INSTALLED_TEDDY_APPROACH_PARAMS="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/config/teddy_approach.yaml"
 SOURCE_PKG_XML="${REPO_ROOT}/src/robot_bringup/package.xml"
 SOURCE_CMAKE="${REPO_ROOT}/src/robot_bringup/CMakeLists.txt"
 MEKK4_SETUP="${REPO_ROOT}/src/mekk4_bringup/setup.py"
 MEKK4_PKG_XML="${REPO_ROOT}/src/mekk4_bringup/package.xml"
 MEKK4_CMD_VEL_MUX="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/cmd_vel_mux_node.py"
+MEKK4_TEDDY_APPROACH="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/teddy_approach_node.py"
 INSTALLED_CMD_VEL_MUX="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/cmd_vel_mux_node"
+INSTALLED_TEDDY_APPROACH="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/teddy_approach_node"
 
 if [[ -z "${DOCKER_LIDAR_GID}" && -e "${PORT_NAME}" ]]; then
   DOCKER_LIDAR_GID="$(stat -c '%g' "${PORT_NAME}")"
@@ -84,11 +90,17 @@ elif [[ ! -f "${INSTALLED_LAUNCH}" ]]; then
   needs_ws_build=1
 elif [[ ! -f "${INSTALLED_NAV2_STACK_LAUNCH}" ]]; then
   needs_ws_build=1
+elif [[ ! -f "${INSTALLED_TEDDY_APPROACH_PARAMS}" ]]; then
+  needs_ws_build=1
 elif [[ ! -f "${INSTALLED_CMD_VEL_MUX}" ]]; then
+  needs_ws_build=1
+elif [[ ! -f "${INSTALLED_TEDDY_APPROACH}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_LAUNCH}" -nt "${INSTALLED_LAUNCH}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_NAV2_STACK_LAUNCH}" -nt "${INSTALLED_NAV2_STACK_LAUNCH}" ]]; then
+  needs_ws_build=1
+elif [[ "${SOURCE_TEDDY_APPROACH_PARAMS}" -nt "${INSTALLED_TEDDY_APPROACH_PARAMS}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_PKG_XML}" -nt "${INSTALLED_LAUNCH}" ]]; then
   needs_ws_build=1
@@ -99,6 +111,8 @@ elif [[ "${MEKK4_SETUP}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
 elif [[ "${MEKK4_PKG_XML}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
   needs_ws_build=1
 elif [[ "${MEKK4_CMD_VEL_MUX}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
+  needs_ws_build=1
+elif [[ "${MEKK4_TEDDY_APPROACH}" -nt "${INSTALLED_TEDDY_APPROACH}" ]]; then
   needs_ws_build=1
 fi
 
@@ -198,4 +212,4 @@ docker "${docker_run_args[@]}" \
   -e MEKK4_DEBUG_STREAM_SCALE="${MEKK4_DEBUG_STREAM_SCALE}" \
   -e MEKK4_DEBUG_STREAM_FPS="${MEKK4_DEBUG_STREAM_FPS}" \
   -e MEKK4_DEBUG_STREAM_BITRATE="${MEKK4_DEBUG_STREAM_BITRATE}" \
-  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} use_imu:=${WITH_IMU} use_mega_driver:=${WITH_MEGA_DRIVER} use_ekf:=${WITH_EKF} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} imu_frame:=${IMU_FRAME} mega_port:=${MEGA_PORT} mega_baudrate:=${MEGA_BAUDRATE} mega_odom_topic:=${MEGA_ODOM_TOPIC} mega_publish_tf:=${MEGA_PUBLISH_TF} swap_sides:=${SWAP_SIDES} left_cmd_sign:=${LEFT_CMD_SIGN} right_cmd_sign:=${RIGHT_CMD_SIGN} angular_cmd_sign:=${ANGULAR_CMD_SIGN} min_nonzero_pwm:=${MIN_NONZERO_PWM} left_cmd_scale:=${LEFT_CMD_SCALE} right_cmd_scale:=${RIGHT_CMD_SCALE} left_tick_sign:=${LEFT_TICK_SIGN} right_tick_sign:=${RIGHT_TICK_SIGN} left_m_per_tick:=${LEFT_M_PER_TICK} right_m_per_tick:=${RIGHT_M_PER_TICK} track_width_eff_m:=${TRACK_WIDTH_EFF_M} ekf_params_file:=${EKF_PARAMS_FILE} params_file:=${PARAMS_FILE}"
+  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} use_teddy_approach:=${WITH_TEDDY_APPROACH} use_imu:=${WITH_IMU} use_mega_driver:=${WITH_MEGA_DRIVER} use_ekf:=${WITH_EKF} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} imu_frame:=${IMU_FRAME} mega_port:=${MEGA_PORT} mega_baudrate:=${MEGA_BAUDRATE} mega_odom_topic:=${MEGA_ODOM_TOPIC} mega_publish_tf:=${MEGA_PUBLISH_TF} swap_sides:=${SWAP_SIDES} left_cmd_sign:=${LEFT_CMD_SIGN} right_cmd_sign:=${RIGHT_CMD_SIGN} angular_cmd_sign:=${ANGULAR_CMD_SIGN} min_nonzero_pwm:=${MIN_NONZERO_PWM} left_cmd_scale:=${LEFT_CMD_SCALE} right_cmd_scale:=${RIGHT_CMD_SCALE} left_tick_sign:=${LEFT_TICK_SIGN} right_tick_sign:=${RIGHT_TICK_SIGN} left_m_per_tick:=${LEFT_M_PER_TICK} right_m_per_tick:=${RIGHT_M_PER_TICK} track_width_eff_m:=${TRACK_WIDTH_EFF_M} ekf_params_file:=${EKF_PARAMS_FILE} params_file:=${PARAMS_FILE} teddy_approach_params_file:=${TEDDY_APPROACH_PARAMS_FILE}"

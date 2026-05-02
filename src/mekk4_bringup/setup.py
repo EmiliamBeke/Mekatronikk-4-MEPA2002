@@ -27,6 +27,7 @@ setup(
             'mega_driver_node = mekk4_bringup.mega_driver_node:main',
             'nav_cmd_vel_flip_node = mekk4_bringup.nav_cmd_vel_flip_node:main',
             'ros_keyboard_teleop = mekk4_bringup.ros_keyboard_teleop:main',
+            'teddy_approach_node = mekk4_bringup.teddy_approach_node:main',
             'zero_joint_state_publisher = mekk4_bringup.zero_joint_state_publisher:main',
         ],
     },
