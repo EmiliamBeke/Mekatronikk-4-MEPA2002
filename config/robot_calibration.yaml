@@ -3,6 +3,7 @@ mega_driver:
   left_cmd_sign: 1
   right_cmd_sign: 1
   angular_cmd_sign: -1
+  min_nonzero_pwm: 65
   left_cmd_scale: 1.0
   right_cmd_scale: 0.95
   left_tick_sign: 1
