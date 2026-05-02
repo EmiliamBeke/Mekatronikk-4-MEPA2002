@@ -14,7 +14,7 @@ teddy_approach:
 
     # Stop when YOLO is centered and LiDAR sees something close straight ahead.
     scan_topic: /lidar
-    stop_lidar_distance_m: 0.35
+    stop_lidar_distance_m: 0.15
     stop_lidar_front_angle_rad: 0.20
     stop_lidar_min_points: 3
     stop_lidar_timeout_s: 0.5
