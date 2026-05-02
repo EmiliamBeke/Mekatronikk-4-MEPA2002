@@ -27,6 +27,15 @@
       </plot>
      </DockArea>
     </DockSplitter>
+    <DockSplitter count="1" orientation="-" sizes="1.000000">
+     <DockArea name="Mega PWM">
+      <plot flip_y="false" flip_x="false" mode="TimeSeries" line_width="1.0">
+       <limitY/>
+       <curve name="/mega_driver/left_pwm/data" color="#1f77b4"/>
+       <curve name="/mega_driver/right_pwm/data" color="#d62728"/>
+      </plot>
+     </DockArea>
+    </DockSplitter>
    </Container>
   </Tab>
   <Tab tab_name="imu" containers="1">
@@ -123,7 +132,7 @@
    <max_array_size value="200"/>
    <boolean_strings_to_number value="true"/>
    <remove_suffix_from_strings value="true"/>
-   <selected_topics value="/cmd_vel;/cmd_vel_collision;/cmd_vel_manual;/cmd_vel_mux_active;/cmd_vel_nav;/cmd_vel_nav_auto;/cmd_vel_nav_flipped;/goal_pose;/imu/data;/odom;/wheel/odom"/>
+   <selected_topics value="/cmd_vel;/cmd_vel_collision;/cmd_vel_manual;/cmd_vel_mux_active;/cmd_vel_nav;/cmd_vel_nav_auto;/cmd_vel_nav_flipped;/goal_pose;/imu/data;/mega_driver/left_pwm;/mega_driver/right_pwm;/odom;/wheel/odom"/>
   </plugin>
   <plugin ID="UDP Server"/>
   <plugin ID="WebSocket Server"/>

@@ -8,6 +8,7 @@ import rclpy
 from geometry_msgs.msg import TransformStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
+from std_msgs.msg import Int32
 from tf2_ros import TransformBroadcaster
 
 
@@ -156,6 +157,8 @@ class MegaDriverNode(Node):
 
         self._cmd_vel_sub = self.create_subscription(Twist, "cmd_vel", self._on_cmd_vel, 10)
         self._odom_pub = self.create_publisher(Odometry, "odom", 10)
+        self._left_pwm_pub = self.create_publisher(Int32, "mega_driver/left_pwm", 10)
+        self._right_pwm_pub = self.create_publisher(Int32, "mega_driver/right_pwm", 10)
         self._tf_broadcaster = TransformBroadcaster(self) if self._publish_tf else None
         self._timer = self.create_timer(0.02, self._on_timer)
 
@@ -291,6 +294,7 @@ class MegaDriverNode(Node):
     def _desired_motion_command(self) -> str:
         now = time.monotonic()
         if self._last_cmd_vel_at < 0.0 or (now - self._last_cmd_vel_at) > self._cmd_vel_timeout_s:
+            self._publish_pwm(0, 0)
             return "STOP"
 
         half_width = self._track_width_eff_m / 2.0
@@ -311,10 +315,20 @@ class MegaDriverNode(Node):
         left_pwm = self._speed_to_pwm(left_speed, self._left_cmd_sign)
         right_pwm = self._speed_to_pwm(right_speed, self._right_cmd_sign)
         if left_pwm == 0 and right_pwm == 0:
+            self._publish_pwm(0, 0)
             return "STOP"
         if self._swap_sides:
             left_pwm, right_pwm = right_pwm, left_pwm
+        self._publish_pwm(left_pwm, right_pwm)
         return f"BOTH {left_pwm} {right_pwm}"
+
+    def _publish_pwm(self, left_pwm: int, right_pwm: int) -> None:
+        left_msg = Int32()
+        left_msg.data = int(left_pwm)
+        right_msg = Int32()
+        right_msg.data = int(right_pwm)
+        self._left_pwm_pub.publish(left_msg)
+        self._right_pwm_pub.publish(right_msg)
 
     def _speed_to_pwm(self, track_speed_mps: float, sign: int) -> int:
         normalized = max(-1.0, min(1.0, track_speed_mps / self._max_track_speed_mps))
