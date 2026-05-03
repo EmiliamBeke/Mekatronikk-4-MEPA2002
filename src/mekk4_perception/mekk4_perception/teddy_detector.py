@@ -3,6 +3,7 @@ import shlex
 import subprocess
 import threading
 import time
+from contextlib import suppress
 
 import cv2
 import numpy as np
@@ -20,6 +21,7 @@ class TeddyDetector(Node):
     def __init__(self):
         super().__init__("teddy_detector")
 
+        # Runtime setup comes from pi_bringup.sh / camera_params.yaml.
         self.model_path = os.environ.get("MEKK4_NCNN_MODEL", "/ws/models/yolo26n_ncnn_model")
         self.gst_source = os.environ.get("MEKK4_CAM_SOURCE_GST", "").strip()
         self.width = int(os.environ.get("MEKK4_CAM_WIDTH", "1296"))
@@ -39,6 +41,8 @@ class TeddyDetector(Node):
 
         self.model = YOLO(self.model_path, task="detect")
         self.pub = self.create_publisher(String, "/teddy_detector/status", 10)
+
+        # One-slot frame buffer: the camera reader overwrites old frames, YOLO uses newest.
         self.proc = None
         self.debug_stream_proc = None
         self.frame_bytes = self.width * self.height * 3
@@ -57,32 +61,19 @@ class TeddyDetector(Node):
             self.get_logger().error("MEKK4_CAM_SOURCE_GST is required for UDP input")
             return
 
+        # Two threads keep latency down: drain GStreamer continuously, infer separately.
         self.get_logger().info(f"GStreamer source: {self.gst_source}")
         self.worker = threading.Thread(target=self._gst_loop, daemon=True)
         self.worker.start()
         self.infer_worker = threading.Thread(target=self._infer_loop, daemon=True)
         self.infer_worker.start()
 
-        self.get_logger().info(
-            "conf={conf} imgsz={imgsz}".format(
-                conf=self.conf,
-                imgsz=self.imgsz,
-            )
-        )
+        self.get_logger().info(f"conf={self.conf} imgsz={self.imgsz}")
         if self.stream_debug_video and self.debug_stream_host:
-            fps_label = (
-                "auto(detector-limited)"
-                if self.debug_stream_fps is None
-                else f"{self.debug_stream_fps}"
-            )
+            fps_label = "auto(detector-limited)" if self.debug_stream_fps is None else f"{self.debug_stream_fps}"
             self.get_logger().info(
-                "debug stream -> udp://{host}:{port} scale={scale} fps={fps} bitrate={bitrate}".format(
-                    host=self.debug_stream_host,
-                    port=self.debug_stream_port,
-                    scale=self.debug_stream_scale,
-                    fps=fps_label,
-                    bitrate=self.debug_stream_bitrate_bps,
-                )
+                f"debug stream -> udp://{self.debug_stream_host}:{self.debug_stream_port} "
+                f"scale={self.debug_stream_scale} fps={fps_label} bitrate={self.debug_stream_bitrate_bps}"
             )
         elif self.stream_debug_video:
             self.get_logger().warning("debug stream enabled, but no MEKK4_DEBUG_STREAM_HOST is set")
@@ -115,6 +106,7 @@ class TeddyDetector(Node):
         return parsed if parsed > 0.0 else None
 
     def _gst_loop(self):
+        """Decode incoming H264/RTP to raw BGR frames and keep only the newest."""
         while not self._stop:
             if self.proc is None or self.proc.poll() is not None:
                 self.proc = self._start_gst_process()
@@ -130,8 +122,7 @@ class TeddyDetector(Node):
                 if self._stop:
                     break
                 self._warn_throttled("failed to read frame")
-                if self.proc is not None:
-                    self.proc.terminate()
+                self._stop_input_stream()
                 self.proc = None
                 time.sleep(0.1)
                 continue
@@ -147,13 +138,11 @@ class TeddyDetector(Node):
                     self._frame_cond.notify()
 
     def _infer_loop(self):
+        """Run YOLO on the newest frame available; older frames are intentionally skipped."""
         seen_seq = 0
         while not self._stop:
             with self._frame_cond:
-                self._frame_cond.wait_for(
-                    lambda: self._stop or self._latest_seq != seen_seq,
-                    timeout=0.5,
-                )
+                self._frame_cond.wait_for(lambda: self._stop or self._latest_seq != seen_seq, timeout=0.5)
                 if self._stop:
                     return
                 if self._latest_seq == seen_seq:
@@ -168,6 +157,22 @@ class TeddyDetector(Node):
         if self._stop or not rclpy.ok():
             return
 
+        count, debug_boxes, best_box = self._detect_teddy(frame)
+        dx, dy, centered = self._box_center_state(best_box)
+        infer_end = time.monotonic()
+        fps_text = self._update_inference_fps(infer_end)
+        if not self._publish_status(count, dx, dy, centered, fps_text):
+            return
+
+        if self.show_gui or self.stream_debug_video:
+            annotated = self._render_debug_view(frame, debug_boxes, best_box, centered, fps_text)
+            if self.stream_debug_video:
+                self._stream_debug_video(annotated)
+            if self.show_gui:
+                cv2.imshow("teddy_detector", annotated)
+                cv2.waitKey(1)
+
+    def _detect_teddy(self, frame):
         results = self.model.predict(
             source=frame,
             imgsz=self.imgsz,
@@ -175,67 +180,51 @@ class TeddyDetector(Node):
             classes=[TEDDY_CLASS_ID],
             verbose=False,
         )
-        count = 0
-        dx = None
-        dy = None
-        centered = False
-        best_box = None
+        boxes = [] if not results or results[0].boxes is None else results[0].boxes
         debug_boxes = []
+        best_box = None
+        best_area = -1.0
 
-        if results:
-            r = results[0]
-            boxes = [] if r.boxes is None else r.boxes
-            count = len(boxes)
-            if count > 0:
-                # pick largest box for center guidance
-                best = None
-                best_area = -1.0
-                for b in boxes:
-                    x1, y1, x2, y2 = b.xyxy[0].tolist()
-                    conf = float(b.conf[0]) if b.conf is not None else 0.0
-                    debug_boxes.append((int(x1), int(y1), int(x2), int(y2), conf))
-                    area = (x2 - x1) * (y2 - y1)
-                    if area > best_area:
-                        best_area = area
-                        best = (x1, y1, x2, y2)
-                if best is not None:
-                    x1, y1, x2, y2 = best
-                    cx = (x1 + x2) / 2.0
-                    cy = (y1 + y2) / 2.0
-                    dx = (cx - (self.width / 2.0)) / (self.width / 2.0)
-                    dy = (cy - (self.height / 2.0)) / (self.height / 2.0)
-                    centered = abs(dx) <= self.center_tol and abs(dy) <= self.center_tol
-                    best_box = (int(x1), int(y1), int(x2), int(y2))
+        # Largest detection is used for centering; all detections are drawn.
+        for box in boxes:
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            conf = float(box.conf[0]) if box.conf is not None else 0.0
+            debug_boxes.append((int(x1), int(y1), int(x2), int(y2), conf))
+            area = (x2 - x1) * (y2 - y1)
+            if area > best_area:
+                best_area = area
+                best_box = (int(x1), int(y1), int(x2), int(y2))
 
-        infer_end = time.monotonic()
-        fps_text = self._update_inference_fps(infer_end)
+        return len(boxes), debug_boxes, best_box
 
-        msg = String()
+    def _box_center_state(self, box):
+        if box is None:
+            return None, None, False
+
+        x1, y1, x2, y2 = box
+        cx = (x1 + x2) / 2.0
+        cy = (y1 + y2) / 2.0
+        dx = (cx - (self.width / 2.0)) / (self.width / 2.0)
+        dy = (cy - (self.height / 2.0)) / (self.height / 2.0)
+        return dx, dy, abs(dx) <= self.center_tol and abs(dy) <= self.center_tol
+
+    def _publish_status(self, count, dx, dy, centered, fps_text):
         if dx is None or dy is None:
-            msg.data = f"teddy_count={count} centered=false fps={fps_text}"
-            log_data = f"teddy_count={count} centered=false"
+            status = f"teddy_count={count} centered=false"
         else:
             state = str(centered).lower()
-            msg.data = f"teddy_count={count} dx={dx:.3f} dy={dy:.3f} centered={state} fps={fps_text}"
-            log_data = f"teddy_count={count} dx={dx:.3f} dy={dy:.3f} centered={state}"
+            status = f"teddy_count={count} dx={dx:.3f} dy={dy:.3f} centered={state}"
+
+        msg = String()
+        msg.data = f"{status} fps={fps_text}"
         try:
             self.pub.publish(msg)
         except _rclpy.RCLError:
-            return
-        if self._should_log_status(log_data):
-            if not self._stop and rclpy.ok():
-                self.get_logger().info(f"{log_data} fps={fps_text}")
+            return False
 
-        annotated = None
-        if self.show_gui or self.stream_debug_video:
-            annotated = self._render_debug_view(frame, debug_boxes, best_box, centered, fps_text)
-
-        if self.stream_debug_video and annotated is not None:
-            self._stream_debug_video(annotated)
-
-        if self.show_gui:
-            cv2.imshow("teddy_detector", annotated)
-            cv2.waitKey(1)
+        if self._should_log_status() and not self._stop and rclpy.ok():
+            self.get_logger().info(msg.data)
+        return True
 
     def _render_debug_view(self, frame, debug_boxes, best_box, centered, fps_text):
         view = frame.copy()
@@ -278,7 +267,7 @@ class TeddyDetector(Node):
             self._infer_fps = (0.8 * self._infer_fps) + (0.2 * inst_fps)
         return f"{self._infer_fps:.1f}"
 
-    def _should_log_status(self, log_data):
+    def _should_log_status(self):
         if self.status_log_period_sec <= 0.0:
             return False
 
@@ -291,28 +280,11 @@ class TeddyDetector(Node):
     @staticmethod
     def _draw_overlay_label(image, text, origin):
         x, y = origin
-        cv2.putText(
-            image,
-            text,
-            (x, y),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (0, 0, 0),
-            4,
-            cv2.LINE_AA,
-        )
-        cv2.putText(
-            image,
-            text,
-            (x, y),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (255, 255, 255),
-            2,
-            cv2.LINE_AA,
-        )
+        for color, thickness in [((0, 0, 0), 4), ((255, 255, 255), 2)]:
+            cv2.putText(image, text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, thickness, cv2.LINE_AA)
 
     def _stream_debug_video(self, annotated):
+        """Encode the annotated BGR frame as low-latency H264/RTP to the PC."""
         if not self.debug_stream_host:
             return
         if self.debug_stream_fps is not None:
@@ -376,41 +348,37 @@ class TeddyDetector(Node):
     def _stop_debug_stream(self):
         if self.debug_stream_proc is None:
             return
-        try:
+        with suppress(Exception):
             if self.debug_stream_proc.stdin is not None:
                 self.debug_stream_proc.stdin.close()
-        except Exception:
-            pass
         self.debug_stream_proc.terminate()
-        try:
+        with suppress(Exception):
             self.debug_stream_proc.wait(timeout=1.0)
-        except Exception:
-            pass
         self.debug_stream_proc = None
+
+    def _stop_input_stream(self):
+        if self.proc is None:
+            return
+        self.proc.terminate()
+        with suppress(Exception):
+            self.proc.wait(timeout=1.0)
+        self.proc = None
 
     def destroy_node(self):
         self._stop = True
-        if self.proc is not None:
-            self.proc.terminate()
-            try:
-                self.proc.wait(timeout=1.0)
-            except Exception:
-                pass
-            self.proc = None
+        self._stop_input_stream()
         self._stop_debug_stream()
         with self._frame_cond:
             self._frame_cond.notify_all()
-        worker = getattr(self, "worker", None)
-        if worker is not None and worker.is_alive():
-            worker.join(timeout=1.0)
-        infer_worker = getattr(self, "infer_worker", None)
-        if infer_worker is not None and infer_worker.is_alive():
-            infer_worker.join(timeout=1.0)
+        for worker in (getattr(self, "worker", None), getattr(self, "infer_worker", None)):
+            if worker is not None and worker.is_alive():
+                worker.join(timeout=1.0)
         if self.show_gui:
             cv2.destroyAllWindows()
         super().destroy_node()
 
     def _start_gst_process(self):
+        """Start the input decoder configured by MEKK4_CAM_SOURCE_GST."""
         pipeline = self.gst_source.replace(", ", ",")
         sink = (
             f"video/x-raw,format=BGR,width={self.width},height={self.height} "
@@ -422,12 +390,7 @@ class TeddyDetector(Node):
         pipeline = f"{pipeline} ! {sink}"
         cmd = ["gst-launch-1.0", "-q"] + shlex.split(pipeline)
         try:
-            return subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                bufsize=0,
-            )
+            return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=0)
         except Exception:
             return None
 
