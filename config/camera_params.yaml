@@ -31,7 +31,7 @@ camera_stream:
 
   # Flush encoded output as frames are written.
   # This is useful when piping H.264 through a FIFO to GStreamer.
-  flush_output: true
+  flush_output: false
 
   # Small RTP jitter buffer on the PC side, in milliseconds.
   # Higher smooths Wi-Fi jitter and reduces artifacts, but adds delay.
