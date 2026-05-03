@@ -17,7 +17,7 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 STATUS_RE = re.compile(r"(?P<key>[A-Za-z_]+)=(?P<value>[^ ]+)")
 MARKER_Z = 0.03
-TARGET_MARKER_DISTANCE_M = 0.50
+DEFAULT_MARKER_DISTANCE_M = 0.50
 TARGET_MARKER_COLOR = (0.0, 1.0, 0.0, 0.9)
 TEDDY_POINT_COLOR = (1.0, 0.65, 0.0, 0.95)
 PARAM_DEFAULTS = {
@@ -294,7 +294,7 @@ class TeddyApproachNode(Node):
         return marker
 
     def _sector_marker(self, stamp) -> Marker:
-        distance = TARGET_MARKER_DISTANCE_M
+        distance = self._marker_ray_distance()
         angle = self._stop_lidar_front_angle_rad
         origin = Point(x=0.0, y=0.0, z=MARKER_Z)
         sector = self._base_marker(stamp, 0, Marker.LINE_LIST, TARGET_MARKER_COLOR)
@@ -303,7 +303,7 @@ class TeddyApproachNode(Node):
         return sector
 
     def _arc_marker(self, stamp) -> Marker:
-        distance = TARGET_MARKER_DISTANCE_M
+        distance = max(0.0, self._stop_lidar_distance_m)
         front_angle = self._stop_lidar_front_angle_rad
         arc = self._base_marker(stamp, 1, Marker.LINE_STRIP, TARGET_MARKER_COLOR)
         arc.scale.x = 0.012
@@ -332,9 +332,13 @@ class TeddyApproachNode(Node):
         return (
             self._last_count > 0
             and math.isfinite(self._last_front_distance)
-            and self._last_front_distance <= TARGET_MARKER_DISTANCE_M
             and abs(self._last_front_angle) <= self._stop_lidar_front_angle_rad
         )
+
+    def _marker_ray_distance(self) -> float:
+        if self._teddy_lidar_candidate_visible():
+            return self._last_front_distance
+        return DEFAULT_MARKER_DISTANCE_M
 
     def _log_mode(self, mode: str) -> None:
         if mode == self._last_mode:
