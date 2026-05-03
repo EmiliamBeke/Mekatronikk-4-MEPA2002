@@ -298,7 +298,7 @@ class TeddyApproachNode(Node):
         angle = self._stop_lidar_front_angle_rad
         origin = Point(x=0.0, y=0.0, z=MARKER_Z)
         sector = self._base_marker(stamp, 0, Marker.LINE_LIST, TARGET_MARKER_COLOR)
-        sector.scale.x = 0.006
+        sector.scale.x = 0.002
         sector.points.extend([origin, point_at(distance, -angle), origin, point_at(distance, angle)])
         return sector
 
@@ -306,7 +306,7 @@ class TeddyApproachNode(Node):
         distance = max(0.0, self._stop_lidar_distance_m)
         front_angle = self._stop_lidar_front_angle_rad
         arc = self._base_marker(stamp, 1, Marker.LINE_STRIP, TARGET_MARKER_COLOR)
-        arc.scale.x = 0.006
+        arc.scale.x = 0.002
         arc.points = [
             point_at(distance, -front_angle + (2.0 * front_angle * idx / 16))
             for idx in range(17)
