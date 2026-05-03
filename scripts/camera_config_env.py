@@ -63,7 +63,6 @@ def main():
     detector = data.get("teddy_detector", {})
 
     denoise = normalize_choice(stream.get("denoise", "auto"), false_value="off", true_value="auto")
-    debug_image_scale = detector.get("debug_image_scale", 0.5)
     debug_stream_scale = detector.get("debug_stream_scale", 1.0)
 
     values = {
@@ -97,10 +96,6 @@ def main():
         "MEKK4_IMGSZ": pick("MEKK4_IMGSZ", detector.get("imgsz", 640)),
         "MEKK4_CENTER_TOL": pick("MEKK4_CENTER_TOL", detector.get("center_tol", 0.10)),
         "MEKK4_SHOW": pick("MEKK4_SHOW", to_shell(detector.get("show_gui", False))),
-        "MEKK4_DEBUG_IMAGE": pick("MEKK4_DEBUG_IMAGE", to_shell(detector.get("publish_debug_image", False))),
-        "MEKK4_DEBUG_IMAGE_TOPIC": pick("MEKK4_DEBUG_IMAGE_TOPIC", detector.get("debug_image_topic", "/teddy_detector/debug_image")),
-        "MEKK4_DEBUG_IMAGE_SCALE": pick("MEKK4_DEBUG_IMAGE_SCALE", debug_image_scale),
-        "MEKK4_DEBUG_IMAGE_FPS": pick("MEKK4_DEBUG_IMAGE_FPS", detector.get("debug_image_fps", 5.0)),
         "MEKK4_DEBUG_STREAM": pick("MEKK4_DEBUG_STREAM", to_shell(detector.get("stream_debug_video", True))),
         "MEKK4_DEBUG_STREAM_PORT": pick("MEKK4_DEBUG_STREAM_PORT", detector.get("debug_stream_port", 5602)),
         "MEKK4_DEBUG_STREAM_SCALE": pick("MEKK4_DEBUG_STREAM_SCALE", debug_stream_scale),

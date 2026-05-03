@@ -420,7 +420,8 @@ def generate_launch_description():
         SetEnvironmentVariable(
             'MEKK4_CAM_SOURCE_GST',
             'udpsrc port=5600 caps=application/x-rtp,media=video,encoding-name=H264,payload=96,clock-rate=90000 ! '
-            'rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false',
+            'rtpjitterbuffer latency=20 drop-on-latency=true ! rtph264depay ! h264parse ! '
+            'avdec_h264 ! videoconvert ! appsink drop=true max-buffers=1 sync=false',
         ),
         SetEnvironmentVariable('MEKK4_CAM_WIDTH', '640'),
         SetEnvironmentVariable('MEKK4_CAM_HEIGHT', '480'),
@@ -429,10 +430,6 @@ def generate_launch_description():
         SetEnvironmentVariable('MEKK4_CONF', '0.3'),
         SetEnvironmentVariable('MEKK4_IMGSZ', '640'),
         SetEnvironmentVariable('MEKK4_CENTER_TOL', '0.10'),
-        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE', '1'),
-        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE_TOPIC', '/teddy_detector/debug_image'),
-        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE_SCALE', '1.0'),
-        SetEnvironmentVariable('MEKK4_DEBUG_IMAGE_FPS', '5.0'),
         SetEnvironmentVariable('MEKK4_DEBUG_STREAM', '0'),
         gz_gui,
         gz_headless,

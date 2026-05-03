@@ -22,7 +22,7 @@ camera_stream:
   # Lower values recover faster from UDP packet loss, but use more bitrate.
   # A good starting point is around the same as FPS, e.g. 10 at 10 FPS.
   # Leave empty for the encoder default if the stream becomes choppy.
-  intra: 10
+  intra: 6
 
   # Try to reduce encoder delay on newer Pi camera stacks.
   # If your rpicam build is too old, the script will ignore this and warn once.
@@ -96,21 +96,6 @@ teddy_detector:
 
   # Debug GUI on the Pi host. Keep false for headless SSH use.
   show_gui: false
-
-  # Publish an annotated raw ROS image from the Pi.
-  # Keep this false unless you explicitly need the image over DDS.
-  publish_debug_image: false
-
-  # Topic used for the annotated debug image.
-  debug_image_topic: /teddy_detector/debug_image
-
-  # Scale factor before publishing the debug image.
-  # Lower values reduce ROS bandwidth a lot. 0.5 means half-size in each dimension.
-  debug_image_scale: 0.3
-
-  # Max publish rate for the debug image topic.
-  # Keep this low so the debug overlay does not flood the network.
-  debug_image_fps: 1.0
 
   # Stream annotated YOLO output as H264/UDP from the Pi.
   # This is the recommended way to view detections on the PC.

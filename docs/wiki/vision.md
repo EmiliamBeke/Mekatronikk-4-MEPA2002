@@ -34,7 +34,6 @@ Kilde: [`config/camera_params.yaml`](../../config/camera_params.yaml)
 | `conf` | `0.3` | Detection threshold |
 | `imgsz` | `640` | YOLO input size |
 | `center_tol` | `0.10` | Centered threshold |
-| `publish_debug_image` | `false` | ROS image fra Pi over DDS |
 | `stream_debug_video` | `true` | H264 debugvideo til PC |
 | `debug_stream_port` | `5602` | Annotert stream port |
 | `debug_stream_fps` | `auto` | Følger detector rate |

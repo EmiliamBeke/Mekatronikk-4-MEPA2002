@@ -8,11 +8,9 @@ from collections import deque
 import cv2
 import numpy as np
 import rclpy
-from cv_bridge import CvBridge
 from rclpy.impl.implementation_singleton import rclpy_implementation as _rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from ultralytics import YOLO
 
@@ -32,10 +30,6 @@ class TeddyDetector(Node):
         self.imgsz = int(os.environ.get("MEKK4_IMGSZ", "640"))
         self.show_gui = os.environ.get("MEKK4_SHOW", "0").strip() == "1"
         self.center_tol = float(os.environ.get("MEKK4_CENTER_TOL", "0.1"))
-        self.publish_debug_image = os.environ.get("MEKK4_DEBUG_IMAGE", "0").strip() == "1"
-        self.debug_image_topic = os.environ.get("MEKK4_DEBUG_IMAGE_TOPIC", "/teddy_detector/debug_image").strip()
-        self.debug_image_scale = float(os.environ.get("MEKK4_DEBUG_IMAGE_SCALE", "0.5"))
-        self.debug_image_fps = float(os.environ.get("MEKK4_DEBUG_IMAGE_FPS", "5.0"))
         self.stream_debug_video = os.environ.get("MEKK4_DEBUG_STREAM", "0").strip() == "1"
         self.debug_stream_host = os.environ.get("MEKK4_DEBUG_STREAM_HOST", "").strip()
         self.debug_stream_port = int(os.environ.get("MEKK4_DEBUG_STREAM_PORT", "5602"))
@@ -45,15 +39,15 @@ class TeddyDetector(Node):
 
         self.model = YOLO(self.model_path, task="detect")
         self.pub = self.create_publisher(String, "/teddy_detector/status", 10)
-        self.bridge = CvBridge() if self.publish_debug_image else None
-        self.debug_pub = self.create_publisher(Image, self.debug_image_topic, 5) if self.publish_debug_image else None
         self.last = None
         self.proc = None
         self.debug_stream_proc = None
         self.frame_bytes = self.width * self.height * 3
         self._buf = bytearray()
+        self._frame_cond = threading.Condition()
+        self._latest_frame = None
+        self._latest_seq = 0
         self._last_warn = 0.0
-        self._last_debug_image = 0.0
         self._last_debug_stream = 0.0
         self._last_debug_stream_warn = 0.0
         self._last_infer_end = None
@@ -68,6 +62,8 @@ class TeddyDetector(Node):
         self.get_logger().info(f"GStreamer source: {self.gst_source}")
         self.worker = threading.Thread(target=self._gst_loop, daemon=True)
         self.worker.start()
+        self.infer_worker = threading.Thread(target=self._infer_loop, daemon=True)
+        self.infer_worker.start()
 
         self.get_logger().info(
             "conf={conf} imgsz={imgsz}".format(
@@ -75,14 +71,6 @@ class TeddyDetector(Node):
                 imgsz=self.imgsz,
             )
         )
-        if self.publish_debug_image:
-            self.get_logger().info(
-                "debug image -> {topic} scale={scale} fps={fps}".format(
-                    topic=self.debug_image_topic,
-                    scale=self.debug_image_scale,
-                    fps=self.debug_image_fps,
-                )
-            )
         if self.stream_debug_video and self.debug_stream_host:
             fps_label = (
                 "auto(detector-limited)"
@@ -155,6 +143,27 @@ class TeddyDetector(Node):
                 data = bytes(self._buf[: self.frame_bytes])
                 del self._buf[: self.frame_bytes]
                 frame = np.frombuffer(data, dtype=np.uint8).reshape((self.height, self.width, 3))
+                with self._frame_cond:
+                    self._latest_frame = frame
+                    self._latest_seq += 1
+                    self._frame_cond.notify()
+
+    def _infer_loop(self):
+        seen_seq = 0
+        while not self._stop:
+            with self._frame_cond:
+                self._frame_cond.wait_for(
+                    lambda: self._stop or self._latest_seq != seen_seq,
+                    timeout=0.5,
+                )
+                if self._stop:
+                    return
+                if self._latest_seq == seen_seq:
+                    continue
+                frame = self._latest_frame
+                seen_seq = self._latest_seq
+
+            if frame is not None:
                 self._infer_frame(frame)
 
     def _infer_frame(self, frame):
@@ -221,11 +230,9 @@ class TeddyDetector(Node):
             self.last = log_data
 
         annotated = None
-        if self.publish_debug_image or self.show_gui or self.stream_debug_video:
+        if self.show_gui or self.stream_debug_video:
             annotated = self._render_debug_view(frame, debug_boxes, best_box, centered, fps_text)
 
-        if self.publish_debug_image and annotated is not None:
-            self._publish_debug_image(annotated)
         if self.stream_debug_video and annotated is not None:
             self._stream_debug_video(annotated)
 
@@ -297,30 +304,6 @@ class TeddyDetector(Node):
             2,
             cv2.LINE_AA,
         )
-
-    def _publish_debug_image(self, annotated):
-        if self.debug_pub is None or self.bridge is None:
-            return
-        if self.debug_image_fps > 0.0:
-            min_period = 1.0 / self.debug_image_fps
-            now = time.monotonic()
-            if now - self._last_debug_image < min_period:
-                return
-            self._last_debug_image = now
-
-        image = annotated
-        if self.debug_image_scale > 0.0 and self.debug_image_scale != 1.0:
-            new_width = max(1, int(round(self.width * self.debug_image_scale)))
-            new_height = max(1, int(round(self.height * self.debug_image_scale)))
-            image = cv2.resize(annotated, (new_width, new_height), interpolation=cv2.INTER_AREA)
-
-        msg = self.bridge.cv2_to_imgmsg(image, encoding="bgr8")
-        msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = "camera_link"
-        try:
-            self.debug_pub.publish(msg)
-        except _rclpy.RCLError:
-            return
 
     def _stream_debug_video(self, annotated):
         if not self.debug_stream_host:
@@ -440,9 +423,14 @@ class TeddyDetector(Node):
                 pass
             self.proc = None
         self._stop_debug_stream()
+        with self._frame_cond:
+            self._frame_cond.notify_all()
         worker = getattr(self, "worker", None)
         if worker is not None and worker.is_alive():
             worker.join(timeout=1.0)
+        infer_worker = getattr(self, "infer_worker", None)
+        if infer_worker is not None and infer_worker.is_alive():
+            infer_worker.join(timeout=1.0)
         if self.show_gui:
             cv2.destroyAllWindows()
         super().destroy_node()
@@ -451,6 +439,7 @@ class TeddyDetector(Node):
         pipeline = self.gst_source.replace(", ", ",")
         sink = (
             f"video/x-raw,format=BGR,width={self.width},height={self.height} "
+            "! queue leaky=downstream max-size-buffers=1 "
             "! fdsink fd=1"
         )
         if "appsink" in pipeline:
