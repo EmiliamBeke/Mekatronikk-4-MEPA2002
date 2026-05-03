@@ -17,6 +17,9 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 STATUS_RE = re.compile(r"(?P<key>[A-Za-z_]+)=(?P<value>[^ ]+)")
 MARKER_Z = 0.03
+TARGET_MARKER_DISTANCE_M = 0.50
+TARGET_MARKER_COLOR = (0.0, 1.0, 0.0, 0.9)
+TEDDY_POINT_COLOR = (1.0, 0.65, 0.0, 0.95)
 PARAM_DEFAULTS = {
     "enabled": False,
     "status_topic": "/teddy_detector/status",
@@ -223,6 +226,7 @@ class TeddyApproachNode(Node):
             self._send_nav_goal()
 
         now = time.monotonic()
+        self._publish_lidar_markers()
         if not self._teddy_recent(now):
             self._log_mode("waiting_for_teddy")
             return
@@ -233,7 +237,6 @@ class TeddyApproachNode(Node):
         if close_enough:
             self._cmd_pub.publish(cmd)
             self._log_mode("close_enough_lidar")
-            self._publish_lidar_markers(close_enough)
             return
 
         # P-controller on horizontal image error:
@@ -246,7 +249,6 @@ class TeddyApproachNode(Node):
             cmd.linear.x = self._linear_speed
 
         self._cmd_pub.publish(cmd)
-        self._publish_lidar_markers(close_enough)
         self._log_mode("centering" if not centered else "approaching")
 
     def _teddy_recent(self, now: float) -> bool:
@@ -268,15 +270,14 @@ class TeddyApproachNode(Node):
         with_minimum = math.copysign(max(abs(raw), self._min_angular_speed), raw)
         return clamp(with_minimum, -self._max_angular_speed, self._max_angular_speed)
 
-    def _publish_lidar_markers(self, lidar_close: bool) -> None:
+    def _publish_lidar_markers(self) -> None:
         if self._marker_pub is None or not self._last_scan_frame:
             return
 
         now = self.get_clock().now().to_msg()
-        color = (1.0, 0.1, 0.1, 0.95) if lidar_close else (0.1, 0.8, 0.2, 0.95)
         markers = MarkerArray()
-        markers.markers.append(self._sector_marker(now, color))
-        markers.markers.append(self._arc_marker(now, color))
+        markers.markers.append(self._sector_marker(now))
+        markers.markers.append(self._arc_marker(now))
         markers.markers.append(self._closest_marker(now))
         self._marker_pub.publish(markers)
 
@@ -292,18 +293,20 @@ class TeddyApproachNode(Node):
         set_color(marker, color)
         return marker
 
-    def _sector_marker(self, stamp, color: tuple[float, float, float, float]) -> Marker:
-        distance = max(0.0, self._stop_lidar_distance_m)
+    def _sector_marker(self, stamp) -> Marker:
+        distance = TARGET_MARKER_DISTANCE_M
         angle = self._stop_lidar_front_angle_rad
         origin = Point(x=0.0, y=0.0, z=MARKER_Z)
-        sector = self._base_marker(stamp, 0, Marker.LINE_LIST, color)
+        sector = self._base_marker(stamp, 0, Marker.LINE_LIST, TARGET_MARKER_COLOR)
+        sector.scale.x = 0.012
         sector.points.extend([origin, point_at(distance, -angle), origin, point_at(distance, angle)])
         return sector
 
-    def _arc_marker(self, stamp, color: tuple[float, float, float, float]) -> Marker:
-        distance = max(0.0, self._stop_lidar_distance_m)
+    def _arc_marker(self, stamp) -> Marker:
+        distance = TARGET_MARKER_DISTANCE_M
         front_angle = self._stop_lidar_front_angle_rad
-        arc = self._base_marker(stamp, 1, Marker.LINE_STRIP, color)
+        arc = self._base_marker(stamp, 1, Marker.LINE_STRIP, TARGET_MARKER_COLOR)
+        arc.scale.x = 0.012
         arc.points = [
             point_at(distance, -front_angle + (2.0 * front_angle * idx / 16))
             for idx in range(17)
@@ -311,12 +314,12 @@ class TeddyApproachNode(Node):
         return arc
 
     def _closest_marker(self, stamp) -> Marker:
-        closest = self._base_marker(stamp, 2, Marker.SPHERE, (1.0, 0.8, 0.0, 0.95))
+        closest = self._base_marker(stamp, 2, Marker.SPHERE, TEDDY_POINT_COLOR)
         closest.type = Marker.SPHERE
-        closest.scale.x = 0.08
-        closest.scale.y = 0.08
-        closest.scale.z = 0.08
-        if math.isfinite(self._last_front_distance):
+        closest.scale.x = 0.06
+        closest.scale.y = 0.06
+        closest.scale.z = 0.06
+        if self._teddy_lidar_candidate_visible():
             closest.pose.position.x = self._last_front_distance * math.cos(self._last_front_angle)
             closest.pose.position.y = self._last_front_distance * math.sin(self._last_front_angle)
             closest.pose.position.z = 0.06
@@ -324,6 +327,14 @@ class TeddyApproachNode(Node):
         else:
             closest.action = Marker.DELETE
         return closest
+
+    def _teddy_lidar_candidate_visible(self) -> bool:
+        return (
+            self._last_count > 0
+            and math.isfinite(self._last_front_distance)
+            and self._last_front_distance <= TARGET_MARKER_DISTANCE_M
+            and abs(self._last_front_angle) <= self._stop_lidar_front_angle_rad
+        )
 
     def _log_mode(self, mode: str) -> None:
         if mode == self._last_mode:
