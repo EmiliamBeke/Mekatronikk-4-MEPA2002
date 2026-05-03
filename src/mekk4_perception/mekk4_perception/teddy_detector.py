@@ -81,6 +81,8 @@ class TeddyDetector(Node):
             self.get_logger().info("GUI enabled (MEKK4_SHOW=1)")
 
     def _warn_throttled(self, message: str, interval_sec: float = 5.0):
+        if self._stop or not rclpy.ok():
+            return
         now = time.monotonic()
         if now - self._last_warn >= interval_sec:
             self.get_logger().warning(message)
@@ -119,7 +121,7 @@ class TeddyDetector(Node):
 
             chunk = self.proc.stdout.read(4096) if self.proc.stdout else b""
             if not chunk:
-                if self._stop:
+                if self._stop or not rclpy.ok():
                     break
                 self._warn_throttled("failed to read frame")
                 self._stop_input_stream()
