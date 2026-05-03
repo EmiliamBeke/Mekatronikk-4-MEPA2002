@@ -108,7 +108,6 @@ Detaljert testprosedyre ligger i [Arduino Mega-wikien](docs/wiki/arduino-mega.md
 | `make sim-nav2` | Start bare Nav2 mot en sim som allerede kjører uten Nav2 |
 | `make pi-bringup` | Start fysisk robotstack på Pi |
 | `make pc-teddy-rviz` | Start PC RViz med annotert YOLO-stream |
-| `make pc-camera-rviz` | Start PC RViz med rå kamerastream |
 | `make pc-ros-keyboard` | Manuell ROS teleop via `/cmd_vel_manual` |
 | `make mega-upload` | Last opp Arduino sketch |
 | `make mega-motor-test` | Kjør direkte motor-/encoder-test på Mega |

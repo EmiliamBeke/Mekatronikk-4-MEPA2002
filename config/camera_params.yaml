@@ -41,9 +41,6 @@ camera_stream:
   # Local UDP port used by teddy_detector on the Pi.
   local_udp_port: 5600
 
-  # Remote UDP port used by the PC camera bridge / RViz.
-  remote_udp_port: 5601
-
   # Auto white balance mode.
   # Common values: auto, indoor, daylight, cloudy.
   awb: auto

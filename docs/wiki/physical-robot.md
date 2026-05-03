@@ -23,7 +23,6 @@ Fra [`scripts/pi_bringup.sh`](../../scripts/pi_bringup.sh):
 | `WITH_IMU` | `1` | Starter BNO085 node |
 | `WITH_MEGA_DRIVER` | `1` | Starter ROS Mega-driver |
 | `WITH_EKF` | `1` | Starter EKF |
-| `WITH_CAMERA_RVIZ` | `0` | Sender rå kamera til PC i tillegg |
 | `PORT_NAME` | `/dev/ttyAMA0` | LiDAR serial |
 | `PORT_BAUDRATE` | `230400` | LiDAR baudrate |
 | `PRODUCT_NAME` | `LDLiDAR_LD06` | LiDAR driver type |
@@ -39,7 +38,7 @@ Fra [`scripts/pi_bringup.sh`](../../scripts/pi_bringup.sh):
 2. Leser robotkalibrering fra [`config/robot_calibration.yaml`](../../config/robot_calibration.yaml).
 3. Setter ROS discovery mot PC.
 4. Bygger workspace i container hvis installasjonen mangler eller er stale.
-5. Starter kamera UDP stream hvis `WITH_TEDDY=1` eller `WITH_CAMERA_RVIZ=1`.
+5. Starter lokal kamera UDP stream hvis `WITH_TEDDY=1`.
 6. Mapper Mega device inn i container hvis `WITH_MEGA_DRIVER=1`.
 7. Kjører [`pi_robot.launch.py`](../../src/robot_bringup/launch/pi_robot.launch.py).
 
@@ -57,9 +56,6 @@ WITH_EKF=0 make pi-bringup
 
 # Bare bringup uten teddy
 WITH_TEDDY=0 make pi-bringup
-
-# Send rå kamera til PC på port 5601
-WITH_CAMERA_RVIZ=1 make pi-bringup
 
 # Overstyr PC-IP
 PC_HOST=192.168.10.42 make pi-bringup

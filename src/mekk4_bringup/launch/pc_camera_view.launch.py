@@ -14,7 +14,7 @@ def generate_launch_description():
     frame_id = LaunchConfiguration("frame_id")
 
     return LaunchDescription([
-        DeclareLaunchArgument("port", default_value="5601"),
+        DeclareLaunchArgument("port", default_value="5602"),
         DeclareLaunchArgument("width", default_value="1296"),
         DeclareLaunchArgument("height", default_value="972"),
         DeclareLaunchArgument("jitter_ms", default_value="40"),

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws lidar-setup lidar-test mega-upload mega-test mega-motor-test mega-terminal mega-keyboard mega-calibrate pc-mega-keyboard pc-ros-keyboard sim-build sim-stop sim sim-headless sim-topics sim-nav2 pi-bringup pc-camera-rviz pc-teddy-rviz camera-stop camera-reload
+.PHONY: build shell up down ws lidar-setup lidar-test mega-upload mega-test mega-motor-test mega-terminal mega-keyboard mega-calibrate pc-mega-keyboard pc-ros-keyboard sim-build sim-stop sim sim-headless sim-topics sim-nav2 pi-bringup pc-teddy-rviz camera-stop camera-reload
 
 MEGA_UPLOAD_DEFAULT_SKETCH := mega_keyboard_drive
 MEGA_UPLOAD_SKETCH := $(firstword $(filter-out mega-upload,$(MAKECMDGOALS)))
@@ -86,9 +86,6 @@ sim-nav2:
 	
 pi-bringup:
 	bash ./scripts/pi_bringup.sh
-
-pc-camera-rviz:
-	bash ./scripts/pc_udp_camera_rviz.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"
 
 pc-teddy-rviz:
 	bash ./scripts/pc_teddy_rviz.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"

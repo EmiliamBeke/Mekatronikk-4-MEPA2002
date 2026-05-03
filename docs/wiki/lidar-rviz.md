@@ -107,21 +107,13 @@ Manuelt oppsett:
 6. `Add -> Image`, bruk `/camera`.
 7. Slå på `TF` hvis du vil debugge frames.
 
-## 5. Rå Kamera I Stedet For YOLO-debug
+## 5. YOLO-video
 
-Pi:
-
-```bash
-WITH_CAMERA_RVIZ=1 make pi-bringup
-```
-
-PC:
+Annotert YOLO-video bruker UDP-port `5602` og vises med:
 
 ```bash
-make pc-camera-rviz
+make pc-teddy-rviz
 ```
-
-Rå kamera bruker UDP-port `5601`. Annotert YOLO-debug bruker `5602`.
 
 ## 6. Vanlige Feil
 
@@ -133,7 +125,6 @@ Rå kamera bruker UDP-port `5601`. Annotert YOLO-debug bruker `5602`.
 | TF-feil for scan | Sjekk `ros2 run tf2_ros tf2_echo base_link base_laser`. |
 | RobotModel ser rar ut | Stol på LiDAR + TF først; joint states kan være statiske/null. |
 | YOLO-bilde mangler | Sjekk `make pc-teddy-rviz`, port `5602` og `stream_debug_video`. |
-| Råkamera mangler | Sjekk GStreamer på PC og port `5601`. |
 | `/dev/ttyAMA0` feiler | Test `PORT_NAME=/dev/serial0 make pi-bringup`. |
 
 ## 7. Minimal LiDAR-test

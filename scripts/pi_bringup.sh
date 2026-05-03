@@ -42,9 +42,7 @@ WIDTH="${WIDTH:-1296}"
 HEIGHT="${HEIGHT:-972}"
 FPS="${FPS:-15}"
 CAM_PORT="${CAM_PORT:-5600}"
-WITH_CAMERA_RVIZ="${WITH_CAMERA_RVIZ:-0}"
-CAMERA_REMOTE_HOST="${CAMERA_REMOTE_HOST:-}"
-CAMERA_REMOTE_PORT="${CAMERA_REMOTE_PORT:-5601}"
+DEBUG_STREAM_HOST="${MEKK4_DEBUG_STREAM_HOST:-}"
 DOCKER_LIDAR_GID="${DOCKER_LIDAR_GID:-}"
 DOCKER_I2C_GID="${DOCKER_I2C_GID:-}"
 DOCKER_GPIO_GID="${DOCKER_GPIO_GID:-}"
@@ -134,38 +132,15 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-if [[ "${WITH_CAMERA_RVIZ}" == "1" && -z "${CAMERA_REMOTE_HOST}" ]]; then
-  CAMERA_REMOTE_HOST="${ROS_STATIC_PEERS}"
+if [[ "${WITH_TEDDY}" == "1" && "${MEKK4_DEBUG_STREAM:-0}" == "1" && -z "${DEBUG_STREAM_HOST}" ]]; then
+  DEBUG_STREAM_HOST="${ROS_STATIC_PEERS}"
 fi
 
-if [[ "${WITH_TEDDY}" == "1" && "${MEKK4_DEBUG_STREAM:-0}" == "1" && -z "${CAMERA_REMOTE_HOST}" ]]; then
-  CAMERA_REMOTE_HOST="${ROS_STATIC_PEERS}"
-fi
-
-if [[ "${WITH_TEDDY}" == "1" || "${WITH_CAMERA_RVIZ}" == "1" ]]; then
-  if ! command -v rpicam-vid >/dev/null 2>&1; then
-    echo "[pi-bringup] Camera streaming requires rpicam-vid on the Pi host." >&2
-    exit 1
-  fi
-  if ! command -v gst-launch-1.0 >/dev/null 2>&1; then
-    echo "[pi-bringup] Camera streaming requires gst-launch-1.0 on the Pi host." >&2
-    exit 1
-  fi
-
+if [[ "${WITH_TEDDY}" == "1" ]]; then
   bash "${SCRIPT_DIR}/camera_stop.sh" >/dev/null 2>&1 || true
   echo "[pi-bringup] Starting camera UDP stream..." >&2
-  ENABLE_LOCAL=0
-  ENABLE_REMOTE=0
-  if [[ "${WITH_TEDDY}" == "1" ]]; then
-    ENABLE_LOCAL=1
-  fi
-  if [[ "${WITH_CAMERA_RVIZ}" == "1" ]]; then
-    ENABLE_REMOTE=1
-  fi
   WIDTH="${WIDTH}" HEIGHT="${HEIGHT}" FPS="${FPS}" \
-    CAM_PORT="${CAM_PORT}" CAMERA_REMOTE_PORT="${CAMERA_REMOTE_PORT}" \
-    LOCAL_PORT="${CAM_PORT}" ENABLE_LOCAL="${ENABLE_LOCAL}" ENABLE_REMOTE="${ENABLE_REMOTE}" \
-    REMOTE_HOST="${CAMERA_REMOTE_HOST}" REMOTE_PORT="${CAMERA_REMOTE_PORT}" \
+    CAM_PORT="${CAM_PORT}" LOCAL_PORT="${CAM_PORT}" \
     bash "${SCRIPT_DIR}/camera_stream_supervisor.sh" &
   camera_pid=$!
   sleep 1
@@ -204,7 +179,7 @@ docker "${docker_run_args[@]}" \
   -e MEKK4_CENTER_TOL="${MEKK4_CENTER_TOL}" \
   -e MEKK4_SHOW="${MEKK4_SHOW}" \
   -e MEKK4_DEBUG_STREAM="${MEKK4_DEBUG_STREAM}" \
-  -e MEKK4_DEBUG_STREAM_HOST="${CAMERA_REMOTE_HOST}" \
+  -e MEKK4_DEBUG_STREAM_HOST="${DEBUG_STREAM_HOST}" \
   -e MEKK4_DEBUG_STREAM_PORT="${MEKK4_DEBUG_STREAM_PORT}" \
   -e MEKK4_DEBUG_STREAM_SCALE="${MEKK4_DEBUG_STREAM_SCALE}" \
   -e MEKK4_DEBUG_STREAM_FPS="${MEKK4_DEBUG_STREAM_FPS}" \

@@ -36,21 +36,7 @@ Dette kjører:
 
 Default topic for bildet er `/camera`, selv om bildet er annotert YOLO-output.
 
-## Rå Kamera Til RViz
-
-Pi:
-
-```bash
-WITH_CAMERA_RVIZ=1 make pi-bringup
-```
-
-PC:
-
-```bash
-make pc-camera-rviz
-```
-
-Rå stream bruker port `5601`. Annotert teddy-stream bruker port `5602`.
+Annotert teddy-stream bruker UDP-port `5602`.
 
 ## ROS Keyboard Teleop
 

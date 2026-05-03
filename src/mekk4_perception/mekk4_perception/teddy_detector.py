@@ -3,7 +3,6 @@ import shlex
 import subprocess
 import threading
 import time
-from collections import deque
 
 import cv2
 import numpy as np
@@ -49,10 +48,8 @@ class TeddyDetector(Node):
         self._latest_seq = 0
         self._last_warn = 0.0
         self._last_debug_stream = 0.0
-        self._last_debug_stream_warn = 0.0
         self._last_infer_end = None
         self._infer_fps = 0.0
-        self._debug_stream_stderr_lines = deque(maxlen=20)
         self._stop = False
 
         if not self.gst_source:
@@ -332,16 +329,9 @@ class TeddyDetector(Node):
 
     def _ensure_debug_stream_process(self, width, height):
         if not self.debug_stream_host:
-            now = time.monotonic()
-            if now - self._last_debug_stream_warn >= 5.0:
-                self.get_logger().warning("debug stream host is empty, not streaming annotated video")
-                self._last_debug_stream_warn = now
             return None
         if self.debug_stream_proc is not None and self.debug_stream_proc.poll() is None:
             return self.debug_stream_proc
-
-        if self.debug_stream_proc is not None and self.debug_stream_proc.poll() is not None:
-            self._log_debug_stream_failure()
 
         self._stop_debug_stream()
         fps_hint = self.debug_stream_fps if self.debug_stream_fps is not None else self.camera_fps
@@ -365,37 +355,13 @@ class TeddyDetector(Node):
                 cmd,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
                 bufsize=0,
             )
-            if self.debug_stream_proc.stderr is not None:
-                self._debug_stream_stderr_lines.clear()
-                threading.Thread(target=self._drain_debug_stream_stderr, daemon=True).start()
         except Exception:
             self.debug_stream_proc = None
             return None
         return self.debug_stream_proc
-
-    def _drain_debug_stream_stderr(self):
-        if self.debug_stream_proc is None or self.debug_stream_proc.stderr is None:
-            return
-
-        while not self._stop:
-            line = self.debug_stream_proc.stderr.readline()
-            if not line:
-                return
-            self._debug_stream_stderr_lines.append(line.decode(errors="replace").rstrip())
-
-    def _log_debug_stream_failure(self):
-        if self.debug_stream_proc is None:
-            return
-        code = self.debug_stream_proc.poll()
-        if self._debug_stream_stderr_lines:
-            self.get_logger().warning(
-                f"debug stream pipeline exited with code {code}: {'; '.join(self._debug_stream_stderr_lines)}"
-            )
-        else:
-            self.get_logger().warning(f"debug stream pipeline exited with code {code}")
 
     def _stop_debug_stream(self):
         if self.debug_stream_proc is None:
@@ -410,7 +376,6 @@ class TeddyDetector(Node):
             self.debug_stream_proc.wait(timeout=1.0)
         except Exception:
             pass
-        self._debug_stream_stderr_lines.clear()
         self.debug_stream_proc = None
 
     def destroy_node(self):

@@ -23,7 +23,6 @@ Kilde: [`config/camera_params.yaml`](../../config/camera_params.yaml)
 | `flush_output` | `true` | Flusher encoded output |
 | `pc_jitter_ms` | `10` | PC jitterbuffer |
 | `local_udp_port` | `5600` | Pi intern stream til detector |
-| `remote_udp_port` | `5601` | Rå stream til PC |
 | `denoise` | `cdn_hq` | Libcamera denoise |
 
 ### `teddy_detector`
@@ -43,8 +42,7 @@ Kilde: [`config/camera_params.yaml`](../../config/camera_params.yaml)
 
 Pi bringup starter kamera hvis:
 
-- `WITH_TEDDY=1`, eller
-- `WITH_CAMERA_RVIZ=1`.
+- `WITH_TEDDY=1`.
 
 Script:
 
@@ -61,8 +59,7 @@ Viktige fakta:
 - Bruker Ultralytics `YOLO(..., task="detect")`.
 - Detekterer COCO class id `77`, kommentert som `teddy bear`.
 - Publiserer status på `/teddy_detector/status`.
-- Kan publisere ROS debug image, men default er av.
-- Anbefalt debugvisning er annotert H264/UDP til PC.
+- Sender annotert H264/UDP til PC når `stream_debug_video=true`.
 
 Statusformat:
 
@@ -82,13 +79,6 @@ make pc-teddy-rviz
 ```
 
 Dette starter `udp_camera_bridge` og publiserer annotert stream som `/camera`.
-
-Direkte rå kamera:
-
-```bash
-WITH_CAMERA_RVIZ=1 make pi-bringup
-make pc-camera-rviz
-```
 
 ## Reload
 

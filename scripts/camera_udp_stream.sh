@@ -13,10 +13,6 @@ LOW_LATENCY=${LOW_LATENCY:-0}
 FLUSH_OUTPUT=${FLUSH_OUTPUT:-1}
 LOCAL_PORT=${LOCAL_PORT:-5600}
 LOCAL_HOST=${LOCAL_HOST:-127.0.0.1}
-ENABLE_LOCAL=${ENABLE_LOCAL:-1}
-ENABLE_REMOTE=${ENABLE_REMOTE:-1}
-REMOTE_HOST=${REMOTE_HOST:-}
-REMOTE_PORT=${REMOTE_PORT:-5601}
 
 if ! command -v rpicam-vid >/dev/null 2>&1; then
   echo "[camera-stream] rpicam-vid not found. Install rpicam-apps on the Pi host." >&2
@@ -38,11 +34,6 @@ if rpicam-vid --help 2>&1 | grep -q -- '--flush'; then
   supports_flush=1
 fi
 
-if [[ "${ENABLE_LOCAL}" != "1" && ! ( "${ENABLE_REMOTE}" == "1" && -n "${REMOTE_HOST}" ) ]]; then
-  echo "[camera-stream] Nothing to do. Enable local streaming or set REMOTE_HOST." >&2
-  exit 1
-fi
-
 rpicam_pid=""
 gst_pid=""
 fifo_path="$(mktemp -u /tmp/mekk4_camera_fifo.XXXXXX)"
@@ -62,29 +53,8 @@ trap cleanup EXIT INT TERM
 
 mkfifo "${fifo_path}"
 
-gst_cmd=(gst-launch-1.0 -q fdsrc '!' h264parse '!' tee name=t)
-
-if [[ "${ENABLE_LOCAL}" == "1" ]]; then
-  gst_cmd+=(
-    t. '!' queue '!' rtph264pay pt=96 config-interval=1 '!'
-    udpsink "host=${LOCAL_HOST}" "port=${LOCAL_PORT}" sync=false async=false
-  )
-fi
-
-if [[ "${ENABLE_REMOTE}" == "1" && -n "${REMOTE_HOST}" ]]; then
-  gst_cmd+=(
-    t. '!' queue '!' rtph264pay pt=96 config-interval=1 '!'
-    udpsink "host=${REMOTE_HOST}" "port=${REMOTE_PORT}" sync=false async=false
-  )
-fi
-
 echo "[camera-stream] width=${WIDTH} height=${HEIGHT} fps=${FPS}" >&2
-if [[ "${ENABLE_LOCAL}" == "1" ]]; then
-  echo "[camera-stream] local udp -> ${LOCAL_HOST}:${LOCAL_PORT}" >&2
-fi
-if [[ "${ENABLE_REMOTE}" == "1" && -n "${REMOTE_HOST}" ]]; then
-  echo "[camera-stream] remote udp -> ${REMOTE_HOST}:${REMOTE_PORT}" >&2
-fi
+echo "[camera-stream] local h264 udp -> ${LOCAL_HOST}:${LOCAL_PORT}" >&2
 
 RPICAM_ARGS=(
   -t 0
@@ -137,7 +107,11 @@ if [[ -n "${TUNING_FILE}" ]]; then
   RPICAM_ARGS+=(--tuning-file "${TUNING_FILE}")
 fi
 
-"${gst_cmd[@]}" < "${fifo_path}" &
+gst-launch-1.0 -q fdsrc \
+  ! h264parse \
+  ! rtph264pay pt=96 config-interval=1 \
+  ! udpsink "host=${LOCAL_HOST}" "port=${LOCAL_PORT}" sync=false async=false \
+  < "${fifo_path}" &
 gst_pid=$!
 
 rpicam-vid "${RPICAM_ARGS[@]}" -o "${fifo_path}" &

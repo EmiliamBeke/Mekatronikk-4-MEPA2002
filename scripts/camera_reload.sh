@@ -23,14 +23,12 @@ source "${STATE_FILE}"
 new_width="${WIDTH}"
 new_height="${HEIGHT}"
 new_cam_port="${CAM_PORT}"
-new_remote_port="${CAMERA_REMOTE_PORT}"
 old_width="${STREAM_WIDTH}"
 old_height="${STREAM_HEIGHT}"
 old_cam_port="${STREAM_CAM_PORT}"
-old_remote_port="${STREAM_CAMERA_REMOTE_PORT}"
 
-if [[ "${new_width}" != "${old_width}" || "${new_height}" != "${old_height}" || "${new_cam_port}" != "${old_cam_port}" || "${new_remote_port}" != "${old_remote_port}" ]]; then
-  echo "[camera-reload] width/height/ports changed. Do a full restart of Pi bringup, and restart PC camera bridge if width/height changed." >&2
+if [[ "${new_width}" != "${old_width}" || "${new_height}" != "${old_height}" || "${new_cam_port}" != "${old_cam_port}" ]]; then
+  echo "[camera-reload] width/height/port changed. Do a full restart of Pi bringup." >&2
   exit 1
 fi
 

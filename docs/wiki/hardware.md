@@ -12,7 +12,7 @@ Docker og modellfiler. Ting som ikke finnes i repoet er markert som usikkert.
 | Pi | Raspberry Pi 5 antatt | Host + Docker | `BLINKA_FORCEBOARD=RASPBERRY_PI_5` |
 | LiDAR | `LDLiDAR_LD06` | Serial | `/dev/ttyAMA0`, `230400` baud |
 | IMU | `BNO085` / BNO08x | I2C | `/dev/i2c-1`, frame `imu_link` |
-| Kamera | Pi camera via `rpicam-vid` | H264/RTP UDP | `5600`, `5601`, `5602` |
+| Kamera | Pi camera via `rpicam-vid` | H264/RTP UDP | `5600`, `5602` |
 | Motorcontroller | Arduino Mega | USB serial | `/dev/ttyACM0`, `115200` baud |
 | Encodere | `ENC1`, `ENC2` | Arduino interrupt pins | M1 pins `3/2`, M2 pins `18/19` |
 | Motor driver | DFR0601-testsketch indikerer DFR0601 | Arduino digital/PWM | M1/M2 pins under |
@@ -84,7 +84,6 @@ Default i nåværende config:
 | `fps` | `6` |
 | `bitrate_bps` | `2800000` |
 | `local_udp_port` | `5600` |
-| `remote_udp_port` | `5601` |
 | `debug_stream_port` | `5602` |
 
 Usikkert: eksakt fysisk kameramodell er ikke dokumentert i repoet.
