@@ -467,6 +467,7 @@ def generate_launch_description():
         SetEnvironmentVariable('MEKK4_DEBUG_STREAM_PORT', '5602'),
         SetEnvironmentVariable('MEKK4_DEBUG_STREAM_FPS', '0'),
         SetEnvironmentVariable('MEKK4_DEBUG_STREAM_BITRATE', '1400000'),
+        SetEnvironmentVariable('MEKK4_DEBUG_STREAM_ENCODER', 'openh264'),
         gz_gui,
         gz_headless,
         start_sim_io,

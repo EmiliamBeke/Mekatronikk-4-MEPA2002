@@ -38,6 +38,7 @@ class TeddyDetector(Node):
         self.debug_stream_scale = float(os.environ.get("MEKK4_DEBUG_STREAM_SCALE", "1.0"))
         self.debug_stream_fps = self._parse_stream_fps(os.environ.get("MEKK4_DEBUG_STREAM_FPS", "10.0"))
         self.debug_stream_bitrate_bps = int(os.environ.get("MEKK4_DEBUG_STREAM_BITRATE", "800000"))
+        self.debug_stream_encoder = os.environ.get("MEKK4_DEBUG_STREAM_ENCODER", "x264").strip().lower()
 
         self.model = YOLO(self.model_path, task="detect")
         self.pub = self.create_publisher(String, "/teddy_detector/status", 10)
@@ -52,6 +53,7 @@ class TeddyDetector(Node):
         self._latest_seq = 0
         self._last_warn = 0.0
         self._last_debug_stream = 0.0
+        self._last_debug_stream_cmd = ""
         self._last_status_log = 0.0
         self._last_infer_end = None
         self._infer_fps = 0.0
@@ -317,23 +319,32 @@ class TeddyDetector(Node):
         if self.debug_stream_proc is not None and self.debug_stream_proc.poll() is None:
             return self.debug_stream_proc
 
+        if self.debug_stream_proc is not None:
+            self._warn_throttled(
+                f"debug stream process exited with code {self.debug_stream_proc.poll()} "
+                f"(encoder={self.debug_stream_encoder})"
+            )
         self._stop_debug_stream()
         fps_hint = self.debug_stream_fps if self.debug_stream_fps is not None else self.camera_fps
         fps = max(1, int(round(fps_hint)))
         bitrate_kbps = max(100, int(round(self.debug_stream_bitrate_bps / 1000.0)))
         key_int = max(1, fps)
+        encoder = self._debug_stream_encoder(bitrate_kbps, key_int)
         pipeline = (
             "fdsrc ! "
             f"videoparse format=bgr width={width} height={height} framerate={fps}/1 ! "
             "queue leaky=downstream max-size-buffers=1 ! "
             "videoconvert ! "
-            f"x264enc tune=zerolatency speed-preset=ultrafast bitrate={bitrate_kbps} key-int-max={key_int} ! "
+            f"{encoder} ! "
             "h264parse ! "
             "rtph264pay pt=96 config-interval=1 ! "
             f"udpsink host={self.debug_stream_host} port={self.debug_stream_port} sync=false async=false"
         )
         cmd = ["gst-launch-1.0", "-q"] + shlex.split(pipeline)
-        self.get_logger().info(f"debug stream pipeline: {' '.join(cmd)}")
+        cmd_text = " ".join(cmd)
+        if cmd_text != self._last_debug_stream_cmd:
+            self.get_logger().info(f"debug stream pipeline: {cmd_text}")
+            self._last_debug_stream_cmd = cmd_text
         try:
             self.debug_stream_proc = subprocess.Popen(
                 cmd,
@@ -346,6 +357,15 @@ class TeddyDetector(Node):
             self.debug_stream_proc = None
             return None
         return self.debug_stream_proc
+
+    def _debug_stream_encoder(self, bitrate_kbps, key_int):
+        if self.debug_stream_encoder == "openh264":
+            return (
+                "video/x-raw,format=I420 ! "
+                f"openh264enc bitrate={bitrate_kbps * 1000} "
+                f"gop-size={key_int} rate-control=bitrate complexity=low"
+            )
+        return f"x264enc tune=zerolatency speed-preset=ultrafast bitrate={bitrate_kbps} key-int-max={key_int}"
 
     def _stop_debug_stream(self):
         if self.debug_stream_proc is None:
