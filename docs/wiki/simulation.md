@@ -42,6 +42,7 @@ Default launch-argumenter som betyr noe:
 | `use_ekf` | `true` | Starter EKF via delt core stack |
 | `use_teddy` | `true` | Starter sim-kamera UDP adapter og teddy-detektor |
 | `use_teddy_approach` | `true` | Starter teddy-approach controller og RViz-markører |
+| `use_overhead_apriltag` | `false` | Starter overhead AprilTag-odom når eksplisitt aktivert |
 | `keyboard_teleop` | `true` | Starter GUI teleop når ikke headless |
 
 Den starter:

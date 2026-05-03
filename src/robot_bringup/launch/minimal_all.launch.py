@@ -404,7 +404,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'use_overhead_apriltag',
-            default_value='true',
+            default_value='false',
             description='Run simulated overhead AprilTag detection and /overhead/odom publisher.'
         ),
         DeclareLaunchArgument(
