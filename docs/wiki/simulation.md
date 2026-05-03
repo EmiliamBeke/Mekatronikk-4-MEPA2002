@@ -4,7 +4,7 @@
 
 Simuleringen kjøres på host/PC, ikke i Docker. Dagens `make sim` starter den
 fulle simstacken: Gazebo, ROS-GZ bridge, sim sensors, tracked-drive adapter, EKF,
-Nav2, RViz og keyboard teleop.
+Nav2, teddy-deteksjon, teddy-approach, RViz og keyboard teleop.
 
 Ikke kjør `make sim-nav2` etter vanlig `make sim`; da starter du en ekstra Nav2
 stack på de samme topicene.
@@ -20,8 +20,8 @@ make sim
 | Kommando | Effekt |
 |---|---|
 | `make sim-build` | Bygger workspace lokalt |
-| `make sim` | Full simstack med Gazebo GUI, bridge, EKF, Nav2, RViz og keyboard teleop |
-| `make sim-headless` | Full simstack med Gazebo server-only, EKF, Nav2 og RViz |
+| `make sim` | Full simstack med Gazebo GUI, bridge, EKF, Nav2, teddy-approach, RViz og keyboard teleop |
+| `make sim-headless` | Full simstack med Gazebo server-only, EKF, Nav2, teddy-approach og RViz |
 | `make sim-stop` | Stopper gamle simprosesser |
 | `make sim-topics` | Lister sentrale topics |
 | `make sim-nav2` | Starter bare Nav2. Brukes kun hvis sim allerede kjører uten Nav2 |
@@ -40,6 +40,8 @@ Default launch-argumenter som betyr noe:
 | `rviz` | `true` | Starter RViz |
 | `use_nav2` | `true` | Starter Nav2 via delt core stack |
 | `use_ekf` | `true` | Starter EKF via delt core stack |
+| `use_teddy` | `true` | Starter sim-kamera UDP adapter og teddy-detektor |
+| `use_teddy_approach` | `true` | Starter teddy-approach controller og RViz-markører |
 | `keyboard_teleop` | `true` | Starter GUI teleop når ikke headless |
 
 Den starter:
@@ -49,6 +51,7 @@ Den starter:
 - Separat bridge for `/wheel/odom`.
 - `tracked_cmd_vel_adapter`.
 - Delt `pi_robot.launch.py` core stack med `use_sim_time:=true`, `use_nav2:=true` og `use_ekf:=true` som default.
+- Sim-kamera via UDP til `teddy_detector`, og `teddy_approach_node` som publiserer `/cmd_vel_teddy`.
 - RViz.
 - Keyboard teleop hvis ikke headless.
 

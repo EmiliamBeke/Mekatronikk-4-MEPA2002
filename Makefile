@@ -73,10 +73,10 @@ sim-stop:
 	bash ./scripts/sim_stop.sh
 
 sim: sim-stop
-	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py use_teddy:=$(if $(WITH_TEDDY),$(WITH_TEDDY),true)'
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py use_teddy:=$(if $(WITH_TEDDY),$(WITH_TEDDY),true) use_teddy_approach:=$(if $(WITH_TEDDY_APPROACH),$(WITH_TEDDY_APPROACH),true)'
 
 sim-headless: sim-stop
-	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py headless:=true rviz:=true use_teddy:=$(if $(WITH_TEDDY),$(WITH_TEDDY),true)'
+	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch robot_bringup minimal_all.launch.py headless:=true rviz:=true use_teddy:=$(if $(WITH_TEDDY),$(WITH_TEDDY),true) use_teddy_approach:=$(if $(WITH_TEDDY_APPROACH),$(WITH_TEDDY_APPROACH),true)'
 
 sim-topics:
 	bash -lc 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 topic list | grep -E "/clock|/odom|/lidar|/cmd_vel"'

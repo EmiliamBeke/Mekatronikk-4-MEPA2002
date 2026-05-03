@@ -23,6 +23,7 @@ def generate_launch_description():
     use_nav2 = LaunchConfiguration('use_nav2')
     use_ekf = LaunchConfiguration('use_ekf')
     use_teddy = LaunchConfiguration('use_teddy')
+    use_teddy_approach = LaunchConfiguration('use_teddy_approach')
     use_overhead_apriltag = LaunchConfiguration('use_overhead_apriltag')
     params_file = LaunchConfiguration('params_file')
     ekf_params_file = LaunchConfiguration('ekf_params_file')
@@ -123,6 +124,7 @@ def generate_launch_description():
             'use_nav2': use_nav2,
             'use_lidar': 'false',
             'use_teddy': use_teddy,
+            'use_teddy_approach': use_teddy_approach,
             'use_imu': 'false',
             'use_mega_driver': 'false',
             'use_ekf': use_ekf,
@@ -369,6 +371,11 @@ def generate_launch_description():
             'use_teddy',
             default_value='true',
             description='Run teddy_detector in sim using a local UDP camera adapter.'
+        ),
+        DeclareLaunchArgument(
+            'use_teddy_approach',
+            default_value='true',
+            description='Run teddy_approach in sim.'
         ),
         DeclareLaunchArgument(
             'use_overhead_apriltag',
