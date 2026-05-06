@@ -11,7 +11,7 @@ teddy_approach:
     angular_kp: 1.2
     angular_kd: 1.0
     max_angular_speed: 1.6
-    min_angular_speed: 1.0
+    min_angular_speed: 1.1
     center_tolerance: 0.10
 
     # Stop when YOLO is centered and LiDAR sees something close straight ahead.
