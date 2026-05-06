@@ -49,6 +49,7 @@ class RosKeyboardTeleop:
         self.max_arm_z_speed = max(self.arm_z_speed, args.max_arm_z_speed)
 
         self.pressed_keys: set[str] = set()
+        self.release_jobs: dict[str, str] = {}
         self.last_command = (None, None)
         self.last_sent_at = 0.0
         self.last_tick_at = time.monotonic()
@@ -163,6 +164,10 @@ class RosKeyboardTeleop:
             return
 
         first_press = key not in self.pressed_keys
+        release_job = self.release_jobs.pop(key, None)
+        if release_job is not None:
+            self.root.after_cancel(release_job)
+
         if key in {"w", "a", "s", "d", "y", "h", "j", "k"}:
             self.pressed_keys.add(key)
 
@@ -190,6 +195,13 @@ class RosKeyboardTeleop:
 
     def _on_key_release(self, event: tk.Event) -> None:
         key = event.keysym.lower()
+        release_job = self.release_jobs.pop(key, None)
+        if release_job is not None:
+            self.root.after_cancel(release_job)
+        self.release_jobs[key] = self.root.after(50, lambda key=key: self._release_key(key))
+
+    def _release_key(self, key: str) -> None:
+        self.release_jobs.pop(key, None)
         self.pressed_keys.discard(key)
 
     def _compute_command(self) -> tuple[float, float]:
@@ -220,9 +232,13 @@ class RosKeyboardTeleop:
         publisher.publish(msg)
 
     def _on_arm_x_state(self, msg: Float64) -> None:
+        if "j" in self.pressed_keys or "k" in self.pressed_keys:
+            return
         self.arm_x = clamp(float(msg.data), self.arm_x_min, self.arm_x_max)
 
     def _on_arm_z_state(self, msg: Float64) -> None:
+        if "y" in self.pressed_keys or "h" in self.pressed_keys:
+            return
         self.arm_z = clamp(float(msg.data), self.arm_z_min, self.arm_z_max)
 
     def _update_arm_targets(self, dt: float) -> None:
