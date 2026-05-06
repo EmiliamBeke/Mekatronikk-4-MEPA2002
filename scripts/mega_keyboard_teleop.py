@@ -91,8 +91,14 @@ def print_status(
     reverse: bool,
     left_turn: bool,
     right_turn: bool,
+    arm_up: bool,
+    arm_down: bool,
+    arm_out: bool,
+    arm_in: bool,
     speed: int,
     turn_speed: int,
+    arm_x_steps: int,
+    arm_z_steps: int,
     left_cmd: int,
     right_cmd: int,
     latest_message: str,
@@ -109,11 +115,25 @@ def print_status(
     elif right_turn and not left_turn:
         steer_label = "right"
 
+    z_label = "idle"
+    if arm_up and not arm_down:
+        z_label = "up"
+    elif arm_down and not arm_up:
+        z_label = "down"
+
+    x_label = "idle"
+    if arm_out and not arm_in:
+        x_label = "out"
+    elif arm_in and not arm_out:
+        x_label = "in"
+
     message = f" msg={latest_message}" if latest_message else ""
     sys.stdout.write(
         "\r"
         f"[mega-keyboard] drive={drive_label} steer={steer_label} "
-        f"speed={speed} turn_speed={turn_speed} cmd=({left_cmd}, {right_cmd}){message}   "
+        f"arm_x={x_label} arm_z={z_label} "
+        f"speed={speed} turn_speed={turn_speed} x_steps={arm_x_steps} z_steps={arm_z_steps} "
+        f"cmd=({left_cmd}, {right_cmd}){message}   "
     )
     sys.stdout.flush()
 
@@ -124,6 +144,12 @@ def main() -> int:
     parser.add_argument("--baudrate", type=int, default=115200, help="Serial baudrate")
     parser.add_argument("--speed", type=int, default=90, help="Forward/reverse PWM magnitude (0-255)")
     parser.add_argument("--turn-speed", type=int, default=55, help="Steering PWM magnitude (0-255)")
+    parser.add_argument("--arm-x-steps", type=int, default=20, help="ARM X steps per repeated keyboard command")
+    parser.add_argument("--arm-z-steps", type=int, default=100, help="ARM Z steps per repeated keyboard command")
+    parser.add_argument("--arm-x-step-increment", type=int, default=5, help="ARM X step increment for M/N")
+    parser.add_argument("--arm-z-step-increment", type=int, default=25, help="ARM Z step increment for T/G")
+    parser.add_argument("--max-arm-x-steps", type=int, default=200, help="Maximum ARM X steps per command")
+    parser.add_argument("--max-arm-z-steps", type=int, default=1000, help="Maximum ARM Z steps per command")
     parser.add_argument("--swap-sides", action=argparse.BooleanOptionalAction, default=False, help="Swap robot-left and robot-right when sending BOTH to Mega")
     parser.add_argument("--left-cmd-sign", type=int, default=1, help="Sign to apply to robot-left commands")
     parser.add_argument("--right-cmd-sign", type=int, default=1, help="Sign to apply to robot-right commands")
@@ -151,6 +177,10 @@ def main() -> int:
 
     speed = max(0, min(255, args.speed))
     turn_speed = max(0, min(255, args.turn_speed))
+    arm_x_steps = max(1, min(args.max_arm_x_steps, args.arm_x_steps))
+    arm_z_steps = max(1, min(args.max_arm_z_steps, args.arm_z_steps))
+    arm_x_step_increment = max(1, args.arm_x_step_increment)
+    arm_z_step_increment = max(1, args.arm_z_step_increment)
 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
@@ -159,8 +189,14 @@ def main() -> int:
     last_reverse_at = -1.0
     last_left_at = -1.0
     last_right_at = -1.0
+    last_arm_up_at = -1.0
+    last_arm_down_at = -1.0
+    last_arm_out_at = -1.0
+    last_arm_in_at = -1.0
     latest_message = ""
     last_sent_at = 0.0
+    last_arm_x_sent_at = 0.0
+    last_arm_z_sent_at = 0.0
     last_sent_command = ""
 
     try:
@@ -173,7 +209,9 @@ def main() -> int:
             tty.setcbreak(fd)
             print(
                 "[mega-keyboard] Hold W/S/A/D. "
+                "Y/H arm up/down. J/K arm out/in. "
                 "E/Q speed up/down. P/O turn speed up/down. "
+                "M/N x step speed up/down. T/G z step speed up/down. "
                 "SPACE stop. - quit."
             )
 
@@ -202,11 +240,23 @@ def main() -> int:
                             last_left_at = key_now
                         elif key in ("d", "D"):
                             last_right_at = key_now
+                        elif key in ("y", "Y"):
+                            last_arm_up_at = key_now
+                        elif key in ("h", "H"):
+                            last_arm_down_at = key_now
+                        elif key in ("j", "J"):
+                            last_arm_out_at = key_now
+                        elif key in ("k", "K"):
+                            last_arm_in_at = key_now
                         elif key == " ":
                             last_forward_at = -1.0
                             last_reverse_at = -1.0
                             last_left_at = -1.0
                             last_right_at = -1.0
+                            last_arm_up_at = -1.0
+                            last_arm_down_at = -1.0
+                            last_arm_out_at = -1.0
+                            last_arm_in_at = -1.0
                         elif key in ("e", "E"):
                             speed = min(255, speed + 5)
                         elif key in ("q", "Q"):
@@ -215,12 +265,24 @@ def main() -> int:
                             turn_speed = min(255, turn_speed + 5)
                         elif key in ("o", "O"):
                             turn_speed = max(0, turn_speed - 5)
+                        elif key in ("m", "M"):
+                            arm_x_steps = min(args.max_arm_x_steps, arm_x_steps + arm_x_step_increment)
+                        elif key in ("n", "N"):
+                            arm_x_steps = max(1, arm_x_steps - arm_x_step_increment)
+                        elif key in ("t", "T"):
+                            arm_z_steps = min(args.max_arm_z_steps, arm_z_steps + arm_z_step_increment)
+                        elif key in ("g", "G"):
+                            arm_z_steps = max(1, arm_z_steps - arm_z_step_increment)
 
                     now = time.monotonic()
                     forward = is_active(last_forward_at, now, args.hold_timeout)
                     reverse = is_active(last_reverse_at, now, args.hold_timeout)
                     left_turn = is_active(last_left_at, now, args.hold_timeout)
                     right_turn = is_active(last_right_at, now, args.hold_timeout)
+                    arm_up = is_active(last_arm_up_at, now, args.hold_timeout)
+                    arm_down = is_active(last_arm_down_at, now, args.hold_timeout)
+                    arm_out = is_active(last_arm_out_at, now, args.hold_timeout)
+                    arm_in = is_active(last_arm_in_at, now, args.hold_timeout)
                     drive = 0
                     if forward and not reverse:
                         drive = 1
@@ -253,13 +315,29 @@ def main() -> int:
                         last_sent_command = command
                         last_sent_at = now
 
+                    if arm_out != arm_in and now - last_arm_x_sent_at >= args.send_period:
+                        x_steps = arm_x_steps if arm_out else -arm_x_steps
+                        send_command(ser, f"ARM X {x_steps}")
+                        last_arm_x_sent_at = now
+
+                    if arm_up != arm_down and now - last_arm_z_sent_at >= args.send_period:
+                        z_steps = arm_z_steps if arm_up else -arm_z_steps
+                        send_command(ser, f"ARM Z {z_steps}")
+                        last_arm_z_sent_at = now
+
                     print_status(
                         forward,
                         reverse,
                         left_turn,
                         right_turn,
+                        arm_up,
+                        arm_down,
+                        arm_out,
+                        arm_in,
                         speed,
                         turn_speed,
+                        arm_x_steps,
+                        arm_z_steps,
                         send_left,
                         send_right,
                         latest_message,

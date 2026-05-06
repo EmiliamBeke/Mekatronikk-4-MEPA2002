@@ -9,6 +9,7 @@ import tkinter as tk
 import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.utilities import remove_ros_args
+from std_msgs.msg import Float64
 
 
 def clamp(value: float, low: float, high: float) -> float:
@@ -19,8 +20,14 @@ class RosKeyboardTeleop:
     def __init__(self, args: argparse.Namespace) -> None:
         self.node = rclpy.create_node("ros_keyboard_teleop")
         self.pub = self.node.create_publisher(Twist, args.topic, 10)
+        self.arm_x_pub = self.node.create_publisher(Float64, args.arm_x_topic, 10)
+        self.arm_z_pub = self.node.create_publisher(Float64, args.arm_z_topic, 10)
+        self.node.create_subscription(Float64, args.arm_x_state_topic, self._on_arm_x_state, 10)
+        self.node.create_subscription(Float64, args.arm_z_state_topic, self._on_arm_z_state, 10)
 
         self.topic = args.topic
+        self.arm_x_topic = args.arm_x_topic
+        self.arm_z_topic = args.arm_z_topic
         self.speed = max(0.0, args.speed)
         self.turn_speed = max(0.0, args.turn_speed)
         self.speed_step = max(0.01, args.speed_step)
@@ -28,23 +35,40 @@ class RosKeyboardTeleop:
         self.max_speed = max(self.speed, args.max_speed)
         self.max_turn_speed = max(self.turn_speed, args.max_turn_speed)
         self.send_period = max(0.01, args.send_period)
+        self.arm_x = clamp(args.arm_x_initial, args.arm_x_min, args.arm_x_max)
+        self.arm_z = clamp(args.arm_z_initial, args.arm_z_min, args.arm_z_max)
+        self.arm_x_min = args.arm_x_min
+        self.arm_x_max = args.arm_x_max
+        self.arm_z_min = args.arm_z_min
+        self.arm_z_max = args.arm_z_max
+        self.arm_x_speed = max(0.0, args.arm_x_speed)
+        self.arm_z_speed = max(0.0, args.arm_z_speed)
+        self.arm_x_speed_step = max(0.001, args.arm_x_speed_step)
+        self.arm_z_speed_step = max(0.001, args.arm_z_speed_step)
+        self.max_arm_x_speed = max(self.arm_x_speed, args.max_arm_x_speed)
+        self.max_arm_z_speed = max(self.arm_z_speed, args.max_arm_z_speed)
 
         self.pressed_keys: set[str] = set()
         self.last_command = (None, None)
         self.last_sent_at = 0.0
+        self.last_tick_at = time.monotonic()
         self.closed = False
 
         self.root = tk.Tk()
         self.root.title("ROS Keyboard Teleop")
-        self.root.geometry("560x260")
+        self.root.geometry("620x310")
         self.root.configure(bg="#111111")
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         self.status_var = tk.StringVar(value=f"Publishing to {self.topic}")
-        self.command_var = tk.StringVar(value="cmd_vel=(0.00, 0.00)")
+        self.command_var = tk.StringVar(value=self._command_text(0.0, 0.0))
         self.speed_var = tk.StringVar(value=self._speed_text())
         self.hint_var = tk.StringVar(
-            value="Hold W/S/A/D. E/Q speed. P/O turn speed. SPACE stop. - quit."
+            value=(
+                "Hold W/S/A/D drive. Y/H arm up/down. J/K arm out/in. "
+                "E/Q drive speed. P/O turn speed. M/N x speed +/-. T/G z speed +/-. "
+                "SPACE stop. - quit."
+            )
         )
 
         self._build_ui()
@@ -116,7 +140,16 @@ class RosKeyboardTeleop:
         self.root.focus_force()
 
     def _speed_text(self) -> str:
-        return f"speed={self.speed:.2f} m/s  turn_speed={self.turn_speed:.2f} rad/s"
+        return (
+            f"drive={self.speed:.2f} m/s  turn={self.turn_speed:.2f} rad/s\n"
+            f"arm_x_speed={self.arm_x_speed:.3f} m/s  arm_z_speed={self.arm_z_speed:.3f} m/s"
+        )
+
+    def _command_text(self, linear_x: float, angular_z: float) -> str:
+        return (
+            f"cmd_vel=({linear_x:.2f}, {angular_z:.2f})  "
+            f"arm=(x={self.arm_x:.3f}, z={self.arm_z:.3f})"
+        )
 
     def _on_key_press(self, event: tk.Event) -> None:
         key = event.keysym.lower()
@@ -130,7 +163,7 @@ class RosKeyboardTeleop:
             return
 
         first_press = key not in self.pressed_keys
-        if key in {"w", "a", "s", "d"}:
+        if key in {"w", "a", "s", "d", "y", "h", "j", "k"}:
             self.pressed_keys.add(key)
 
         if not first_press:
@@ -144,6 +177,14 @@ class RosKeyboardTeleop:
             self.turn_speed = clamp(self.turn_speed + self.turn_speed_step, 0.0, self.max_turn_speed)
         elif key == "o":
             self.turn_speed = clamp(self.turn_speed - self.turn_speed_step, 0.0, self.max_turn_speed)
+        elif key == "m":
+            self.arm_x_speed = clamp(self.arm_x_speed + self.arm_x_speed_step, 0.0, self.max_arm_x_speed)
+        elif key == "n":
+            self.arm_x_speed = clamp(self.arm_x_speed - self.arm_x_speed_step, 0.0, self.max_arm_x_speed)
+        elif key == "t":
+            self.arm_z_speed = clamp(self.arm_z_speed + self.arm_z_speed_step, 0.0, self.max_arm_z_speed)
+        elif key == "g":
+            self.arm_z_speed = clamp(self.arm_z_speed - self.arm_z_speed_step, 0.0, self.max_arm_z_speed)
 
         self.speed_var.set(self._speed_text())
 
@@ -173,15 +214,59 @@ class RosKeyboardTeleop:
         msg.angular.z = angular_z
         self.pub.publish(msg)
 
+    def _publish_arm(self, publisher, value: float) -> None:
+        msg = Float64()
+        msg.data = float(value)
+        publisher.publish(msg)
+
+    def _on_arm_x_state(self, msg: Float64) -> None:
+        self.arm_x = clamp(float(msg.data), self.arm_x_min, self.arm_x_max)
+
+    def _on_arm_z_state(self, msg: Float64) -> None:
+        self.arm_z = clamp(float(msg.data), self.arm_z_min, self.arm_z_max)
+
+    def _update_arm_targets(self, dt: float) -> None:
+        x_dir = 0
+        if "j" in self.pressed_keys and "k" not in self.pressed_keys:
+            x_dir = 1
+        elif "k" in self.pressed_keys and "j" not in self.pressed_keys:
+            x_dir = -1
+
+        z_dir = 0
+        if "y" in self.pressed_keys and "h" not in self.pressed_keys:
+            z_dir = 1
+        elif "h" in self.pressed_keys and "y" not in self.pressed_keys:
+            z_dir = -1
+
+        if x_dir:
+            self.arm_x = clamp(
+                self.arm_x + x_dir * self.arm_x_speed * dt,
+                self.arm_x_min,
+                self.arm_x_max,
+            )
+            self._publish_arm(self.arm_x_pub, self.arm_x)
+
+        if z_dir:
+            self.arm_z = clamp(
+                self.arm_z + z_dir * self.arm_z_speed * dt,
+                self.arm_z_min,
+                self.arm_z_max,
+            )
+            self._publish_arm(self.arm_z_pub, self.arm_z)
+
     def _tick(self) -> None:
         if self.closed:
             return
 
+        now = time.monotonic()
+        dt = min(0.1, max(0.0, now - self.last_tick_at))
+        self.last_tick_at = now
+
         linear_x, angular_z = self._compute_command()
-        self.command_var.set(f"cmd_vel=({linear_x:.2f}, {angular_z:.2f})")
+        self._update_arm_targets(dt)
+        self.command_var.set(self._command_text(linear_x, angular_z))
         self.speed_var.set(self._speed_text())
 
-        now = time.monotonic()
         command = (linear_x, angular_z)
         should_repeat = command != (0.0, 0.0)
         should_send = command != self.last_command or (
@@ -232,6 +317,22 @@ def main() -> int:
     parser.add_argument("--max-speed", type=float, default=0.50, help="Maximum linear speed in m/s")
     parser.add_argument("--max-turn-speed", type=float, default=3.70, help="Maximum angular speed in rad/s")
     parser.add_argument("--send-period", type=float, default=0.03, help="Seconds between repeated cmd_vel publishes")
+    parser.add_argument("--arm-x-topic", default="/robotarm/request/x_position", help="Robot arm x request topic")
+    parser.add_argument("--arm-z-topic", default="/robotarm/request/z_position", help="Robot arm z request topic")
+    parser.add_argument("--arm-x-state-topic", default="/robotarm/x_position_cmd", help="Robot arm x command feedback topic")
+    parser.add_argument("--arm-z-state-topic", default="/robotarm/z_position_cmd", help="Robot arm z command feedback topic")
+    parser.add_argument("--arm-x-initial", type=float, default=0.0, help="Initial arm x target in meters")
+    parser.add_argument("--arm-z-initial", type=float, default=0.227, help="Initial arm z target in meters")
+    parser.add_argument("--arm-x-min", type=float, default=-0.2, help="Minimum arm x target in meters")
+    parser.add_argument("--arm-x-max", type=float, default=0.2, help="Maximum arm x target in meters")
+    parser.add_argument("--arm-z-min", type=float, default=0.112, help="Minimum arm z target in meters")
+    parser.add_argument("--arm-z-max", type=float, default=0.3, help="Maximum arm z target in meters")
+    parser.add_argument("--arm-x-speed", type=float, default=0.010, help="Default arm x jog speed in m/s")
+    parser.add_argument("--arm-z-speed", type=float, default=0.002, help="Default arm z jog speed in m/s")
+    parser.add_argument("--arm-x-speed-step", type=float, default=0.002, help="Arm x jog speed increment for M/N")
+    parser.add_argument("--arm-z-speed-step", type=float, default=0.001, help="Arm z jog speed increment for T/G")
+    parser.add_argument("--max-arm-x-speed", type=float, default=0.050, help="Maximum arm x jog speed in m/s")
+    parser.add_argument("--max-arm-z-speed", type=float, default=0.010, help="Maximum arm z jog speed in m/s")
     args = parser.parse_args(remove_ros_args(args=sys.argv)[1:])
 
     rclpy.init()

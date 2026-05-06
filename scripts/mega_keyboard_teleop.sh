@@ -34,6 +34,8 @@ MEGA_PORT="${MEGA_PORT:-}"
 MEGA_BAUDRATE="${MEGA_BAUDRATE:-115200}"
 DRIVE_SPEED="${DRIVE_SPEED:-90}"
 TURN_SPEED="${TURN_SPEED:-75}"
+ARM_X_STEPS="${ARM_X_STEPS:-20}"
+ARM_Z_STEPS="${ARM_Z_STEPS:-100}"
 
 if [[ -z "${MEGA_PORT}" ]]; then
   MEGA_PORT="$(detect_mega_port)" || {
@@ -62,6 +64,8 @@ python3 "${SCRIPT_DIR}/mega_keyboard_teleop.py" \
   --baudrate "${MEGA_BAUDRATE}" \
   --speed "${DRIVE_SPEED}" \
   --turn-speed "${TURN_SPEED}" \
+  --arm-x-steps "${ARM_X_STEPS}" \
+  --arm-z-steps "${ARM_Z_STEPS}" \
   "$(if [[ "${SWAP_SIDES:-1}" == "1" ]]; then echo --swap-sides; else echo --no-swap-sides; fi)" \
   --left-cmd-sign "${LEFT_CMD_SIGN:-1}" \
   --right-cmd-sign "${RIGHT_CMD_SIGN:-1}" \

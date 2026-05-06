@@ -71,9 +71,13 @@ class MegaKeyboardGui:
         self.args = args
         self.speed = max(0, min(255, args.speed))
         self.turn_speed = max(0, min(255, args.turn_speed))
+        self.arm_x_steps = max(1, min(args.max_arm_x_steps, args.arm_x_steps))
+        self.arm_z_steps = max(1, min(args.max_arm_z_steps, args.arm_z_steps))
         self.pressed_keys: set[str] = set()
         self.last_command = ""
         self.last_sent_at = 0.0
+        self.last_arm_x_sent_at = 0.0
+        self.last_arm_z_sent_at = 0.0
         self.status_queue: queue.Queue[tuple[str, str]] = queue.Queue()
         self.remote_ready = threading.Event()
         self.remote_failed = threading.Event()
@@ -86,15 +90,19 @@ class MegaKeyboardGui:
 
         self.root = tk.Tk()
         self.root.title("Mega Keyboard Teleop")
-        self.root.geometry("540x260")
+        self.root.geometry("620x310")
         self.root.configure(bg="#111111")
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         self.status_var = tk.StringVar(value=f"Connecting to {args.host} ...")
-        self.command_var = tk.StringVar(value="cmd=(0, 0)")
+        self.command_var = tk.StringVar(value="drive=(0, 0) arm=(0, 0)")
         self.speed_var = tk.StringVar(value=self._speed_text())
         self.hint_var = tk.StringVar(
-            value="Hold W/S/A/D. E/Q speed. P/O turn speed. SPACE stop. - quit."
+            value=(
+                "Hold W/S/A/D drive. Y/H arm up/down. J/K arm out/in. "
+                "E/Q drive speed. P/O turn speed. M/N x step speed +/-. "
+                "T/G z step speed +/-. SPACE stop. - quit."
+            )
         )
 
         self._build_ui()
@@ -269,6 +277,8 @@ class MegaKeyboardGui:
         self.remote_error = ""
         self.last_command = ""
         self.last_sent_at = 0.0
+        self.last_arm_x_sent_at = 0.0
+        self.last_arm_z_sent_at = 0.0
         self.next_reconnect_at = 0.0
         self.status_var.set(f"Reconnecting to {self.args.host} ...")
         self.proc = self._start_remote_bridge()
@@ -309,7 +319,10 @@ class MegaKeyboardGui:
             self.root.after(50, self._pump_status_queue)
 
     def _speed_text(self) -> str:
-        return f"speed={self.speed}  turn_speed={self.turn_speed}"
+        return (
+            f"speed={self.speed}  turn_speed={self.turn_speed}\n"
+            f"arm_x_steps={self.arm_x_steps}  arm_z_steps={self.arm_z_steps}"
+        )
 
     def _on_key_press(self, event: tk.Event) -> None:
         key = event.keysym.lower()
@@ -323,7 +336,7 @@ class MegaKeyboardGui:
             return
 
         first_press = key not in self.pressed_keys
-        if key in {"w", "a", "s", "d"}:
+        if key in {"w", "a", "s", "d", "y", "h", "j", "k"}:
             self.pressed_keys.add(key)
 
         if not first_press:
@@ -337,6 +350,20 @@ class MegaKeyboardGui:
             self.turn_speed = min(255, self.turn_speed + 5)
         elif key == "o":
             self.turn_speed = max(0, self.turn_speed - 5)
+        elif key == "m":
+            self.arm_x_steps = min(
+                self.args.max_arm_x_steps,
+                self.arm_x_steps + max(1, self.args.arm_x_step_increment),
+            )
+        elif key == "n":
+            self.arm_x_steps = max(1, self.arm_x_steps - max(1, self.args.arm_x_step_increment))
+        elif key == "t":
+            self.arm_z_steps = min(
+                self.args.max_arm_z_steps,
+                self.arm_z_steps + max(1, self.args.arm_z_step_increment),
+            )
+        elif key == "g":
+            self.arm_z_steps = max(1, self.arm_z_steps - max(1, self.args.arm_z_step_increment))
 
         self.speed_var.set(self._speed_text())
 
@@ -378,6 +405,18 @@ class MegaKeyboardGui:
         elif "d" in self.pressed_keys and "a" not in self.pressed_keys:
             steer = -1
 
+        arm_x_direction = 0
+        if "j" in self.pressed_keys and "k" not in self.pressed_keys:
+            arm_x_direction = 1
+        elif "k" in self.pressed_keys and "j" not in self.pressed_keys:
+            arm_x_direction = -1
+
+        arm_z_direction = 0
+        if "y" in self.pressed_keys and "h" not in self.pressed_keys:
+            arm_z_direction = 1
+        elif "h" in self.pressed_keys and "y" not in self.pressed_keys:
+            arm_z_direction = -1
+
         left, right = tank_mix(drive, steer, self.speed, self.turn_speed)
         send_left, send_right = map_robot_commands(
             left,
@@ -390,7 +429,11 @@ class MegaKeyboardGui:
         )
         command = "STOP" if send_left == 0 and send_right == 0 else f"BOTH {send_left} {send_right}"
 
-        self.command_var.set(f"cmd=({send_left}, {send_right})")
+        display_x_steps = arm_x_direction * self.arm_x_steps
+        display_z_steps = arm_z_direction * self.arm_z_steps
+        self.command_var.set(
+            f"drive=({send_left}, {send_right}) arm=({display_x_steps}, {display_z_steps})"
+        )
 
         self.speed_var.set(self._speed_text())
 
@@ -402,6 +445,14 @@ class MegaKeyboardGui:
             self._send_command(command)
             self.last_command = command
             self.last_sent_at = now
+
+        if self.remote_ready.is_set() and arm_x_direction and now - self.last_arm_x_sent_at >= self.args.send_period:
+            self._send_command(f"ARM X {display_x_steps}")
+            self.last_arm_x_sent_at = now
+
+        if self.remote_ready.is_set() and arm_z_direction and now - self.last_arm_z_sent_at >= self.args.send_period:
+            self._send_command(f"ARM Z {display_z_steps}")
+            self.last_arm_z_sent_at = now
 
         self.root.after(20, self._tick)
 
@@ -431,6 +482,12 @@ def main() -> int:
     parser.add_argument("--baudrate", type=int, default=115200, help="Serial baudrate")
     parser.add_argument("--speed", type=int, default=90, help="Forward/reverse PWM magnitude (0-255)")
     parser.add_argument("--turn-speed", type=int, default=55, help="Steering PWM magnitude (0-255)")
+    parser.add_argument("--arm-x-steps", type=int, default=20, help="ARM X steps per repeated keyboard command")
+    parser.add_argument("--arm-z-steps", type=int, default=100, help="ARM Z steps per repeated keyboard command")
+    parser.add_argument("--arm-x-step-increment", type=int, default=5, help="ARM X step increment for M/N")
+    parser.add_argument("--arm-z-step-increment", type=int, default=25, help="ARM Z step increment for T/G")
+    parser.add_argument("--max-arm-x-steps", type=int, default=200, help="Maximum ARM X steps per command")
+    parser.add_argument("--max-arm-z-steps", type=int, default=1000, help="Maximum ARM Z steps per command")
     parser.add_argument("--swap-sides", action=argparse.BooleanOptionalAction, default=False, help="Swap robot-left and robot-right when sending BOTH to Mega")
     parser.add_argument("--left-cmd-sign", type=int, default=1, help="Sign to apply to robot-left commands")
     parser.add_argument("--right-cmd-sign", type=int, default=1, help="Sign to apply to robot-right commands")
