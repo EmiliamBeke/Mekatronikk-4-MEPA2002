@@ -19,6 +19,20 @@ constexpr int kPwm2Pin = 10;
 constexpr int kHallA2Pin = 18;
 constexpr int kHallB2Pin = 19;
 
+constexpr int kXStepPin = 45;
+constexpr int kXDirPin = 29;
+constexpr int kXEnPin = 37;
+constexpr bool kInvertXDirection = false;
+
+constexpr int kZStepPin = 44;
+constexpr int kZDirPin = 28;
+constexpr int kZEnPin = 36;
+constexpr bool kInvertZDirection = false;
+
+constexpr unsigned int kStepperPulseUs = 10;
+constexpr unsigned int kXStepDelayUs = 1000;
+constexpr unsigned int kZStepDelayUs = 100;
+
 volatile long encoder1_count = 0;
 volatile uint8_t encoder1_state = 0;
 volatile long encoder2_count = 0;
@@ -29,6 +43,8 @@ size_t command_length = 0;
 
 int current_m1_speed = 0;
 int current_m2_speed = 0;
+long current_x_steps = 0;
+long current_z_steps = 0;
 unsigned long last_drive_command_ms = 0;
 bool drive_watchdog_armed = false;
 
@@ -180,6 +196,41 @@ void stop_all() {
   apply_motor_output(kIna2Pin, kInb2Pin, kPwm2Pin, 0);
 }
 
+void move_stepper(
+  int step_pin,
+  int dir_pin,
+  long steps,
+  bool invert_direction,
+  unsigned int step_delay_us
+) {
+  if (steps == 0) {
+    return;
+  }
+
+  const bool positive_direction = steps > 0;
+  const bool dir_level = invert_direction ? !positive_direction : positive_direction;
+  const long count = labs(steps);
+
+  digitalWrite(dir_pin, dir_level ? HIGH : LOW);
+
+  for (long i = 0; i < count; i++) {
+    digitalWrite(step_pin, HIGH);
+    delayMicroseconds(kStepperPulseUs);
+    digitalWrite(step_pin, LOW);
+    delayMicroseconds(step_delay_us);
+  }
+}
+
+void move_x_stepper(long steps) {
+  move_stepper(kXStepPin, kXDirPin, steps, kInvertXDirection, kXStepDelayUs);
+  current_x_steps += steps;
+}
+
+void move_z_stepper(long steps) {
+  move_stepper(kZStepPin, kZDirPin, steps, kInvertZDirection, kZStepDelayUs);
+  current_z_steps += steps;
+}
+
 void maybe_stop_on_watchdog() {
   if (!drive_watchdog_armed) {
     return;
@@ -243,7 +294,11 @@ void handle_command(const char *command) {
     Serial.print(" ENC1=");
     Serial.print(read_encoder1_count());
     Serial.print(" ENC2=");
-    Serial.println(read_encoder2_count());
+    Serial.print(read_encoder2_count());
+    Serial.print(" X=");
+    Serial.print(current_x_steps);
+    Serial.print(" Z=");
+    Serial.println(current_z_steps);
     return;
   }
 
@@ -265,6 +320,19 @@ void handle_command(const char *command) {
     return;
   }
 
+  long arm_steps = 0;
+  if (sscanf(command, "ARM X %ld", &arm_steps) == 1) {
+    Serial.println("OK ARM X");
+    move_x_stepper(arm_steps);
+    return;
+  }
+
+  if (sscanf(command, "ARM Z %ld", &arm_steps) == 1) {
+    Serial.println("OK ARM Z");
+    move_z_stepper(arm_steps);
+    return;
+  }
+
   Serial.println("ERR UNKNOWN");
 }
 
@@ -281,6 +349,19 @@ void setup() {
   pinMode(kHallB1Pin, INPUT_PULLUP);
   pinMode(kHallA2Pin, INPUT_PULLUP);
   pinMode(kHallB2Pin, INPUT_PULLUP);
+  pinMode(kXStepPin, OUTPUT);
+  pinMode(kXDirPin, OUTPUT);
+  pinMode(kXEnPin, OUTPUT);
+  pinMode(kZStepPin, OUTPUT);
+  pinMode(kZDirPin, OUTPUT);
+  pinMode(kZEnPin, OUTPUT);
+
+  digitalWrite(kXStepPin, LOW);
+  digitalWrite(kXDirPin, LOW);
+  digitalWrite(kXEnPin, LOW);
+  digitalWrite(kZStepPin, LOW);
+  digitalWrite(kZDirPin, LOW);
+  digitalWrite(kZEnPin, LOW);
 
   stop_all();
   reset_encoder1_count();

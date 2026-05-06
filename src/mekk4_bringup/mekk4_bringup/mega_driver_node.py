@@ -8,7 +8,7 @@ import rclpy
 from geometry_msgs.msg import TransformStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
-from std_msgs.msg import Int32
+from std_msgs.msg import Float64, Int32
 from tf2_ros import TransformBroadcaster
 
 
@@ -50,6 +50,8 @@ class MegaDriverNode(Node):
         self.declare_parameter("right_m_per_tick", 0.0)
         self.declare_parameter("track_width_eff_m", 0.35)
         self.declare_parameter("reset_encoders_on_connect", True)
+        self.declare_parameter("arm_x_steps_per_mm", 18.65)
+        self.declare_parameter("arm_z_steps_per_mm", 2929.0)
 
         self._port = self.get_parameter("port").get_parameter_value().string_value
         self._baudrate = self.get_parameter("baudrate").get_parameter_value().integer_value
@@ -108,6 +110,12 @@ class MegaDriverNode(Node):
         self._reset_encoders_on_connect = (
             self.get_parameter("reset_encoders_on_connect").get_parameter_value().bool_value
         )
+        self._arm_x_steps_per_mm = (
+            self.get_parameter("arm_x_steps_per_mm").get_parameter_value().double_value
+        )
+        self._arm_z_steps_per_mm = (
+            self.get_parameter("arm_z_steps_per_mm").get_parameter_value().double_value
+        )
 
         if self._max_track_speed_mps <= 0.0:
             raise ValueError("max_track_speed_mps must be greater than zero.")
@@ -125,6 +133,10 @@ class MegaDriverNode(Node):
             raise ValueError("pure_rotation_linear_deadband_mps must be zero or greater.")
         if self._send_period_s <= 0.0 or self._odom_poll_period_s <= 0.0:
             raise ValueError("Timer periods must be greater than zero.")
+        if self._arm_x_steps_per_mm <= 0.0:
+            raise ValueError("arm_x_steps_per_mm must be greater than zero.")
+        if self._arm_z_steps_per_mm <= 0.0:
+            raise ValueError("arm_z_steps_per_mm must be greater than zero.")
 
         self._serial = None
         self._serial_module = None
@@ -137,6 +149,15 @@ class MegaDriverNode(Node):
         self._desired_linear = 0.0
         self._desired_angular = 0.0
         self._last_cmd_vel_at = -1.0
+
+        self._desired_arm_x = 0.0
+        self._last_arm_x_cmd_m = None
+        self._pending_arm_x_delta_steps = 0
+        self._desired_arm_z = 0.0
+        self._last_arm_z_cmd_m = None
+        self._pending_arm_z_delta_steps = 0
+        self._desired_left_gripper = 0.0
+        self._desired_right_gripper = 0.0
 
         self._last_left_ticks = None
         self._last_right_ticks = None
@@ -156,6 +177,18 @@ class MegaDriverNode(Node):
         self._load_serial()
 
         self._cmd_vel_sub = self.create_subscription(Twist, "cmd_vel", self._on_cmd_vel, 10)
+        self._arm_x_sub = self.create_subscription(
+            Float64, "/robotarm/x_position_cmd", self._on_arm_x_cmd, 10
+        )
+        self._arm_z_sub = self.create_subscription(
+            Float64, "/robotarm/z_position_cmd", self._on_arm_z_cmd, 10
+        )
+        self._left_gripper_sub = self.create_subscription(
+            Float64, "/gripper/left_position_cmd", self._on_left_gripper_cmd, 10
+        )
+        self._right_gripper_sub = self.create_subscription(
+            Float64, "/gripper/right_position_cmd", self._on_right_gripper_cmd, 10
+        )
         self._odom_pub = self.create_publisher(Odometry, "odom", 10)
         self._left_pwm_pub = self.create_publisher(Int32, "mega_driver/left_pwm", 10)
         self._right_pwm_pub = self.create_publisher(Int32, "mega_driver/right_pwm", 10)
@@ -290,6 +323,66 @@ class MegaDriverNode(Node):
         self._desired_linear = float(msg.linear.x)
         self._desired_angular = float(msg.angular.z)
         self._last_cmd_vel_at = time.monotonic()
+
+    def _on_arm_x_cmd(self, msg: Float64) -> None:
+        x_m = float(msg.data)
+        if self._last_arm_x_cmd_m is None:
+            self._last_arm_x_cmd_m = x_m
+            self._desired_arm_x = x_m
+            self._pending_arm_x_delta_steps = 0
+            return
+
+        delta_m = x_m - self._last_arm_x_cmd_m
+        self._last_arm_x_cmd_m = x_m
+        self._desired_arm_x = x_m
+        delta_steps = self._meters_to_x_steps(delta_m)
+        if delta_steps != 0:
+            self._pending_arm_x_delta_steps += delta_steps
+
+    def _on_arm_z_cmd(self, msg: Float64) -> None:
+        z_m = float(msg.data)
+        if self._last_arm_z_cmd_m is None:
+            self._last_arm_z_cmd_m = z_m
+            self._desired_arm_z = z_m
+            self._pending_arm_z_delta_steps = 0
+            return
+
+        delta_m = z_m - self._last_arm_z_cmd_m
+        self._last_arm_z_cmd_m = z_m
+        self._desired_arm_z = z_m
+        delta_steps = self._meters_to_z_steps(delta_m)
+        if delta_steps != 0:
+            self._pending_arm_z_delta_steps += delta_steps
+
+    def _on_left_gripper_cmd(self, msg: Float64) -> None:
+        self._desired_left_gripper = float(msg.data)
+
+    def _on_right_gripper_cmd(self, msg: Float64) -> None:
+        self._desired_right_gripper = float(msg.data)
+
+    def _meters_to_z_steps(self, meters: float) -> int:
+        millimeters = meters * 1000.0
+        return int(round(millimeters * self._arm_z_steps_per_mm))
+
+    def _meters_to_x_steps(self, meters: float) -> int:
+        millimeters = meters * 1000.0
+        return int(round(millimeters * self._arm_x_steps_per_mm))
+
+    def _maybe_send_arm_x(self) -> None:
+        if self._pending_arm_x_delta_steps == 0:
+            return
+
+        delta_steps = self._pending_arm_x_delta_steps
+        self._send_expect(f"ARM X {delta_steps}", "OK ARM X")
+        self._pending_arm_x_delta_steps -= delta_steps
+
+    def _maybe_send_arm_z(self) -> None:
+        if self._pending_arm_z_delta_steps == 0:
+            return
+
+        delta_steps = self._pending_arm_z_delta_steps
+        self._send_expect(f"ARM Z {delta_steps}", "OK ARM Z")
+        self._pending_arm_z_delta_steps -= delta_steps
 
     def _desired_motion_command(self) -> str:
         now = time.monotonic()
@@ -439,6 +532,8 @@ class MegaDriverNode(Node):
 
         try:
             self._maybe_send_motion(self._desired_motion_command())
+            self._maybe_send_arm_x()
+            self._maybe_send_arm_z()
             self._poll_odometry()
         except Exception as exc:
             self.get_logger().warning(f"Mega driver loop failed: {exc}")
