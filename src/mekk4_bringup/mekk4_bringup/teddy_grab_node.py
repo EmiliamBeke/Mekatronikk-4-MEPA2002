@@ -18,7 +18,7 @@ PARAM_DEFAULTS = {
     "z_state_topic": "/robotarm/z_position_state",
     "publish_period_s": 0.05,
     "position_tolerance_m": 0.003,
-    "safe_x": 0.09,
+    "safe_x": 0.11,
     "safe_z": 0.12,
     "lower_z": 0.01,
     "grab_x": 0.15,
@@ -119,7 +119,7 @@ class TeddyGrabNode(Node):
 
         return [
             {
-                "name": "safe_x_90mm",
+                "name": "safe_x_110mm",
                 "x": safe_x,
                 "z": safe_z,
                 "gripper": open_gripper,
