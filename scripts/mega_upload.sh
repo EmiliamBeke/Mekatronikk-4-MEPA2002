@@ -48,7 +48,7 @@ resolve_sketch_dir() {
     sketch_dir="${REPO_ROOT}/arduino/${input}"
   else
     echo "[mega-upload] Sketch not found: ${input}" >&2
-    echo "[mega-upload] Try for example: MEGA_SKETCH=mega_keyboard_drive make mega-upload" >&2
+    echo "[mega-upload] Try for example: make mega-upload mega_total_code_nonblocking" >&2
     return 1
   fi
 

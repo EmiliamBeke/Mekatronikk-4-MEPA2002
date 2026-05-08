@@ -36,6 +36,8 @@ DRIVE_SPEED="${DRIVE_SPEED:-90}"
 TURN_SPEED="${TURN_SPEED:-75}"
 ARM_X_STEPS="${ARM_X_STEPS:-20}"
 ARM_Z_STEPS="${ARM_Z_STEPS:-100}"
+SEND_PERIOD="${SEND_PERIOD:-0.03}"
+HOLD_TIMEOUT="${HOLD_TIMEOUT:-0.12}"
 
 if [[ -z "${MEGA_PORT}" ]]; then
   MEGA_PORT="$(detect_mega_port)" || {
@@ -57,7 +59,7 @@ if ! python3 -c 'import serial' >/dev/null 2>&1; then
 fi
 
 echo "[mega-keyboard] Using ${MEGA_PORT} @ ${MEGA_BAUDRATE}" >&2
-echo "[mega-keyboard] Upload arduino/mega_keyboard_drive/mega_keyboard_drive.ino first." >&2
+echo "[mega-keyboard] Expected firmware: arduino/mega_total_code_nonblocking/mega_total_code_nonblocking.ino" >&2
 
 python3 "${SCRIPT_DIR}/mega_keyboard_teleop.py" \
   --port "${MEGA_PORT}" \
@@ -66,6 +68,8 @@ python3 "${SCRIPT_DIR}/mega_keyboard_teleop.py" \
   --turn-speed "${TURN_SPEED}" \
   --arm-x-steps "${ARM_X_STEPS}" \
   --arm-z-steps "${ARM_Z_STEPS}" \
+  --send-period "${SEND_PERIOD}" \
+  --hold-timeout "${HOLD_TIMEOUT}" \
   "$(if [[ "${SWAP_SIDES:-1}" == "1" ]]; then echo --swap-sides; else echo --no-swap-sides; fi)" \
   --left-cmd-sign "${LEFT_CMD_SIGN:-1}" \
   --right-cmd-sign "${RIGHT_CMD_SIGN:-1}" \

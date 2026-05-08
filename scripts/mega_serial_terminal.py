@@ -37,7 +37,10 @@ def main() -> int:
             ser.reset_input_buffer()
             ser.reset_output_buffer()
 
-            print("[mega-terminal] Type commands like: ID, PING, M1 120, M1 -120, M2 120, STOP, ENC1, ENC2")
+            print(
+                "[mega-terminal] Type commands like: ID, PING, STATE, LIMITS, "
+                "BOTH 100 100, ARM X 20, ARM Z 100, S 90, DIST, STOP"
+            )
             print("[mega-terminal] Type q or quit to stop and exit.")
 
             while True:

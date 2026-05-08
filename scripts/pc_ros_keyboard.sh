@@ -21,4 +21,10 @@ set -u
 
 eval "$(bash "${SCRIPT_DIR}/ros_discovery_env.sh" pc "${PI_HOST}")"
 
-ros2 run mekk4_bringup ros_keyboard_teleop "$@"
+ros2 run mekk4_bringup ros_keyboard_teleop \
+  --topic /cmd_vel_manual \
+  --arm-x-topic /robotarm/request/x_position \
+  --arm-z-topic /robotarm/request/z_position \
+  --arm-x-state-topic /robotarm/x_position_state \
+  --arm-z-state-topic /robotarm/z_position_state \
+  "$@"
