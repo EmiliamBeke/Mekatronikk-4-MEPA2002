@@ -24,6 +24,7 @@ constexpr int kXDirPin = 29;
 constexpr int kXEnPin = 37;
 constexpr bool kInvertXDirection = false;
 constexpr int kXLimitPin = 27;
+constexpr int kXLimitActiveState = HIGH;
 constexpr long kXHomeDirectionStep = -1;
 constexpr long kXHomeMaxSteps = 10000;
 
@@ -32,6 +33,7 @@ constexpr int kZDirPin = 28;
 constexpr int kZEnPin = 52;
 constexpr bool kInvertZDirection = false;
 constexpr int kZLimitPin = 44;
+constexpr int kZLimitActiveState = HIGH;
 constexpr long kZHomeDirectionStep = -1;
 constexpr long kZHomeMaxSteps = 800000;
 
@@ -59,6 +61,10 @@ long current_x_steps = 0;
 long current_z_steps = 0;
 unsigned long last_drive_command_ms = 0;
 bool drive_watchdog_armed = false;
+int last_x_limit_state = -1;
+int last_z_limit_state = -1;
+
+void maybe_print_limit_switch_changes();
 
 constexpr int8_t kQuadratureDelta[16] = {
   0, -1,  1,  0,
@@ -234,15 +240,17 @@ void move_stepper(
   digitalWrite(dir_pin, dir_level ? HIGH : LOW);
 
   for (long i = 0; i < count; i++) {
+    maybe_print_limit_switch_changes();
     digitalWrite(step_pin, HIGH);
     delayMicroseconds(kStepperPulseUs);
     digitalWrite(step_pin, LOW);
     delayMicroseconds(step_delay_us);
+    maybe_print_limit_switch_changes();
   }
 }
 
 bool x_limit_active() {
-  return digitalRead(kXLimitPin) == HIGH;
+  return digitalRead(kXLimitPin) == kXLimitActiveState;
 }
 
 void step_x_physical_once(long direction_step) {
@@ -303,7 +311,24 @@ bool home_x_stepper() {
 }
 
 bool z_limit_active() {
-  return digitalRead(kZLimitPin) == HIGH;
+  return digitalRead(kZLimitPin) == kZLimitActiveState;
+}
+
+void maybe_print_limit_switch_changes() {
+  const int x_state = digitalRead(kXLimitPin);
+  const int z_state = digitalRead(kZLimitPin);
+
+  if (last_x_limit_state != x_state) {
+    last_x_limit_state = x_state;
+    Serial.print("EVENT LIMIT 27 ");
+    Serial.println(x_state);
+  }
+
+  if (last_z_limit_state != z_state) {
+    last_z_limit_state = z_state;
+    Serial.print("EVENT LIMIT 44 ");
+    Serial.println(z_state);
+  }
 }
 
 void step_z_once(long direction_step) {
@@ -448,7 +473,27 @@ void handle_command(const char *command) {
     Serial.print(" X=");
     Serial.print(current_x_steps);
     Serial.print(" Z=");
-    Serial.println(current_z_steps);
+    Serial.print(current_z_steps);
+    Serial.print(" L27=");
+    Serial.print(digitalRead(kXLimitPin));
+    Serial.print(" L44=");
+    Serial.print(digitalRead(kZLimitPin));
+    Serial.print(" P27=");
+    Serial.print(x_limit_active() ? 1 : 0);
+    Serial.print(" P44=");
+    Serial.println(z_limit_active() ? 1 : 0);
+    return;
+  }
+
+  if (strcmp(command, "LIMITS") == 0) {
+    Serial.print("LIMITS RAW27=");
+    Serial.print(digitalRead(kXLimitPin));
+    Serial.print(" RAW44=");
+    Serial.print(digitalRead(kZLimitPin));
+    Serial.print(" PRESSED27=");
+    Serial.print(x_limit_active() ? 1 : 0);
+    Serial.print(" PRESSED44=");
+    Serial.println(z_limit_active() ? 1 : 0);
     return;
   }
 
@@ -517,11 +562,11 @@ void setup() {
   pinMode(kXStepPin, OUTPUT);
   pinMode(kXDirPin, OUTPUT);
   pinMode(kXEnPin, OUTPUT);
-  pinMode(kXLimitPin, INPUT);
+  pinMode(kXLimitPin, INPUT_PULLUP);
   pinMode(kZStepPin, OUTPUT);
   pinMode(kZDirPin, OUTPUT);
   pinMode(kZEnPin, OUTPUT);
-  pinMode(kZLimitPin, INPUT);
+  pinMode(kZLimitPin, INPUT_PULLUP);
 
   digitalWrite(kXStepPin, LOW);
   digitalWrite(kXDirPin, LOW);
@@ -542,12 +587,14 @@ void setup() {
   while (!Serial && millis() < 3000) {
   }
 
+  maybe_print_limit_switch_changes();
   reset_command_buffer();
   startup_home_arm();
   Serial.println("MEGA_KEYBOARD_READY");
 }
 
 void loop() {
+  maybe_print_limit_switch_changes();
   maybe_stop_on_watchdog();
 
   while (Serial.available() > 0) {

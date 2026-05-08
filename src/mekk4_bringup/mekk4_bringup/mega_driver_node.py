@@ -56,6 +56,8 @@ class MegaDriverNode(Node):
         self.declare_parameter("right_m_per_tick", 0.0)
         self.declare_parameter("track_width_eff_m", 0.35)
         self.declare_parameter("reset_encoders_on_connect", True)
+        self.declare_parameter("initial_arm_x_m", 0.0)
+        self.declare_parameter("initial_arm_z_m", 0.12)
         self.declare_parameter("arm_x_steps_per_mm", 18.65)
         self.declare_parameter("arm_z_steps_per_mm", 2929.0)
 
@@ -119,6 +121,12 @@ class MegaDriverNode(Node):
         self._reset_encoders_on_connect = (
             self.get_parameter("reset_encoders_on_connect").get_parameter_value().bool_value
         )
+        self._initial_arm_x_m = (
+            self.get_parameter("initial_arm_x_m").get_parameter_value().double_value
+        )
+        self._initial_arm_z_m = (
+            self.get_parameter("initial_arm_z_m").get_parameter_value().double_value
+        )
         self._arm_x_steps_per_mm = (
             self.get_parameter("arm_x_steps_per_mm").get_parameter_value().double_value
         )
@@ -161,12 +169,14 @@ class MegaDriverNode(Node):
         self._desired_angular = 0.0
         self._last_cmd_vel_at = -1.0
 
-        self._desired_arm_x = 0.0
-        self._last_arm_x_cmd_m = None
+        self._desired_arm_x = self._initial_arm_x_m
+        self._last_arm_x_cmd_m = self._initial_arm_x_m
         self._pending_arm_x_delta_steps = 0
-        self._desired_arm_z = 0.0
-        self._last_arm_z_cmd_m = None
+        self._desired_arm_z = self._initial_arm_z_m
+        self._last_arm_z_cmd_m = self._initial_arm_z_m
         self._pending_arm_z_delta_steps = 0
+        self._actual_arm_x = self._initial_arm_x_m
+        self._actual_arm_z = self._initial_arm_z_m
         self._desired_left_gripper = 0.0
         self._desired_right_gripper = 0.0
 
@@ -203,6 +213,8 @@ class MegaDriverNode(Node):
         self._odom_pub = self.create_publisher(Odometry, "odom", 10)
         self._left_pwm_pub = self.create_publisher(Int32, "mega_driver/left_pwm", 10)
         self._right_pwm_pub = self.create_publisher(Int32, "mega_driver/right_pwm", 10)
+        self._arm_x_state_pub = self.create_publisher(Float64, "/robotarm/x_position_state", 10)
+        self._arm_z_state_pub = self.create_publisher(Float64, "/robotarm/z_position_state", 10)
         self._tf_broadcaster = TransformBroadcaster(self) if self._publish_tf else None
         self._timer = self.create_timer(0.02, self._on_timer)
 
@@ -276,6 +288,12 @@ class MegaDriverNode(Node):
             self._last_stop_sent = True
             self._last_motion_sent_at = time.monotonic()
             self._last_poll_at = 0.0
+            self._sync_arm_state_from_mega()
+            self._desired_arm_x = self._actual_arm_x
+            self._last_arm_x_cmd_m = self._actual_arm_x
+            self._desired_arm_z = self._actual_arm_z
+            self._last_arm_z_cmd_m = self._actual_arm_z
+            self._publish_arm_state()
             self.get_logger().info(f"Connected to Mega on {self._port} @ {self._baudrate}")
             return True
         except Exception as exc:
@@ -294,6 +312,9 @@ class MegaDriverNode(Node):
                 continue
             if text == "MEGA_KEYBOARD_READY":
                 return
+            if text.startswith("EVENT LIMIT "):
+                self.get_logger().info(f"Mega {text}")
+                continue
             self.get_logger().debug(f"Mega startup: {text}")
         raise RuntimeError("timeout waiting for Mega startup ready")
 
@@ -307,7 +328,10 @@ class MegaDriverNode(Node):
             if not text:
                 continue
             if any(text.startswith(prefix) for prefix in IGNORED_SERIAL_PREFIXES):
-                self.get_logger().debug(f"Mega event: {text}")
+                if text.startswith("EVENT LIMIT "):
+                    self.get_logger().info(f"Mega {text}")
+                else:
+                    self.get_logger().debug(f"Mega event: {text}")
                 continue
             return text
         raise RuntimeError("timeout waiting for Mega reply")
@@ -401,6 +425,11 @@ class MegaDriverNode(Node):
         delta_steps = self._pending_arm_x_delta_steps
         self._send_expect(f"ARM X {delta_steps}", "OK ARM X")
         self._pending_arm_x_delta_steps -= delta_steps
+        self._sync_arm_state_from_mega()
+        self._desired_arm_x = self._actual_arm_x
+        self._last_arm_x_cmd_m = self._actual_arm_x
+        self._pending_arm_x_delta_steps = 0
+        self._publish_arm_state()
 
     def _maybe_send_arm_z(self) -> None:
         if self._pending_arm_z_delta_steps == 0:
@@ -409,6 +438,33 @@ class MegaDriverNode(Node):
         delta_steps = self._pending_arm_z_delta_steps
         self._send_expect(f"ARM Z {delta_steps}", "OK ARM Z")
         self._pending_arm_z_delta_steps -= delta_steps
+        self._sync_arm_state_from_mega()
+        self._desired_arm_z = self._actual_arm_z
+        self._last_arm_z_cmd_m = self._actual_arm_z
+        self._pending_arm_z_delta_steps = 0
+        self._publish_arm_state()
+
+    def _publish_arm_state(self) -> None:
+        x_msg = Float64()
+        x_msg.data = float(self._actual_arm_x)
+        z_msg = Float64()
+        z_msg.data = float(self._actual_arm_z)
+        self._arm_x_state_pub.publish(x_msg)
+        self._arm_z_state_pub.publish(z_msg)
+
+    def _sync_arm_state_from_mega(self) -> None:
+        reply = self._send_expect("STATE", "STATE ")
+        state = {}
+        for token in reply.split()[1:]:
+            if "=" not in token:
+                continue
+            name, value = token.split("=", 1)
+            state[name] = value
+
+        if "X" in state:
+            self._actual_arm_x = int(state["X"]) / self._arm_x_steps_per_mm / 1000.0
+        if "Z" in state:
+            self._actual_arm_z = int(state["Z"]) / self._arm_z_steps_per_mm / 1000.0
 
     def _desired_motion_command(self) -> str:
         now = time.monotonic()

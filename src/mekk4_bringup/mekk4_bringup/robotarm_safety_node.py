@@ -17,6 +17,8 @@ PARAM_DEFAULTS = {
     "z_command_topic": "/robotarm/z_position_cmd",
     "left_gripper_command_topic": "/gripper/left_position_cmd",
     "right_gripper_command_topic": "/gripper/right_position_cmd",
+    "x_state_topic": "/robotarm/x_position_state",
+    "z_state_topic": "/robotarm/z_position_state",
     "joint_states_topic": "/joint_states",
     "z_joint_name": "robotarm_z_joint",
     "publish_period_s": 0.05,
@@ -86,6 +88,7 @@ class RobotarmSafetyNode(Node):
             self.gripper_min,
             self.gripper_max,
         )
+        self.current_x: float | None = None
         self.current_z: float | None = None
         self.commanded_x = self.requested_x
         self.commanded_z = self.requested_z
@@ -129,6 +132,18 @@ class RobotarmSafetyNode(Node):
             self.on_joint_states,
             10,
         )
+        self.create_subscription(
+            Float64,
+            self.param("x_state_topic"),
+            self.on_x_state,
+            10,
+        )
+        self.create_subscription(
+            Float64,
+            self.param("z_state_topic"),
+            self.on_z_state,
+            10,
+        )
         self.create_timer(float(self.param("publish_period_s")), self.on_timer)
 
         self.get_logger().info(
@@ -151,7 +166,15 @@ class RobotarmSafetyNode(Node):
     def set_right_gripper(self, value: float) -> None:
         self.requested_right_gripper = clamp(float(value), self.gripper_min, self.gripper_max)
 
+    def on_x_state(self, msg: Float64) -> None:
+        self.current_x = clamp(float(msg.data), self.x_min, self.x_max)
+
+    def on_z_state(self, msg: Float64) -> None:
+        self.current_z = clamp(float(msg.data), self.z_min, self.z_max)
+
     def on_joint_states(self, msg: JointState) -> None:
+        if self.current_z is not None:
+            return
         try:
             index = msg.name.index(self.z_joint_name)
         except ValueError:
@@ -170,8 +193,8 @@ class RobotarmSafetyNode(Node):
 
     def commanded_xz(self) -> tuple[float, float]:
         target_x, target_z = self.safe_requested_xz()
-        x_position = self.commanded_x
-        z_position = self.commanded_z
+        x_position = self.current_x if self.current_x is not None else self.commanded_x
+        z_position = self.current_z if self.current_z is not None else self.commanded_z
 
         if self.in_lidar_keepout(x_position, z_position):
             z_position = step_towards(
