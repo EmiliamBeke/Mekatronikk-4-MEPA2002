@@ -45,6 +45,9 @@ class MegaDriverNode(Node):
         self.declare_parameter("max_track_speed_mps", 0.45)
         self.declare_parameter("max_pwm", 255)
         self.declare_parameter("min_nonzero_pwm", 55)
+        self.declare_parameter("min_forward_pwm", 0)
+        self.declare_parameter("min_reverse_pwm", 0)
+        self.declare_parameter("min_turn_pwm", 0)
         self.declare_parameter("pure_rotation_linear_deadband_mps", 0.03)
         self.declare_parameter("left_cmd_sign", 1)
         self.declare_parameter("right_cmd_sign", 1)
@@ -97,6 +100,13 @@ class MegaDriverNode(Node):
         self._min_nonzero_pwm = (
             self.get_parameter("min_nonzero_pwm").get_parameter_value().integer_value
         )
+        self._min_forward_pwm = (
+            self.get_parameter("min_forward_pwm").get_parameter_value().integer_value
+        )
+        self._min_reverse_pwm = (
+            self.get_parameter("min_reverse_pwm").get_parameter_value().integer_value
+        )
+        self._min_turn_pwm = self.get_parameter("min_turn_pwm").get_parameter_value().integer_value
         self._pure_rotation_linear_deadband_mps = (
             self.get_parameter("pure_rotation_linear_deadband_mps")
             .get_parameter_value()
@@ -158,6 +168,13 @@ class MegaDriverNode(Node):
             raise ValueError("left_cmd_sign, right_cmd_sign, and angular_cmd_sign must be -1 or 1.")
         if self._track_width_eff_m <= 0.0:
             raise ValueError("track_width_eff_m must be greater than zero.")
+        if (
+            self._min_nonzero_pwm < 0
+            or self._min_forward_pwm < 0
+            or self._min_reverse_pwm < 0
+            or self._min_turn_pwm < 0
+        ):
+            raise ValueError("minimum PWM values must be zero or greater.")
         if self._pure_rotation_linear_deadband_mps < 0.0:
             raise ValueError("pure_rotation_linear_deadband_mps must be zero or greater.")
         if self._startup_ready_timeout_s <= 0.0:
@@ -637,8 +654,9 @@ class MegaDriverNode(Node):
         left_speed *= self._left_cmd_scale
         right_speed *= self._right_cmd_scale
 
-        left_pwm = self._speed_to_pwm(left_speed, self._left_cmd_sign)
-        right_pwm = self._speed_to_pwm(right_speed, self._right_cmd_sign)
+        min_pwm = self._minimum_pwm_for_motion(linear)
+        left_pwm = self._speed_to_pwm(left_speed, self._left_cmd_sign, min_pwm)
+        right_pwm = self._speed_to_pwm(right_speed, self._right_cmd_sign, min_pwm)
         if left_pwm == 0 and right_pwm == 0:
             self._publish_pwm(0, 0)
             return "STOP"
@@ -655,13 +673,20 @@ class MegaDriverNode(Node):
         self._left_pwm_pub.publish(left_msg)
         self._right_pwm_pub.publish(right_msg)
 
-    def _speed_to_pwm(self, track_speed_mps: float, sign: int) -> int:
+    def _minimum_pwm_for_motion(self, linear_mps: float) -> int:
+        if abs(linear_mps) < 1e-6:
+            return self._min_turn_pwm or self._min_nonzero_pwm
+        if linear_mps > 0.0:
+            return self._min_forward_pwm or self._min_nonzero_pwm
+        return self._min_reverse_pwm or self._min_nonzero_pwm
+
+    def _speed_to_pwm(self, track_speed_mps: float, sign: int, min_pwm: int) -> int:
         normalized = max(-1.0, min(1.0, track_speed_mps / self._max_track_speed_mps))
         pwm = int(round(normalized * self._max_pwm))
         if pwm > 0:
-            pwm = max(self._min_nonzero_pwm, pwm)
+            pwm = max(min_pwm, pwm)
         elif pwm < 0:
-            pwm = min(-self._min_nonzero_pwm, pwm)
+            pwm = min(-min_pwm, pwm)
         return max(-self._max_pwm, min(self._max_pwm, pwm * sign))
 
     def _maybe_send_motion(self, command: str) -> None:

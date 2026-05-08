@@ -54,6 +54,9 @@ def generate_launch_description():
     right_cmd_sign = LaunchConfiguration('right_cmd_sign')
     angular_cmd_sign = LaunchConfiguration('angular_cmd_sign')
     min_nonzero_pwm = LaunchConfiguration('min_nonzero_pwm')
+    min_forward_pwm = LaunchConfiguration('min_forward_pwm')
+    min_reverse_pwm = LaunchConfiguration('min_reverse_pwm')
+    min_turn_pwm = LaunchConfiguration('min_turn_pwm')
     pure_rotation_linear_deadband_mps = LaunchConfiguration('pure_rotation_linear_deadband_mps')
     left_cmd_scale = LaunchConfiguration('left_cmd_scale')
     right_cmd_scale = LaunchConfiguration('right_cmd_scale')
@@ -235,6 +238,9 @@ def generate_launch_description():
                 'right_cmd_sign': ParameterValue(right_cmd_sign, value_type=int),
                 'angular_cmd_sign': ParameterValue(angular_cmd_sign, value_type=int),
                 'min_nonzero_pwm': ParameterValue(min_nonzero_pwm, value_type=int),
+                'min_forward_pwm': ParameterValue(min_forward_pwm, value_type=int),
+                'min_reverse_pwm': ParameterValue(min_reverse_pwm, value_type=int),
+                'min_turn_pwm': ParameterValue(min_turn_pwm, value_type=int),
                 'pure_rotation_linear_deadband_mps': ParameterValue(
                     pure_rotation_linear_deadband_mps, value_type=float
                 ),
@@ -299,6 +305,9 @@ def generate_launch_description():
         DeclareLaunchArgument('right_cmd_sign', default_value='1'),
         DeclareLaunchArgument('angular_cmd_sign', default_value='1'),
         DeclareLaunchArgument('min_nonzero_pwm', default_value='55'),
+        DeclareLaunchArgument('min_forward_pwm', default_value='0'),
+        DeclareLaunchArgument('min_reverse_pwm', default_value='0'),
+        DeclareLaunchArgument('min_turn_pwm', default_value='0'),
         DeclareLaunchArgument('pure_rotation_linear_deadband_mps', default_value='0.03'),
         DeclareLaunchArgument('left_cmd_scale', default_value='1.0'),
         DeclareLaunchArgument('right_cmd_scale', default_value='1.0'),

@@ -27,6 +27,9 @@ SWAP_SIDES="${SWAP_SIDES:-1}"
 LEFT_CMD_SIGN="${LEFT_CMD_SIGN:-1}"
 RIGHT_CMD_SIGN="${RIGHT_CMD_SIGN:-1}"
 MIN_NONZERO_PWM="${MIN_NONZERO_PWM:-55}"
+MIN_FORWARD_PWM="${MIN_FORWARD_PWM:-0}"
+MIN_REVERSE_PWM="${MIN_REVERSE_PWM:-0}"
+MIN_TURN_PWM="${MIN_TURN_PWM:-0}"
 PURE_ROTATION_LINEAR_DEADBAND_MPS="${PURE_ROTATION_LINEAR_DEADBAND_MPS:-0.03}"
 LEFT_CMD_SCALE="${LEFT_CMD_SCALE:-1.0}"
 RIGHT_CMD_SCALE="${RIGHT_CMD_SCALE:-1.0}"
@@ -57,8 +60,10 @@ SOURCE_PKG_XML="${REPO_ROOT}/src/robot_bringup/package.xml"
 SOURCE_CMAKE="${REPO_ROOT}/src/robot_bringup/CMakeLists.txt"
 MEKK4_SETUP="${REPO_ROOT}/src/mekk4_bringup/setup.py"
 MEKK4_PKG_XML="${REPO_ROOT}/src/mekk4_bringup/package.xml"
+MEKK4_MEGA_DRIVER="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/mega_driver_node.py"
 MEKK4_CMD_VEL_MUX="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/cmd_vel_mux_node.py"
 MEKK4_TEDDY_APPROACH="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/teddy_approach_node.py"
+INSTALLED_MEGA_DRIVER="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/mega_driver_node"
 INSTALLED_CMD_VEL_MUX="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/cmd_vel_mux_node"
 INSTALLED_TEDDY_APPROACH="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/teddy_approach_node"
 
@@ -93,6 +98,8 @@ elif [[ ! -f "${INSTALLED_TEDDY_APPROACH_PARAMS}" ]]; then
   needs_ws_build=1
 elif [[ ! -f "${INSTALLED_CMD_VEL_MUX}" ]]; then
   needs_ws_build=1
+elif [[ ! -f "${INSTALLED_MEGA_DRIVER}" ]]; then
+  needs_ws_build=1
 elif [[ ! -f "${INSTALLED_TEDDY_APPROACH}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_LAUNCH}" -nt "${INSTALLED_LAUNCH}" ]]; then
@@ -108,6 +115,8 @@ elif [[ "${SOURCE_CMAKE}" -nt "${INSTALLED_LAUNCH}" ]]; then
 elif [[ "${MEKK4_SETUP}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
   needs_ws_build=1
 elif [[ "${MEKK4_PKG_XML}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
+  needs_ws_build=1
+elif [[ "${MEKK4_MEGA_DRIVER}" -nt "${INSTALLED_MEGA_DRIVER}" ]]; then
   needs_ws_build=1
 elif [[ "${MEKK4_CMD_VEL_MUX}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
   needs_ws_build=1
@@ -186,4 +195,4 @@ docker "${docker_run_args[@]}" \
   -e MEKK4_DEBUG_STREAM_FPS="${MEKK4_DEBUG_STREAM_FPS}" \
   -e MEKK4_DEBUG_STREAM_BITRATE="${MEKK4_DEBUG_STREAM_BITRATE}" \
   -e YOLO_CONFIG_DIR="/tmp" \
-  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} use_teddy_approach:=${WITH_TEDDY_APPROACH} use_imu:=${WITH_IMU} use_mega_driver:=${WITH_MEGA_DRIVER} use_ekf:=${WITH_EKF} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} imu_frame:=${IMU_FRAME} mega_port:=${MEGA_PORT} mega_baudrate:=${MEGA_BAUDRATE} mega_odom_topic:=${MEGA_ODOM_TOPIC} mega_publish_tf:=${MEGA_PUBLISH_TF} swap_sides:=${SWAP_SIDES} left_cmd_sign:=${LEFT_CMD_SIGN} right_cmd_sign:=${RIGHT_CMD_SIGN} angular_cmd_sign:=${ANGULAR_CMD_SIGN} min_nonzero_pwm:=${MIN_NONZERO_PWM} pure_rotation_linear_deadband_mps:=${PURE_ROTATION_LINEAR_DEADBAND_MPS} left_cmd_scale:=${LEFT_CMD_SCALE} right_cmd_scale:=${RIGHT_CMD_SCALE} left_tick_sign:=${LEFT_TICK_SIGN} right_tick_sign:=${RIGHT_TICK_SIGN} left_m_per_tick:=${LEFT_M_PER_TICK} right_m_per_tick:=${RIGHT_M_PER_TICK} track_width_eff_m:=${TRACK_WIDTH_EFF_M} ekf_params_file:=${EKF_PARAMS_FILE} params_file:=${PARAMS_FILE} teddy_approach_params_file:=${TEDDY_APPROACH_PARAMS_FILE}"
+  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} use_teddy_approach:=${WITH_TEDDY_APPROACH} use_imu:=${WITH_IMU} use_mega_driver:=${WITH_MEGA_DRIVER} use_ekf:=${WITH_EKF} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} imu_frame:=${IMU_FRAME} mega_port:=${MEGA_PORT} mega_baudrate:=${MEGA_BAUDRATE} mega_odom_topic:=${MEGA_ODOM_TOPIC} mega_publish_tf:=${MEGA_PUBLISH_TF} swap_sides:=${SWAP_SIDES} left_cmd_sign:=${LEFT_CMD_SIGN} right_cmd_sign:=${RIGHT_CMD_SIGN} angular_cmd_sign:=${ANGULAR_CMD_SIGN} min_nonzero_pwm:=${MIN_NONZERO_PWM} min_forward_pwm:=${MIN_FORWARD_PWM} min_reverse_pwm:=${MIN_REVERSE_PWM} min_turn_pwm:=${MIN_TURN_PWM} pure_rotation_linear_deadband_mps:=${PURE_ROTATION_LINEAR_DEADBAND_MPS} left_cmd_scale:=${LEFT_CMD_SCALE} right_cmd_scale:=${RIGHT_CMD_SCALE} left_tick_sign:=${LEFT_TICK_SIGN} right_tick_sign:=${RIGHT_TICK_SIGN} left_m_per_tick:=${LEFT_M_PER_TICK} right_m_per_tick:=${RIGHT_M_PER_TICK} track_width_eff_m:=${TRACK_WIDTH_EFF_M} ekf_params_file:=${EKF_PARAMS_FILE} params_file:=${PARAMS_FILE} teddy_approach_params_file:=${TEDDY_APPROACH_PARAMS_FILE}"
