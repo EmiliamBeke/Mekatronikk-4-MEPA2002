@@ -52,7 +52,7 @@ class RosKeyboardTeleop:
         self.gripper = clamp(args.gripper_initial, args.gripper_min, args.gripper_max)
         self.gripper_min = args.gripper_min
         self.gripper_max = args.gripper_max
-        self.gripper_step = max(0.001, args.gripper_step)
+        self.gripper_step = max(1.0, args.gripper_step)
 
         self.pressed_keys: set[str] = set()
         self.release_jobs: dict[str, str] = {}
@@ -74,7 +74,7 @@ class RosKeyboardTeleop:
             value=(
                 "Hold W/S/A/D drive. Y/H arm up/down. J/K arm out/in. "
                 "E/Q drive speed. P/O turn speed. M/N x speed +/-. T/G z speed +/-. "
-                "U/I gripper -/+. "
+                "U/I gripper open/close. "
                 "SPACE stop. - quit."
             )
         )
@@ -151,13 +151,13 @@ class RosKeyboardTeleop:
         return (
             f"drive={self.speed:.2f} m/s  turn={self.turn_speed:.2f} rad/s\n"
             f"arm_x_speed={self.arm_x_speed:.3f} m/s  arm_z_speed={self.arm_z_speed:.3f} m/s  "
-            f"gripper={self.gripper:.3f} rad"
+            f"gripper={self.gripper:.0f} us"
         )
 
     def _command_text(self, linear_x: float, angular_z: float) -> str:
         return (
             f"cmd_vel=({linear_x:.2f}, {angular_z:.2f})  "
-            f"arm=(x={self.arm_x:.3f}, z={self.arm_z:.3f})  gripper={self.gripper:.3f}"
+            f"arm=(x={self.arm_x:.3f}, z={self.arm_z:.3f})  gripper={self.gripper:.0f} us"
         )
 
     def _on_key_press(self, event: tk.Event) -> None:
@@ -369,10 +369,10 @@ def main() -> int:
     parser.add_argument("--arm-z-speed-step", type=float, default=0.001, help="Arm z jog speed increment for T/G")
     parser.add_argument("--max-arm-x-speed", type=float, default=0.050, help="Maximum arm x jog speed in m/s")
     parser.add_argument("--max-arm-z-speed", type=float, default=0.010, help="Maximum arm z jog speed in m/s")
-    parser.add_argument("--gripper-min", type=float, default=-0.785, help="Minimum gripper command in radians")
-    parser.add_argument("--gripper-max", type=float, default=0.785, help="Maximum gripper command in radians")
-    parser.add_argument("--gripper-initial", type=float, default=0.0, help="Initial gripper command in radians")
-    parser.add_argument("--gripper-step", type=float, default=0.05, help="Gripper command increment for U/I")
+    parser.add_argument("--gripper-min", type=float, default=500.0, help="Minimum gripper pulse width in microseconds")
+    parser.add_argument("--gripper-max", type=float, default=1800.0, help="Maximum gripper pulse width in microseconds")
+    parser.add_argument("--gripper-initial", type=float, default=500.0, help="Initial gripper pulse width in microseconds")
+    parser.add_argument("--gripper-step", type=float, default=50.0, help="Gripper pulse-width increment for U/I")
     args = parser.parse_args(remove_ros_args(args=sys.argv)[1:])
 
     rclpy.init()

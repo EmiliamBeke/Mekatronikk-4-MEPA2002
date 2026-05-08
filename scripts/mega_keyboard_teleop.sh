@@ -39,8 +39,8 @@ ARM_Z_STEPS="${ARM_Z_STEPS:-100}"
 SEND_PERIOD="${SEND_PERIOD:-0.03}"
 HOLD_TIMEOUT="${HOLD_TIMEOUT:-0.12}"
 READY_TIMEOUT="${READY_TIMEOUT:-120}"
-SERVO_ANGLE="${SERVO_ANGLE:-90}"
-SERVO_STEP="${SERVO_STEP:-5}"
+SERVO_US="${SERVO_US:-500}"
+SERVO_STEP_US="${SERVO_STEP_US:-50}"
 
 if [[ -z "${MEGA_PORT}" ]]; then
   MEGA_PORT="$(detect_mega_port)" || {
@@ -74,8 +74,8 @@ python3 "${SCRIPT_DIR}/mega_keyboard_teleop.py" \
   --send-period "${SEND_PERIOD}" \
   --hold-timeout "${HOLD_TIMEOUT}" \
   --ready-timeout "${READY_TIMEOUT}" \
-  --servo-angle "${SERVO_ANGLE}" \
-  --servo-step "${SERVO_STEP}" \
+  --servo-us "${SERVO_US}" \
+  --servo-step-us "${SERVO_STEP_US}" \
   "$(if [[ "${SWAP_SIDES:-1}" == "1" ]]; then echo --swap-sides; else echo --no-swap-sides; fi)" \
   --left-cmd-sign "${LEFT_CMD_SIGN:-1}" \
   --right-cmd-sign "${RIGHT_CMD_SIGN:-1}" \

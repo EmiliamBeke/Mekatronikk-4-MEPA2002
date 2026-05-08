@@ -27,18 +27,33 @@ def read_line(ser: serial.Serial, timeout_s: float) -> str:
 def wait_for_ready(ser: serial.Serial, timeout_s: float) -> None:
     deadline = time.monotonic() + timeout_s
     last_line = ""
+    next_probe_at = time.monotonic() + 2.0
     while time.monotonic() < deadline:
         text = read_line(ser, 0.2)
-        if not text:
+        if text:
+            last_line = text
+            print(f"[mega-keyboard] Mega startup: {text}")
+            if text == "MEGA_KEYBOARD_READY":
+                return
+            if text == "MEGA_KEYBOARD_DRIVE":
+                return
+            if text == "ERR MEGA_KEYBOARD_NOT_READY":
+                continue
+
+        if time.monotonic() < next_probe_at:
             continue
-        last_line = text
-        print(f"[mega-keyboard] Mega startup: {text}")
-        if text == "MEGA_KEYBOARD_READY":
+
+        next_probe_at = time.monotonic() + 2.0
+        send_command(ser, "ID")
+        reply = read_line(ser, 0.3)
+        if reply == "MEGA_KEYBOARD_DRIVE":
             return
-        if text == "ERR MEGA_KEYBOARD_NOT_READY":
-            raise RuntimeError("Mega firmware reported startup failure")
+        if reply:
+            last_line = reply
+            print(f"[mega-keyboard] Mega probe: {reply}")
+
     detail = f"; last line: {last_line}" if last_line else ""
-    raise RuntimeError(f"timeout waiting for MEGA_KEYBOARD_READY{detail}")
+    raise RuntimeError(f"timeout waiting for Mega firmware{detail}")
 
 
 def expect_reply(ser: serial.Serial, command: str, expected: str, timeout_s: float) -> str:
@@ -139,7 +154,7 @@ def print_status(
     turn_speed: int,
     arm_x_steps: int,
     arm_z_steps: int,
-    servo_angle: int,
+    servo_us: int,
     left_cmd: int,
     right_cmd: int,
     latest_message: str,
@@ -174,7 +189,7 @@ def print_status(
         f"[mega-keyboard] drive={drive_label} steer={steer_label} "
         f"arm_x={x_label} arm_z={z_label} "
         f"speed={speed} turn_speed={turn_speed} x_steps={arm_x_steps} z_steps={arm_z_steps} "
-        f"servo={servo_angle} cmd=({left_cmd}, {right_cmd}){message}   "
+        f"servo_us={servo_us} cmd=({left_cmd}, {right_cmd}){message}   "
     )
     sys.stdout.flush()
 
@@ -191,8 +206,22 @@ def main() -> int:
     parser.add_argument("--arm-z-step-increment", type=int, default=25, help="ARM Z step increment for T/G")
     parser.add_argument("--max-arm-x-steps", type=int, default=200, help="Maximum ARM X steps per command")
     parser.add_argument("--max-arm-z-steps", type=int, default=1000, help="Maximum ARM Z steps per command")
-    parser.add_argument("--servo-angle", type=int, default=90, help="Initial servo angle in degrees")
-    parser.add_argument("--servo-step", type=int, default=5, help="Servo angle increment for U/I")
+    parser.add_argument(
+        "--servo-us",
+        "--servo-angle",
+        dest="servo_us",
+        type=int,
+        default=500,
+        help="Initial servo pulse width in microseconds. 500=open/home, 1800=closed.",
+    )
+    parser.add_argument(
+        "--servo-step-us",
+        "--servo-step",
+        dest="servo_step_us",
+        type=int,
+        default=50,
+        help="Servo pulse-width increment for U/I in microseconds",
+    )
     parser.add_argument("--swap-sides", action=argparse.BooleanOptionalAction, default=False, help="Swap robot-left and robot-right when sending BOTH to Mega")
     parser.add_argument("--left-cmd-sign", type=int, default=1, help="Sign to apply to robot-left commands")
     parser.add_argument("--right-cmd-sign", type=int, default=1, help="Sign to apply to robot-right commands")
@@ -230,8 +259,8 @@ def main() -> int:
     arm_z_steps = max(1, min(args.max_arm_z_steps, args.arm_z_steps))
     arm_x_step_increment = max(1, args.arm_x_step_increment)
     arm_z_step_increment = max(1, args.arm_z_step_increment)
-    servo_angle = max(0, min(180, args.servo_angle))
-    servo_step = max(1, args.servo_step)
+    servo_us = max(500, min(1800, args.servo_us))
+    servo_step_us = max(1, args.servo_step_us)
 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
@@ -261,7 +290,7 @@ def main() -> int:
             if firmware != "MEGA_KEYBOARD_DRIVE":
                 raise RuntimeError(f"expected MEGA_KEYBOARD_DRIVE firmware, got {firmware!r}")
             expect_reply(ser, "PING", "PONG", 2.0)
-            expect_reply(ser, f"S {servo_angle}", "OK SERVO", 2.0)
+            expect_reply(ser, f"S {servo_us}", "OK SERVO", 2.0)
 
             tty.setcbreak(fd)
             print(
@@ -269,7 +298,7 @@ def main() -> int:
                 "Y/H arm up/down. J/K arm out/in. "
                 "E/Q speed up/down. P/O turn speed up/down. "
                 "M/N x step speed up/down. T/G z step speed up/down. "
-                "U/I servo -/+. "
+                "U/I servo open/close. "
                 "SPACE stop. - quit."
             )
 
@@ -332,11 +361,11 @@ def main() -> int:
                         elif key in ("g", "G"):
                             arm_z_steps = max(1, arm_z_steps - arm_z_step_increment)
                         elif key in ("u", "U"):
-                            servo_angle = max(0, servo_angle - servo_step)
-                            expect_reply(ser, f"S {servo_angle}", "OK SERVO", 2.0)
+                            servo_us = max(500, servo_us - servo_step_us)
+                            expect_reply(ser, f"S {servo_us}", "OK SERVO", 2.0)
                         elif key in ("i", "I"):
-                            servo_angle = min(180, servo_angle + servo_step)
-                            expect_reply(ser, f"S {servo_angle}", "OK SERVO", 2.0)
+                            servo_us = min(1800, servo_us + servo_step_us)
+                            expect_reply(ser, f"S {servo_us}", "OK SERVO", 2.0)
 
                     now = time.monotonic()
                     forward = is_active(last_forward_at, now, args.hold_timeout)
@@ -402,7 +431,7 @@ def main() -> int:
                         turn_speed,
                         arm_x_steps,
                         arm_z_steps,
-                        servo_angle,
+                        servo_us,
                         send_left,
                         send_right,
                         latest_message,

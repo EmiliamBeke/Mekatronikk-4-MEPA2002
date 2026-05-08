@@ -35,15 +35,25 @@ def read_line(ser: serial.Serial, timeout_s: float) -> str:
 
 def wait_for_ready(ser: serial.Serial, timeout_s: float) -> bool:
     deadline = time.monotonic() + timeout_s
+    next_probe_at = time.monotonic() + 2.0
     while time.monotonic() < deadline:
         text = read_line(ser, 0.2)
-        if not text:
+        if text:
+            print(f"<- {text}")
+            if text in ("MEGA_KEYBOARD_READY", "MEGA_KEYBOARD_DRIVE"):
+                return True
+
+        if time.monotonic() < next_probe_at:
             continue
-        print(f"<- {text}")
-        if text == "MEGA_KEYBOARD_READY":
+
+        next_probe_at = time.monotonic() + 2.0
+        send_command(ser, "ID")
+        reply = read_line(ser, 0.3)
+        if reply:
+            print(f"<- {reply}")
+        if reply == "MEGA_KEYBOARD_DRIVE":
             return True
-        if text == "ERR MEGA_KEYBOARD_NOT_READY":
-            return False
+
     return False
 
 
@@ -66,7 +76,7 @@ def main() -> int:
 
             print(
                 "[mega-terminal] Type commands like: ID, PING, STATE, LIMITS, "
-                "BOTH 100 100, ARM X 20, ARM Z 100, S 90, DIST, STOP"
+                "BOTH 100 100, ARM X 20, ARM Z 100, S 500, S 1800, DIST, STOP"
             )
             print("[mega-terminal] Type q or quit to stop and exit.")
 

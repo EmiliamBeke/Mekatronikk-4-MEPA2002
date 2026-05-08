@@ -440,7 +440,7 @@ class MegaDriverNode(Node):
         delta_steps = self._pending_arm_x_delta_steps
         self._send_expect(f"ARM X {delta_steps}", "OK ARM X")
         self._pending_arm_x_delta_steps -= delta_steps
-        self._sync_arm_state_from_mega()
+        self._actual_arm_x += delta_steps / self._arm_x_steps_per_mm / 1000.0
         self._desired_arm_x = self._actual_arm_x
         self._last_arm_x_cmd_m = self._actual_arm_x
         self._pending_arm_x_delta_steps = 0
@@ -453,7 +453,7 @@ class MegaDriverNode(Node):
         delta_steps = self._pending_arm_z_delta_steps
         self._send_expect(f"ARM Z {delta_steps}", "OK ARM Z")
         self._pending_arm_z_delta_steps -= delta_steps
-        self._sync_arm_state_from_mega()
+        self._actual_arm_z += delta_steps / self._arm_z_steps_per_mm / 1000.0
         self._desired_arm_z = self._actual_arm_z
         self._last_arm_z_cmd_m = self._actual_arm_z
         self._pending_arm_z_delta_steps = 0
@@ -464,7 +464,7 @@ class MegaDriverNode(Node):
         if gripper_us == self._last_gripper_us_sent:
             return
 
-        self._send_expect(f"SERVO {gripper_us}", f"OK SERVO {gripper_us}")
+        self._send_expect(f"SERVO {gripper_us}", "OK SERVO")
         self._last_gripper_us_sent = gripper_us
 
     def _publish_arm_state(self) -> None:

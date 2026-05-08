@@ -39,6 +39,10 @@ constexpr int kZLimitActiveState = HIGH;
 constexpr long kZHomeDir = -1;
 
 constexpr int kServoPin = 46;
+constexpr int kServoHomeUs = 500;
+constexpr int kServoClosedUs = 1800;
+constexpr int kServoMinUs = 500;
+constexpr int kServoMaxUs = 2500;
 constexpr int kDistanceXshutPin = -1;
 constexpr int kDistanceOffsetMm = 15;
 
@@ -87,7 +91,7 @@ bool drive_watchdog_armed = false;
 bool stream_status = false;
 unsigned long last_status_ms = 0;
 unsigned long last_distance_ms = 0;
-int servo_angle = 90;
+int servo_us = kServoHomeUs;
 int distance_mm = -1;
 bool distance_ok = false;
 int last_x_limit_state = -1;
@@ -387,7 +391,7 @@ void print_state(const char *prefix) {
   Serial.print(" D=");
   Serial.print(distance_mm);
   Serial.print(" S=");
-  Serial.println(servo_angle);
+  Serial.println(servo_us);
 }
 
 void maybe_stream_status() {
@@ -462,8 +466,8 @@ void handle_command(const char *cmd) {
       move_axis_relative(z_axis, steps);
       Serial.println("OK ARM Z");
     } else if (sscanf(cmd, "SERVO %d", &a) == 1 || sscanf(cmd, "S %d", &a) == 1) {
-      servo_angle = constrain(a, 0, 180);
-      gripper_servo.write(servo_angle);
+      servo_us = constrain(a, kServoMinUs, kServoMaxUs);
+      gripper_servo.writeMicroseconds(servo_us);
       Serial.println("OK SERVO");
     } else if (sscanf(cmd, "STREAM %d", &a) == 1) {
       stream_status = a != 0;
@@ -535,14 +539,13 @@ void setup() {
 
   maybe_print_limit_switch_changes();
   reset_command_buffer();
-  if (startup_home_arm()) {
-    gripper_servo.attach(kServoPin);
-    gripper_servo.write(servo_angle);
-    init_distance_sensor();
-    Serial.println("MEGA_KEYBOARD_READY");
-  } else {
+  if (!startup_home_arm()) {
     Serial.println("ERR MEGA_KEYBOARD_NOT_READY");
   }
+  gripper_servo.attach(kServoPin, kServoMinUs, kServoMaxUs);
+  gripper_servo.writeMicroseconds(servo_us);
+  init_distance_sensor();
+  Serial.println("MEGA_KEYBOARD_READY");
 }
 
 void loop() {
