@@ -29,6 +29,7 @@ PARAM_DEFAULTS = {
     "move_hold_s": 0.2,
     "grab_hold_s": 0.8,
     "final_hold_s": 0.5,
+    "require_state_feedback": True,
 }
 
 
@@ -190,7 +191,7 @@ class TeddyGrabNode(Node):
         if elapsed < float(hold_s):
             return False
         if self.current_x is None or self.current_z is None:
-            return True
+            return not bool(self.param("require_state_feedback"))
 
         tolerance = float(self.param("position_tolerance_m"))
         return (

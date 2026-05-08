@@ -35,6 +35,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("reconnect_delay_s", 1.0)
         self.declare_parameter("send_period_s", 0.2)
         self.declare_parameter("odom_poll_period_s", 0.05)
+        self.declare_parameter("arm_state_poll_period_s", 0.05)
         self.declare_parameter("cmd_vel_timeout_s", 0.5)
         self.declare_parameter("reply_timeout_s", 2.0)
         self.declare_parameter("base_frame_id", "base_link")
@@ -77,6 +78,9 @@ class MegaDriverNode(Node):
         self._send_period_s = self.get_parameter("send_period_s").get_parameter_value().double_value
         self._odom_poll_period_s = (
             self.get_parameter("odom_poll_period_s").get_parameter_value().double_value
+        )
+        self._arm_state_poll_period_s = (
+            self.get_parameter("arm_state_poll_period_s").get_parameter_value().double_value
         )
         self._cmd_vel_timeout_s = (
             self.get_parameter("cmd_vel_timeout_s").get_parameter_value().double_value
@@ -158,7 +162,11 @@ class MegaDriverNode(Node):
             raise ValueError("pure_rotation_linear_deadband_mps must be zero or greater.")
         if self._startup_ready_timeout_s <= 0.0:
             raise ValueError("startup_ready_timeout_s must be greater than zero.")
-        if self._send_period_s <= 0.0 or self._odom_poll_period_s <= 0.0:
+        if (
+            self._send_period_s <= 0.0
+            or self._odom_poll_period_s <= 0.0
+            or self._arm_state_poll_period_s <= 0.0
+        ):
             raise ValueError("Timer periods must be greater than zero.")
         if self._arm_x_steps_per_mm <= 0.0:
             raise ValueError("arm_x_steps_per_mm must be greater than zero.")
@@ -175,6 +183,7 @@ class MegaDriverNode(Node):
         self._last_motion_sent_at = 0.0
         self._last_stop_sent = False
         self._last_poll_at = 0.0
+        self._last_arm_state_poll_at = 0.0
 
         self._desired_linear = 0.0
         self._desired_angular = 0.0
@@ -190,6 +199,7 @@ class MegaDriverNode(Node):
         self._actual_arm_z = self._initial_arm_z_m
         self._arm_homed = False
         self._warned_arm_not_homed = False
+        self._active_arm_axis: str | None = None
         self._desired_left_gripper = float(self._gripper_min_us)
         self._desired_right_gripper = float(self._gripper_min_us)
         self._last_gripper_us_sent = None
@@ -264,6 +274,7 @@ class MegaDriverNode(Node):
         self._last_left_ticks = None
         self._last_right_ticks = None
         self._last_encoder_stamp = None
+        self._active_arm_axis = None
         self._serial_error_count = 0
         self._next_connect_attempt = time.monotonic() + self._reconnect_delay_s
 
@@ -304,6 +315,7 @@ class MegaDriverNode(Node):
             self._last_stop_sent = True
             self._last_motion_sent_at = time.monotonic()
             self._last_poll_at = 0.0
+            self._last_arm_state_poll_at = 0.0
             self._serial_error_count = 0
             self._sync_arm_state_from_mega()
             if self._arm_homed:
@@ -474,15 +486,14 @@ class MegaDriverNode(Node):
                 self._warned_arm_not_homed = True
             self._pending_arm_x_delta_steps = 0
             return
+        if self._active_arm_axis not in (None, "x"):
+            return
 
         delta_steps = self._pending_arm_x_delta_steps
         self._send_expect(f"ARM X {delta_steps}", "OK ARM X")
-        self._pending_arm_x_delta_steps -= delta_steps
-        self._actual_arm_x += delta_steps / self._arm_x_steps_per_mm / 1000.0
-        self._desired_arm_x = self._actual_arm_x
-        self._last_arm_x_cmd_m = self._actual_arm_x
         self._pending_arm_x_delta_steps = 0
-        self._publish_arm_state()
+        self._active_arm_axis = "x"
+        self._last_arm_state_poll_at = 0.0
 
     def _maybe_send_arm_z(self) -> None:
         if self._pending_arm_z_delta_steps == 0:
@@ -493,15 +504,14 @@ class MegaDriverNode(Node):
                 self._warned_arm_not_homed = True
             self._pending_arm_z_delta_steps = 0
             return
+        if self._active_arm_axis not in (None, "z"):
+            return
 
         delta_steps = self._pending_arm_z_delta_steps
         self._send_expect(f"ARM Z {delta_steps}", "OK ARM Z")
-        self._pending_arm_z_delta_steps -= delta_steps
-        self._actual_arm_z += delta_steps / self._arm_z_steps_per_mm / 1000.0
-        self._desired_arm_z = self._actual_arm_z
-        self._last_arm_z_cmd_m = self._actual_arm_z
         self._pending_arm_z_delta_steps = 0
-        self._publish_arm_state()
+        self._active_arm_axis = "z"
+        self._last_arm_state_poll_at = 0.0
 
     def _maybe_send_gripper(self) -> None:
         gripper_us = self._gripper_us_from_command(self._desired_left_gripper)
@@ -530,6 +540,7 @@ class MegaDriverNode(Node):
             self._last_arm_z_cmd_m = self._actual_arm_z
             self._pending_arm_z_delta_steps = 0
             self._warned_arm_not_homed = False
+            self._active_arm_axis = None
             self._publish_arm_state()
         except Exception as exc:
             response.success = False
@@ -558,14 +569,52 @@ class MegaDriverNode(Node):
             name, value = token.split("=", 1)
             state[name] = value
 
+        was_homed = self._arm_homed
         self._arm_homed = state.get("H") == "1"
         if not self._arm_homed:
+            self._active_arm_axis = None
             return
 
         if "X" in state:
             self._actual_arm_x = int(state["X"]) / self._arm_x_steps_per_mm / 1000.0
         if "Z" in state:
             self._actual_arm_z = int(state["Z"]) / self._arm_z_steps_per_mm / 1000.0
+        if not was_homed:
+            self._desired_arm_x = self._actual_arm_x
+            self._last_arm_x_cmd_m = self._actual_arm_x
+            self._pending_arm_x_delta_steps = 0
+            self._desired_arm_z = self._actual_arm_z
+            self._last_arm_z_cmd_m = self._actual_arm_z
+            self._pending_arm_z_delta_steps = 0
+            self._warned_arm_not_homed = False
+            self._active_arm_axis = None
+        self._refresh_active_arm_axis(state)
+        self._publish_arm_state()
+
+    def _arm_x_at_target(self) -> bool:
+        tolerance_m = 1.5 / self._arm_x_steps_per_mm / 1000.0
+        return abs(self._actual_arm_x - self._desired_arm_x) <= tolerance_m
+
+    def _arm_z_at_target(self) -> bool:
+        tolerance_m = 1.5 / self._arm_z_steps_per_mm / 1000.0
+        return abs(self._actual_arm_z - self._desired_arm_z) <= tolerance_m
+
+    def _refresh_active_arm_axis(self, state: dict[str, str]) -> None:
+        if self._active_arm_axis == "x" and (
+            state.get("XM") == "0" or ("XM" not in state and self._arm_x_at_target())
+        ):
+            self._active_arm_axis = None
+        elif self._active_arm_axis == "z" and (
+            state.get("ZM") == "0" or ("ZM" not in state and self._arm_z_at_target())
+        ):
+            self._active_arm_axis = None
+
+    def _maybe_poll_arm_state(self) -> None:
+        now = time.monotonic()
+        if now - self._last_arm_state_poll_at < self._arm_state_poll_period_s:
+            return
+        self._last_arm_state_poll_at = now
+        self._sync_arm_state_from_mega()
 
     def _desired_motion_command(self) -> str:
         now = time.monotonic()
@@ -717,6 +766,7 @@ class MegaDriverNode(Node):
             self._maybe_send_motion(self._desired_motion_command())
             self._maybe_send_arm_x()
             self._maybe_send_arm_z()
+            self._maybe_poll_arm_state()
             self._maybe_send_gripper()
             self._poll_odometry()
         except Exception as exc:

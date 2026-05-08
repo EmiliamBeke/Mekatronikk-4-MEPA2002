@@ -423,11 +423,11 @@ bool startup_home_arm() {
     update_axis(x_axis, "X");
   }
 
+  arm_homed = true;
   Serial.print("OK ARM STARTUP HOME X=");
   Serial.print(x_axis.position);
   Serial.print(" Z=");
   Serial.println(z_axis.position);
-  arm_homed = true;
   save_arm_state();
   return true;
 }
@@ -482,13 +482,17 @@ void print_state(const char *prefix) {
   Serial.print(x_axis.position);
   Serial.print(" Z=");
   Serial.print(z_axis.position);
+  Serial.print(" XM=");
+  Serial.print(x_axis.moving ? 1 : 0);
+  Serial.print(" ZM=");
+  Serial.print(z_axis.moving ? 1 : 0);
   Serial.print(" XL=");
   Serial.print(limit_active(x_axis) ? 1 : 0);
   Serial.print(" ZL=");
   Serial.print(limit_active(z_axis) ? 1 : 0);
   Serial.print(" D=");
   Serial.print(distance_mm);
-  Serial.print(" S=");
+  Serial.print(" SERVO=");
   Serial.print(servo_us);
   Serial.print(" H=");
   Serial.print(arm_homed ? 1 : 0);
@@ -584,7 +588,8 @@ void handle_command(const char *cmd) {
       servo_us = constrain(a, kServoMinUs, kServoMaxUs);
       gripper_servo.writeMicroseconds(servo_us);
       mark_persist_dirty();
-      Serial.println("OK SERVO");
+      Serial.print("OK SERVO ");
+      Serial.println(servo_us);
     } else if (sscanf(cmd, "STREAM %d", &a) == 1) {
       stream_status = a != 0;
       Serial.println("OK STREAM");

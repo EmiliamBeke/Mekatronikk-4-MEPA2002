@@ -67,6 +67,7 @@ long current_z_steps = 0;
 int current_gripper_us = kGripperOpenUs;
 unsigned long last_drive_command_ms = 0;
 bool drive_watchdog_armed = false;
+bool arm_homed = false;
 int last_x_limit_state = -1;
 int last_z_limit_state = -1;
 
@@ -408,6 +409,7 @@ bool home_z_stepper() {
 }
 
 void startup_home_arm() {
+  arm_homed = false;
   Serial.println("EVENT ARM STARTUP HOME BEGIN");
 
   if (!home_x_stepper()) {
@@ -423,6 +425,7 @@ void startup_home_arm() {
   move_z_stepper(mm_to_steps(kStartupZClearanceMm, kZStepsPerMm));
   move_x_stepper(-mm_to_steps(kStartupXMaxMm, kXStepsPerMm));
 
+  arm_homed = true;
   Serial.print("OK ARM STARTUP HOME X=");
   Serial.print(current_x_steps);
   Serial.print(" Z=");
@@ -497,6 +500,8 @@ void handle_command(const char *command) {
     Serial.print(current_x_steps);
     Serial.print(" Z=");
     Serial.print(current_z_steps);
+    Serial.print(" H=");
+    Serial.print(arm_homed ? 1 : 0);
     Serial.print(" L27=");
     Serial.print(digitalRead(kXLimitPin));
     Serial.print(" L44=");
