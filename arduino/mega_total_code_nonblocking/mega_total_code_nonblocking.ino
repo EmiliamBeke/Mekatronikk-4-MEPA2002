@@ -39,7 +39,7 @@ constexpr int kZLimitActiveState = HIGH;
 constexpr long kZHomeDir = -1;
 
 constexpr int kServoPin = 46;
-constexpr int kDistanceXshutPin = 7;
+constexpr int kDistanceXshutPin = -1;
 constexpr int kDistanceOffsetMm = 15;
 
 constexpr float kXStepsPerMm = 18.65f;
@@ -328,11 +328,7 @@ bool startup_home_arm() {
 void init_distance_sensor() {
   Wire.begin();
   Wire.setClock(100000);
-  pinMode(kDistanceXshutPin, OUTPUT);
-  digitalWrite(kDistanceXshutPin, LOW);
-  delay(200);
-  digitalWrite(kDistanceXshutPin, HIGH);
-  delay(1000);
+  delay(10);
   if (distance_sensor.begin() != 0 || distance_sensor.InitSensor() != 0 ||
       distance_sensor.VL53L4ED_StartRanging() != 0) {
     Serial.println("ERR DIST INIT");
@@ -513,7 +509,11 @@ void setup() {
   pinMode(kZDirPin, OUTPUT);
   pinMode(kZEnPin, OUTPUT);
   pinMode(kZLimitPin, INPUT_PULLUP);
+  digitalWrite(kXStepPin, LOW);
+  digitalWrite(kXDirPin, LOW);
   digitalWrite(kXEnPin, LOW);
+  digitalWrite(kZStepPin, LOW);
+  digitalWrite(kZDirPin, LOW);
   digitalWrite(kZEnPin, LOW);
 
   Serial.begin(kBaudrate);
@@ -528,12 +528,12 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(kHallA2Pin), on_encoder2_change, CHANGE);
   attachInterrupt(digitalPinToInterrupt(kHallB2Pin), on_encoder2_change, CHANGE);
 
-  gripper_servo.attach(kServoPin);
-  gripper_servo.write(servo_angle);
-  init_distance_sensor();
   maybe_print_limit_switch_changes();
   reset_command_buffer();
   if (startup_home_arm()) {
+    gripper_servo.attach(kServoPin);
+    gripper_servo.write(servo_angle);
+    init_distance_sensor();
     Serial.println("MEGA_KEYBOARD_READY");
   } else {
     Serial.println("ERR MEGA_KEYBOARD_NOT_READY");
