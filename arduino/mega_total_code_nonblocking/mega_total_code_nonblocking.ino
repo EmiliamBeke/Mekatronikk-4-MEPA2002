@@ -580,21 +580,6 @@ void handle_command(const char *cmd) {
       }
       move_axis_relative(z_axis, steps);
       Serial.println("OK ARM Z");
-    } else if (strcmp(cmd, "SERVO TEST") == 0 || strcmp(cmd, "S TEST") == 0) {
-      Serial.println("OK SERVO TEST START");
-      // Quick blocking sweep for manual verification
-      for (int i = 0; i < 3; i++) {
-        gripper_servo.writeMicroseconds(kServoMinUs);
-        delay(300);
-        gripper_servo.writeMicroseconds(kServoClosedUs);
-        delay(300);
-        gripper_servo.writeMicroseconds(kServoMaxUs);
-        delay(300);
-      }
-      // restore last commanded position
-      gripper_servo.writeMicroseconds(servo_us);
-      mark_persist_dirty();
-      Serial.println("OK SERVO TEST DONE");
     } else if (sscanf(cmd, "SERVO %d", &a) == 1 || sscanf(cmd, "S %d", &a) == 1) {
       servo_us = constrain(a, kServoMinUs, kServoMaxUs);
       gripper_servo.writeMicroseconds(servo_us);
