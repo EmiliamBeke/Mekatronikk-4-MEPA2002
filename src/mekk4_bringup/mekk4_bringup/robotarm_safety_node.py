@@ -22,14 +22,16 @@ PARAM_DEFAULTS = {
     "publish_period_s": 0.05,
     "x_min": -0.2,
     "x_max": 0.2,
-    "z_min": 0.112,
+    "z_min": 0.0,
     "z_max": 0.3,
     "gripper_min": -0.785,
     "gripper_max": 0.785,
-    "lidar_x_threshold": 0.04,
-    "lidar_z_clearance": 0.222,
+    "lidar_x_threshold": 0.09,
+    "lidar_z_clearance": 0.12,
+    "max_x_step_per_publish": 0.005,
+    "max_z_step_per_publish": 0.001,
     "initial_x": 0.0,
-    "initial_z": 0.227,
+    "initial_z": 0.12,
     "initial_left_gripper": 0.0,
     "initial_right_gripper": 0.0,
 }
@@ -37,6 +39,15 @@ PARAM_DEFAULTS = {
 
 def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
+
+
+def step_towards(current: float, target: float, max_step: float) -> float:
+    delta = target - current
+    if abs(delta) <= max_step:
+        return target
+    if delta > 0.0:
+        return current + max_step
+    return current - max_step
 
 
 class RobotarmSafetyNode(Node):
@@ -54,7 +65,14 @@ class RobotarmSafetyNode(Node):
         self.gripper_max = float(self.param("gripper_max"))
         self.lidar_x_threshold = float(self.param("lidar_x_threshold"))
         self.lidar_z_clearance = float(self.param("lidar_z_clearance"))
+        self.max_x_step_per_publish = float(self.param("max_x_step_per_publish"))
+        self.max_z_step_per_publish = float(self.param("max_z_step_per_publish"))
         self.z_joint_name = str(self.param("z_joint_name"))
+
+        if self.max_x_step_per_publish <= 0.0:
+            raise ValueError("max_x_step_per_publish must be greater than zero.")
+        if self.max_z_step_per_publish <= 0.0:
+            raise ValueError("max_z_step_per_publish must be greater than zero.")
 
         self.requested_x = clamp(float(self.param("initial_x")), self.x_min, self.x_max)
         self.requested_z = clamp(float(self.param("initial_z")), self.z_min, self.z_max)
@@ -69,6 +87,8 @@ class RobotarmSafetyNode(Node):
             self.gripper_max,
         )
         self.current_z: float | None = None
+        self.commanded_x = self.requested_x
+        self.commanded_z = self.requested_z
 
         self.x_pub = self.create_publisher(Float64, self.param("x_command_topic"), 10)
         self.z_pub = self.create_publisher(Float64, self.param("z_command_topic"), 10)
@@ -141,23 +161,62 @@ class RobotarmSafetyNode(Node):
 
     def on_timer(self) -> None:
         x_position, z_position = self.commanded_xz()
+        self.commanded_x = x_position
+        self.commanded_z = z_position
         self.publish(self.x_pub, x_position)
         self.publish(self.z_pub, z_position)
         self.publish(self.left_gripper_pub, self.requested_left_gripper)
         self.publish(self.right_gripper_pub, self.requested_right_gripper)
 
     def commanded_xz(self) -> tuple[float, float]:
-        x_position = self.requested_x
-        z_position = self.requested_z
+        target_x, target_z = self.safe_requested_xz()
+        x_position = self.commanded_x
+        z_position = self.commanded_z
 
-        if x_position < self.lidar_x_threshold and not self.z_has_lidar_clearance():
-            x_position = clamp(self.lidar_x_threshold, self.x_min, self.x_max)
-            z_position = clamp(max(z_position, self.lidar_z_clearance), self.z_min, self.z_max)
+        if self.in_lidar_keepout(x_position, z_position):
+            z_position = step_towards(
+                z_position,
+                self.lidar_z_clearance,
+                self.max_z_step_per_publish,
+            )
+            return x_position, z_position
+
+        if target_z < self.lidar_z_clearance and x_position < self.lidar_x_threshold:
+            x_position = step_towards(
+                x_position,
+                self.lidar_x_threshold,
+                self.max_x_step_per_publish,
+            )
+            return x_position, z_position
+
+        if target_x < self.lidar_x_threshold and z_position < self.lidar_z_clearance:
+            z_position = step_towards(
+                z_position,
+                self.lidar_z_clearance,
+                self.max_z_step_per_publish,
+            )
+            return x_position, z_position
+
+        if abs(z_position - target_z) > 1e-9:
+            z_position = step_towards(z_position, target_z, self.max_z_step_per_publish)
+            return x_position, z_position
+
+        if abs(x_position - target_x) > 1e-9:
+            x_position = step_towards(x_position, target_x, self.max_x_step_per_publish)
 
         return x_position, z_position
 
-    def z_has_lidar_clearance(self) -> bool:
-        return self.current_z is not None and self.current_z >= self.lidar_z_clearance
+    def safe_requested_xz(self) -> tuple[float, float]:
+        x_position = self.requested_x
+        z_position = self.requested_z
+
+        if self.in_lidar_keepout(x_position, z_position):
+            z_position = clamp(self.lidar_z_clearance, self.z_min, self.z_max)
+
+        return x_position, z_position
+
+    def in_lidar_keepout(self, x_position: float, z_position: float) -> bool:
+        return x_position < self.lidar_x_threshold and z_position < self.lidar_z_clearance
 
     def publish(self, publisher, value: float) -> None:
         msg = Float64()

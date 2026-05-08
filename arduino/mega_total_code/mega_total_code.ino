@@ -23,11 +23,23 @@ constexpr int kXStepPin = 45;
 constexpr int kXDirPin = 29;
 constexpr int kXEnPin = 37;
 constexpr bool kInvertXDirection = false;
+constexpr int kXLimitPin = 27;
+constexpr long kXHomeDirectionStep = -1;
+constexpr long kXHomeMaxSteps = 10000;
 
-constexpr int kZStepPin = 44;
+constexpr int kZStepPin = 36;
 constexpr int kZDirPin = 28;
-constexpr int kZEnPin = 36;
+constexpr int kZEnPin = 52;
 constexpr bool kInvertZDirection = false;
+constexpr int kZLimitPin = 44;
+constexpr long kZHomeDirectionStep = -1;
+constexpr long kZHomeMaxSteps = 800000;
+
+constexpr float kXStepsPerMm = 18.65f;
+constexpr float kZStepsPerMm = 2929.0f;
+constexpr float kHomeBackoffMm = 5.0f;
+constexpr float kStartupXMaxMm = 150.0f;
+constexpr float kStartupZClearanceMm = 120.0f;
 
 constexpr unsigned int kStepperPulseUs = 10;
 constexpr unsigned int kXStepDelayUs = 1000;
@@ -68,6 +80,14 @@ int clamp_pwm(int speed) {
     return -255;
   }
   return speed;
+}
+
+long mm_to_steps(float millimeters, float steps_per_mm) {
+  const float steps = millimeters * steps_per_mm;
+  if (steps >= 0.0f) {
+    return static_cast<long>(steps + 0.5f);
+  }
+  return static_cast<long>(steps - 0.5f);
 }
 
 bool should_flip_pure_spin(int m1_speed, int m2_speed) {
@@ -221,14 +241,144 @@ void move_stepper(
   }
 }
 
+bool x_limit_active() {
+  return digitalRead(kXLimitPin) == HIGH;
+}
+
+void step_x_physical_once(long direction_step) {
+  move_stepper(kXStepPin, kXDirPin, direction_step, kInvertXDirection, kXStepDelayUs);
+  if (direction_step == kXHomeDirectionStep) {
+    current_x_steps += 1;
+  } else {
+    current_x_steps -= 1;
+  }
+}
+
 void move_x_stepper(long steps) {
-  move_stepper(kXStepPin, kXDirPin, steps, kInvertXDirection, kXStepDelayUs);
-  current_x_steps += steps;
+  if (steps == 0) {
+    return;
+  }
+
+  const long direction_step = steps > 0 ? kXHomeDirectionStep : -kXHomeDirectionStep;
+  const long count = labs(steps);
+
+  for (long i = 0; i < count; i++) {
+    if (direction_step == kXHomeDirectionStep && x_limit_active()) {
+      move_stepper(
+        kXStepPin,
+        kXDirPin,
+        -kXHomeDirectionStep * mm_to_steps(kHomeBackoffMm, kXStepsPerMm),
+        kInvertXDirection,
+        kXStepDelayUs
+      );
+      current_x_steps = mm_to_steps(kStartupXMaxMm, kXStepsPerMm);
+      Serial.print("EVENT X LIMIT ");
+      Serial.println(current_x_steps);
+      return;
+    }
+    step_x_physical_once(direction_step);
+  }
+}
+
+bool home_x_stepper() {
+  const long x_backoff_steps = mm_to_steps(kHomeBackoffMm, kXStepsPerMm);
+
+  if (x_limit_active()) {
+    move_x_stepper(-x_backoff_steps);
+  }
+
+  for (long i = 0; i < kXHomeMaxSteps; i++) {
+    if (x_limit_active()) {
+      move_x_stepper(-x_backoff_steps);
+      current_x_steps = mm_to_steps(kStartupXMaxMm, kXStepsPerMm);
+      Serial.print("OK HOME X ");
+      Serial.println(current_x_steps);
+      return true;
+    }
+    step_x_physical_once(kXHomeDirectionStep);
+  }
+
+  Serial.println("ERR HOME X TIMEOUT");
+  return false;
+}
+
+bool z_limit_active() {
+  return digitalRead(kZLimitPin) == HIGH;
+}
+
+void step_z_once(long direction_step) {
+  move_stepper(kZStepPin, kZDirPin, direction_step, kInvertZDirection, kZStepDelayUs);
+  current_z_steps += direction_step;
 }
 
 void move_z_stepper(long steps) {
-  move_stepper(kZStepPin, kZDirPin, steps, kInvertZDirection, kZStepDelayUs);
-  current_z_steps += steps;
+  if (steps == 0) {
+    return;
+  }
+
+  const long direction_step = steps > 0 ? 1 : -1;
+  const long count = labs(steps);
+
+  for (long i = 0; i < count; i++) {
+    if (direction_step == kZHomeDirectionStep && z_limit_active()) {
+      move_stepper(
+        kZStepPin,
+        kZDirPin,
+        -kZHomeDirectionStep * mm_to_steps(kHomeBackoffMm, kZStepsPerMm),
+        kInvertZDirection,
+        kZStepDelayUs
+      );
+      current_z_steps = 0;
+      Serial.print("EVENT Z LIMIT ");
+      Serial.println(current_z_steps);
+      return;
+    }
+    step_z_once(direction_step);
+  }
+}
+
+bool home_z_stepper() {
+  const long z_backoff_steps = mm_to_steps(kHomeBackoffMm, kZStepsPerMm);
+
+  if (z_limit_active()) {
+    move_z_stepper(-kZHomeDirectionStep * z_backoff_steps);
+  }
+
+  for (long i = 0; i < kZHomeMaxSteps; i++) {
+    if (z_limit_active()) {
+      move_z_stepper(-kZHomeDirectionStep * z_backoff_steps);
+      current_z_steps = 0;
+      Serial.print("OK HOME Z ");
+      Serial.println(current_z_steps);
+      return true;
+    }
+    step_z_once(kZHomeDirectionStep);
+  }
+
+  Serial.println("ERR HOME Z TIMEOUT");
+  return false;
+}
+
+void startup_home_arm() {
+  Serial.println("EVENT ARM STARTUP HOME BEGIN");
+
+  if (!home_x_stepper()) {
+    Serial.println("ERR ARM STARTUP HOME X");
+    return;
+  }
+
+  if (!home_z_stepper()) {
+    Serial.println("ERR ARM STARTUP HOME Z");
+    return;
+  }
+
+  move_z_stepper(mm_to_steps(kStartupZClearanceMm, kZStepsPerMm));
+  move_x_stepper(-mm_to_steps(kStartupXMaxMm, kXStepsPerMm));
+
+  Serial.print("OK ARM STARTUP HOME X=");
+  Serial.print(current_x_steps);
+  Serial.print(" Z=");
+  Serial.println(current_z_steps);
 }
 
 void maybe_stop_on_watchdog() {
@@ -322,14 +472,29 @@ void handle_command(const char *command) {
 
   long arm_steps = 0;
   if (sscanf(command, "ARM X %ld", &arm_steps) == 1) {
-    Serial.println("OK ARM X");
     move_x_stepper(arm_steps);
+    Serial.println("OK ARM X");
     return;
   }
 
   if (sscanf(command, "ARM Z %ld", &arm_steps) == 1) {
-    Serial.println("OK ARM Z");
     move_z_stepper(arm_steps);
+    Serial.println("OK ARM Z");
+    return;
+  }
+
+  if (strcmp(command, "HOME Z") == 0) {
+    home_z_stepper();
+    return;
+  }
+
+  if (strcmp(command, "HOME X") == 0) {
+    home_x_stepper();
+    return;
+  }
+
+  if (strcmp(command, "HOME ARM") == 0) {
+    startup_home_arm();
     return;
   }
 
@@ -352,9 +517,11 @@ void setup() {
   pinMode(kXStepPin, OUTPUT);
   pinMode(kXDirPin, OUTPUT);
   pinMode(kXEnPin, OUTPUT);
+  pinMode(kXLimitPin, INPUT);
   pinMode(kZStepPin, OUTPUT);
   pinMode(kZDirPin, OUTPUT);
   pinMode(kZEnPin, OUTPUT);
+  pinMode(kZLimitPin, INPUT);
 
   digitalWrite(kXStepPin, LOW);
   digitalWrite(kXDirPin, LOW);
@@ -376,6 +543,7 @@ void setup() {
   }
 
   reset_command_buffer();
+  startup_home_arm();
   Serial.println("MEGA_KEYBOARD_READY");
 }
 

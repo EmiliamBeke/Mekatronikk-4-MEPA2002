@@ -12,7 +12,12 @@ from std_msgs.msg import Float64, Int32
 from tf2_ros import TransformBroadcaster
 
 
-IGNORED_SERIAL_PREFIXES = ("MEGA_KEYBOARD_READY", "EVENT ")
+IGNORED_SERIAL_PREFIXES = (
+    "MEGA_KEYBOARD_READY",
+    "EVENT ",
+    "OK HOME ",
+    "OK ARM STARTUP HOME",
+)
 
 
 def normalize_angle(angle: float) -> float:
@@ -26,11 +31,12 @@ class MegaDriverNode(Node):
         self.declare_parameter("port", "/dev/ttyACM0")
         self.declare_parameter("baudrate", 115200)
         self.declare_parameter("post_open_wait_s", 2.5)
+        self.declare_parameter("startup_ready_timeout_s", 120.0)
         self.declare_parameter("reconnect_delay_s", 1.0)
         self.declare_parameter("send_period_s", 0.2)
         self.declare_parameter("odom_poll_period_s", 0.05)
         self.declare_parameter("cmd_vel_timeout_s", 0.5)
-        self.declare_parameter("reply_timeout_s", 0.4)
+        self.declare_parameter("reply_timeout_s", 2.0)
         self.declare_parameter("base_frame_id", "base_link")
         self.declare_parameter("odom_frame_id", "odom")
         self.declare_parameter("publish_tf", True)
@@ -57,6 +63,9 @@ class MegaDriverNode(Node):
         self._baudrate = self.get_parameter("baudrate").get_parameter_value().integer_value
         self._post_open_wait_s = (
             self.get_parameter("post_open_wait_s").get_parameter_value().double_value
+        )
+        self._startup_ready_timeout_s = (
+            self.get_parameter("startup_ready_timeout_s").get_parameter_value().double_value
         )
         self._reconnect_delay_s = (
             self.get_parameter("reconnect_delay_s").get_parameter_value().double_value
@@ -131,6 +140,8 @@ class MegaDriverNode(Node):
             raise ValueError("track_width_eff_m must be greater than zero.")
         if self._pure_rotation_linear_deadband_mps < 0.0:
             raise ValueError("pure_rotation_linear_deadband_mps must be zero or greater.")
+        if self._startup_ready_timeout_s <= 0.0:
+            raise ValueError("startup_ready_timeout_s must be greater than zero.")
         if self._send_period_s <= 0.0 or self._odom_poll_period_s <= 0.0:
             raise ValueError("Timer periods must be greater than zero.")
         if self._arm_x_steps_per_mm <= 0.0:
@@ -244,6 +255,7 @@ class MegaDriverNode(Node):
                 write_timeout=1.0,
             )
             time.sleep(max(0.0, self._post_open_wait_s))
+            self._wait_for_ready(self._startup_ready_timeout_s)
             self._serial.reset_input_buffer()
             self._serial.reset_output_buffer()
             firmware = self._send_expect("ID", "MEGA_")
@@ -270,6 +282,20 @@ class MegaDriverNode(Node):
             self.get_logger().warning(f"Failed to connect to Mega on {self._port}: {exc}")
             self._close_serial()
             return False
+
+    def _wait_for_ready(self, timeout_s: float) -> None:
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline:
+            raw = self._serial.readline()
+            if not raw:
+                continue
+            text = raw.decode("utf-8", errors="replace").strip()
+            if not text:
+                continue
+            if text == "MEGA_KEYBOARD_READY":
+                return
+            self.get_logger().debug(f"Mega startup: {text}")
+        raise RuntimeError("timeout waiting for Mega startup ready")
 
     def _read_reply(self, timeout_s: float) -> str:
         deadline = time.monotonic() + timeout_s
