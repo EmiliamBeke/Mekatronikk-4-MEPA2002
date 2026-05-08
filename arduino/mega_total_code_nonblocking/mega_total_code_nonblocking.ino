@@ -533,6 +533,8 @@ void handle_command(const char *cmd) {
   } else if (strcmp(cmd, "DIST") == 0) {
     Serial.print("DIST ");
     Serial.println(distance_mm);
+  } else if (strcmp(cmd, "DIST INIT") == 0) {
+    init_distance_sensor();
   } else if (strcmp(cmd, "LIMITS") == 0) {
     Serial.print("LIMITS RAW27=");
     Serial.print(digitalRead(kXLimitPin));
@@ -665,7 +667,6 @@ void setup() {
   }
   gripper_servo.attach(kServoPin, kServoMinUs, kServoMaxUs);
   gripper_servo.writeMicroseconds(servo_us);
-  init_distance_sensor();
   Serial.println("MEGA_KEYBOARD_READY");
 }
 
