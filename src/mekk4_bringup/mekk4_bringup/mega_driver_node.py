@@ -323,19 +323,41 @@ class MegaDriverNode(Node):
 
     def _wait_for_ready(self, timeout_s: float) -> None:
         deadline = time.monotonic() + timeout_s
+        next_probe_at = time.monotonic() + 2.0
         while time.monotonic() < deadline:
             raw = self._serial.readline()
-            if not raw:
+            if raw:
+                text = raw.decode("utf-8", errors="replace").strip()
+                if not text:
+                    continue
+                if text in ("MEGA_KEYBOARD_READY", "MEGA_KEYBOARD_DRIVE"):
+                    return
+                if text.startswith("EVENT LIMIT "):
+                    self.get_logger().info(f"Mega {text}")
+                    continue
+                self.get_logger().debug(f"Mega startup: {text}")
+
+            if time.monotonic() < next_probe_at:
                 continue
-            text = raw.decode("utf-8", errors="replace").strip()
-            if not text:
+
+            next_probe_at = time.monotonic() + 2.0
+            try:
+                self._serial.write(b"ID\n")
+                self._serial.flush()
+                reply_raw = self._serial.readline()
+                if not reply_raw:
+                    continue
+                reply = reply_raw.decode("utf-8", errors="replace").strip()
+                if not reply:
+                    continue
+                if reply == "MEGA_KEYBOARD_DRIVE":
+                    return
+                if reply.startswith("EVENT LIMIT "):
+                    self.get_logger().info(f"Mega {reply}")
+                else:
+                    self.get_logger().debug(f"Mega probe: {reply}")
+            except Exception:
                 continue
-            if text == "MEGA_KEYBOARD_READY":
-                return
-            if text.startswith("EVENT LIMIT "):
-                self.get_logger().info(f"Mega {text}")
-                continue
-            self.get_logger().debug(f"Mega startup: {text}")
         raise RuntimeError("timeout waiting for Mega startup ready")
 
     def _read_reply(self, timeout_s: float) -> str:
