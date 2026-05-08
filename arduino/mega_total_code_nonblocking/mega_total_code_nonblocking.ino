@@ -28,12 +28,14 @@ constexpr int kXStepPin = 45;
 constexpr int kXDirPin = 29;
 constexpr int kXEnPin = 37;
 constexpr int kXLimitPin = 27;
+constexpr int kXLimitActiveState = HIGH;
 constexpr long kXHomeDir = -1;
 
 constexpr int kZStepPin = 36;
 constexpr int kZDirPin = 28;
 constexpr int kZEnPin = 52;
 constexpr int kZLimitPin = 44;
+constexpr int kZLimitActiveState = HIGH;
 constexpr long kZHomeDir = -1;
 
 constexpr int kServoPin = 46;
@@ -88,6 +90,8 @@ unsigned long last_distance_ms = 0;
 int servo_angle = 90;
 int distance_mm = -1;
 bool distance_ok = false;
+int last_x_limit_state = -1;
+int last_z_limit_state = -1;
 
 Servo gripper_servo;
 VL53L4ED distance_sensor(&Wire, kDistanceXshutPin);
@@ -186,7 +190,27 @@ void stop_all() {
 }
 
 bool limit_active(const Axis &axis) {
-  return digitalRead(axis.limit_pin) == HIGH;
+  if (axis.limit_pin == kXLimitPin) {
+    return digitalRead(axis.limit_pin) == kXLimitActiveState;
+  }
+  return digitalRead(axis.limit_pin) == kZLimitActiveState;
+}
+
+void maybe_print_limit_switch_changes() {
+  const int x_state = digitalRead(kXLimitPin);
+  const int z_state = digitalRead(kZLimitPin);
+
+  if (last_x_limit_state != x_state) {
+    last_x_limit_state = x_state;
+    Serial.print("EVENT LIMIT 27 ");
+    Serial.println(x_state);
+  }
+
+  if (last_z_limit_state != z_state) {
+    last_z_limit_state = z_state;
+    Serial.print("EVENT LIMIT 44 ");
+    Serial.println(z_state);
+  }
 }
 
 void set_dir(const Axis &axis, long physical_dir) {
@@ -402,6 +426,15 @@ void handle_command(const char *cmd) {
   } else if (strcmp(cmd, "DIST") == 0) {
     Serial.print("DIST ");
     Serial.println(distance_mm);
+  } else if (strcmp(cmd, "LIMITS") == 0) {
+    Serial.print("LIMITS RAW27=");
+    Serial.print(digitalRead(kXLimitPin));
+    Serial.print(" RAW44=");
+    Serial.print(digitalRead(kZLimitPin));
+    Serial.print(" PRESSED27=");
+    Serial.print(limit_active(x_axis) ? 1 : 0);
+    Serial.print(" PRESSED44=");
+    Serial.println(limit_active(z_axis) ? 1 : 0);
   } else if (strcmp(cmd, "HOME ARM") == 0) {
     stop_all();
     startup_home_arm();
@@ -475,11 +508,11 @@ void setup() {
   pinMode(kXStepPin, OUTPUT);
   pinMode(kXDirPin, OUTPUT);
   pinMode(kXEnPin, OUTPUT);
-  pinMode(kXLimitPin, INPUT);
+  pinMode(kXLimitPin, INPUT_PULLUP);
   pinMode(kZStepPin, OUTPUT);
   pinMode(kZDirPin, OUTPUT);
   pinMode(kZEnPin, OUTPUT);
-  pinMode(kZLimitPin, INPUT);
+  pinMode(kZLimitPin, INPUT_PULLUP);
   digitalWrite(kXEnPin, LOW);
   digitalWrite(kZEnPin, LOW);
 
@@ -498,6 +531,7 @@ void setup() {
   gripper_servo.attach(kServoPin);
   gripper_servo.write(servo_angle);
   init_distance_sensor();
+  maybe_print_limit_switch_changes();
   reset_command_buffer();
   if (startup_home_arm()) {
     Serial.println("MEGA_KEYBOARD_READY");
@@ -507,6 +541,7 @@ void setup() {
 }
 
 void loop() {
+  maybe_print_limit_switch_changes();
   read_serial();
   maybe_stop_on_watchdog();
   update_axis(x_axis, "X");
