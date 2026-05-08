@@ -28,6 +28,7 @@ detect_mega_port() {
 
 MEGA_PORT="${MEGA_PORT:-}"
 MEGA_BAUDRATE="${MEGA_BAUDRATE:-115200}"
+READY_TIMEOUT="${READY_TIMEOUT:-120}"
 
 if [[ -z "${MEGA_PORT}" ]]; then
   MEGA_PORT="$(detect_mega_port)" || {
@@ -50,4 +51,5 @@ fi
 
 python3 "${SCRIPT_DIR}/mega_serial_terminal.py" \
   --port "${MEGA_PORT}" \
-  --baudrate "${MEGA_BAUDRATE}"
+  --baudrate "${MEGA_BAUDRATE}" \
+  --ready-timeout "${READY_TIMEOUT}"

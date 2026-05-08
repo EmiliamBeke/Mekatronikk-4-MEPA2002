@@ -14,6 +14,46 @@ def send_command(ser: serial.Serial, command: str) -> None:
     ser.flush()
 
 
+def read_line(ser: serial.Serial, timeout_s: float) -> str:
+    original_timeout = ser.timeout
+    ser.timeout = timeout_s
+    try:
+        raw = ser.readline()
+    finally:
+        ser.timeout = original_timeout
+    return raw.decode("utf-8", errors="replace").strip() if raw else ""
+
+
+def wait_for_ready(ser: serial.Serial, timeout_s: float) -> None:
+    deadline = time.monotonic() + timeout_s
+    last_line = ""
+    while time.monotonic() < deadline:
+        text = read_line(ser, 0.2)
+        if not text:
+            continue
+        last_line = text
+        print(f"[mega-keyboard] Mega startup: {text}")
+        if text == "MEGA_KEYBOARD_READY":
+            return
+        if text == "ERR MEGA_KEYBOARD_NOT_READY":
+            raise RuntimeError("Mega firmware reported startup failure")
+    detail = f"; last line: {last_line}" if last_line else ""
+    raise RuntimeError(f"timeout waiting for MEGA_KEYBOARD_READY{detail}")
+
+
+def expect_reply(ser: serial.Serial, command: str, expected: str, timeout_s: float) -> str:
+    send_command(ser, command)
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        text = read_line(ser, 0.1)
+        if not text or text.startswith("EVENT "):
+            continue
+        if not text.startswith(expected):
+            raise RuntimeError(f"unexpected reply to {command!r}: {text!r}")
+        return text
+    raise RuntimeError(f"timeout waiting for reply to {command!r}")
+
+
 def clamp_pwm(value: int) -> int:
     return max(-255, min(255, value))
 
@@ -158,8 +198,14 @@ def main() -> int:
     parser.add_argument(
         "--post-open-wait",
         type=float,
-        default=2.5,
-        help="Seconds to wait after opening the port (Mega often resets on open)",
+        default=0.2,
+        help="Seconds to wait before reading startup output after opening the port",
+    )
+    parser.add_argument(
+        "--ready-timeout",
+        type=float,
+        default=120.0,
+        help="Seconds to wait for MEGA_KEYBOARD_READY after opening the port",
     )
     parser.add_argument(
         "--send-period",
@@ -203,8 +249,13 @@ def main() -> int:
         with serial.Serial(args.port, args.baudrate, timeout=0.01, write_timeout=1.0) as ser:
             print(f"[mega-keyboard] Opened {args.port} @ {args.baudrate}")
             time.sleep(max(0.0, args.post_open_wait))
-            ser.reset_input_buffer()
             ser.reset_output_buffer()
+            wait_for_ready(ser, args.ready_timeout)
+            ser.reset_input_buffer()
+            firmware = expect_reply(ser, "ID", "MEGA_", 2.0)
+            if firmware != "MEGA_KEYBOARD_DRIVE":
+                raise RuntimeError(f"expected MEGA_KEYBOARD_DRIVE firmware, got {firmware!r}")
+            expect_reply(ser, "PING", "PONG", 2.0)
 
             tty.setcbreak(fd)
             print(
@@ -351,8 +402,8 @@ def main() -> int:
                     send_command(ser, "STOP")
                 except serial.SerialException:
                     pass
-    except serial.SerialException as exc:
-        print(f"[mega-keyboard] Serial error: {exc}", file=sys.stderr)
+    except (RuntimeError, serial.SerialException) as exc:
+        print(f"[mega-keyboard] Error: {exc}", file=sys.stderr)
         return 1
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
