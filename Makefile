@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws lidar-setup lidar-test mega-upload mega-test mega-motor-test mega-terminal mega-keyboard mega-calibrate pc-mega-keyboard pc-ros-keyboard sim-build sim-stop sim sim-headless sim-topics sim-nav2 pi-bringup pi-teddy-grab pc-teddy-rviz camera-stop camera-reload
+.PHONY: build shell up down ws lidar-setup lidar-test mega-upload mega-test mega-motor-test mega-terminal mega-keyboard mega-calibrate arm-cal x-cal arm-calibrate arm-x-calibrate pc-mega-keyboard pc-ros-keyboard sim-build sim-stop sim sim-headless sim-topics sim-nav2 pi-bringup pi-teddy-grab pc-teddy-rviz camera-stop camera-reload
 
 MEGA_UPLOAD_DEFAULT_SKETCH := mega_total_code_nonblocking
 MEGA_UPLOAD_SKETCH := $(firstword $(filter-out mega-upload,$(MAKECMDGOALS)))
@@ -58,6 +58,18 @@ mega-keyboard:
 
 mega-calibrate:
 	bash ./scripts/mega_calibrate.sh $(ARGS)
+
+arm-cal:
+	bash ./scripts/mega_arm_calibrate.sh all
+
+x-cal:
+	bash ./scripts/mega_arm_calibrate.sh x
+
+arm-calibrate: arm-cal
+	@:
+
+arm-x-calibrate: x-cal
+	@:
 
 pc-mega-keyboard:
 	bash ./scripts/pc_mega_serial_keyboard.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5@gruppe5pi5)"
