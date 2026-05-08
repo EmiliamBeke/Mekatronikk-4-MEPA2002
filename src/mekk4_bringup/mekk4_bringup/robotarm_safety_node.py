@@ -26,16 +26,16 @@ PARAM_DEFAULTS = {
     "x_max": 0.2,
     "z_min": 0.0,
     "z_max": 0.3,
-    "gripper_min": -0.785,
-    "gripper_max": 0.785,
+    "gripper_min": 500.0,
+    "gripper_max": 1800.0,
     "lidar_x_threshold": 0.09,
     "lidar_z_clearance": 0.12,
     "max_x_step_per_publish": 0.005,
     "max_z_step_per_publish": 0.001,
     "initial_x": 0.0,
     "initial_z": 0.12,
-    "initial_left_gripper": 0.0,
-    "initial_right_gripper": 0.0,
+    "initial_left_gripper": 500.0,
+    "initial_right_gripper": 500.0,
 }
 
 

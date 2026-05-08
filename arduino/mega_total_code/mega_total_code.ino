@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <Servo.h>
 
 namespace {
 
@@ -18,6 +19,10 @@ constexpr int kInb2Pin = 12;
 constexpr int kPwm2Pin = 10;
 constexpr int kHallA2Pin = 18;
 constexpr int kHallB2Pin = 19;
+
+constexpr int kGripperServoPin = 46;
+constexpr int kGripperOpenUs = 500;
+constexpr int kGripperClosedUs = 1800;
 
 constexpr int kXStepPin = 45;
 constexpr int kXDirPin = 29;
@@ -59,10 +64,13 @@ int current_m1_speed = 0;
 int current_m2_speed = 0;
 long current_x_steps = 0;
 long current_z_steps = 0;
+int current_gripper_us = kGripperOpenUs;
 unsigned long last_drive_command_ms = 0;
 bool drive_watchdog_armed = false;
 int last_x_limit_state = -1;
 int last_z_limit_state = -1;
+
+Servo gripper_servo;
 
 void maybe_print_limit_switch_changes();
 
@@ -86,6 +94,21 @@ int clamp_pwm(int speed) {
     return -255;
   }
   return speed;
+}
+
+int clamp_servo_us(int pulse_us) {
+  if (pulse_us < kGripperOpenUs) {
+    return kGripperOpenUs;
+  }
+  if (pulse_us > kGripperClosedUs) {
+    return kGripperClosedUs;
+  }
+  return pulse_us;
+}
+
+void set_gripper_servo_us(int pulse_us) {
+  current_gripper_us = clamp_servo_us(pulse_us);
+  gripper_servo.writeMicroseconds(current_gripper_us);
 }
 
 long mm_to_steps(float millimeters, float steps_per_mm) {
@@ -481,7 +504,9 @@ void handle_command(const char *command) {
     Serial.print(" P27=");
     Serial.print(x_limit_active() ? 1 : 0);
     Serial.print(" P44=");
-    Serial.println(z_limit_active() ? 1 : 0);
+    Serial.print(z_limit_active() ? 1 : 0);
+    Serial.print(" SERVO=");
+    Serial.println(current_gripper_us);
     return;
   }
 
@@ -528,6 +553,14 @@ void handle_command(const char *command) {
     return;
   }
 
+  int servo_us = 0;
+  if (sscanf(command, "SERVO %d", &servo_us) == 1) {
+    set_gripper_servo_us(servo_us);
+    Serial.print("OK SERVO ");
+    Serial.println(current_gripper_us);
+    return;
+  }
+
   if (strcmp(command, "HOME Z") == 0) {
     home_z_stepper();
     return;
@@ -555,6 +588,7 @@ void setup() {
   pinMode(kInb2Pin, OUTPUT);
   pinMode(kPwm1Pin, OUTPUT);
   pinMode(kPwm2Pin, OUTPUT);
+  pinMode(kGripperServoPin, OUTPUT);
   pinMode(kHallA1Pin, INPUT_PULLUP);
   pinMode(kHallB1Pin, INPUT_PULLUP);
   pinMode(kHallA2Pin, INPUT_PULLUP);
@@ -574,6 +608,8 @@ void setup() {
   digitalWrite(kZStepPin, LOW);
   digitalWrite(kZDirPin, LOW);
   digitalWrite(kZEnPin, LOW);
+  gripper_servo.attach(kGripperServoPin);
+  set_gripper_servo_us(kGripperOpenUs);
 
   stop_all();
   reset_encoder1_count();

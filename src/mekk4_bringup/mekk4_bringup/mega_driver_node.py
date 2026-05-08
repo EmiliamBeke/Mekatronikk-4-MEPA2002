@@ -60,11 +60,8 @@ class MegaDriverNode(Node):
         self.declare_parameter("initial_arm_z_m", 0.12)
         self.declare_parameter("arm_x_steps_per_mm", 18.65)
         self.declare_parameter("arm_z_steps_per_mm", 2929.0)
-        self.declare_parameter("servo_min_angle_deg", 0)
-        self.declare_parameter("servo_max_angle_deg", 180)
-        self.declare_parameter("gripper_min_rad", -0.785)
-        self.declare_parameter("gripper_max_rad", 0.785)
-        self.declare_parameter("initial_servo_angle_deg", 90)
+        self.declare_parameter("gripper_min_us", 500)
+        self.declare_parameter("gripper_max_us", 1800)
 
         self._port = self.get_parameter("port").get_parameter_value().string_value
         self._baudrate = self.get_parameter("baudrate").get_parameter_value().integer_value
@@ -138,20 +135,11 @@ class MegaDriverNode(Node):
         self._arm_z_steps_per_mm = (
             self.get_parameter("arm_z_steps_per_mm").get_parameter_value().double_value
         )
-        self._servo_min_angle_deg = (
-            self.get_parameter("servo_min_angle_deg").get_parameter_value().integer_value
+        self._gripper_min_us = (
+            self.get_parameter("gripper_min_us").get_parameter_value().integer_value
         )
-        self._servo_max_angle_deg = (
-            self.get_parameter("servo_max_angle_deg").get_parameter_value().integer_value
-        )
-        self._gripper_min_rad = (
-            self.get_parameter("gripper_min_rad").get_parameter_value().double_value
-        )
-        self._gripper_max_rad = (
-            self.get_parameter("gripper_max_rad").get_parameter_value().double_value
-        )
-        self._servo_angle_deg = (
-            self.get_parameter("initial_servo_angle_deg").get_parameter_value().integer_value
+        self._gripper_max_us = (
+            self.get_parameter("gripper_max_us").get_parameter_value().integer_value
         )
 
         if self._max_track_speed_mps <= 0.0:
@@ -176,14 +164,8 @@ class MegaDriverNode(Node):
             raise ValueError("arm_x_steps_per_mm must be greater than zero.")
         if self._arm_z_steps_per_mm <= 0.0:
             raise ValueError("arm_z_steps_per_mm must be greater than zero.")
-        if not 0 <= self._servo_min_angle_deg <= self._servo_max_angle_deg <= 180:
-            raise ValueError("servo angles must satisfy 0 <= min <= max <= 180.")
-        if self._gripper_min_rad >= self._gripper_max_rad:
-            raise ValueError("gripper_min_rad must be less than gripper_max_rad.")
-        self._servo_angle_deg = max(
-            self._servo_min_angle_deg,
-            min(self._servo_max_angle_deg, self._servo_angle_deg),
-        )
+        if self._gripper_min_us <= 0 or self._gripper_min_us >= self._gripper_max_us:
+            raise ValueError("gripper_min_us must be greater than zero and below gripper_max_us.")
 
         self._serial = None
         self._serial_module = None
@@ -205,9 +187,9 @@ class MegaDriverNode(Node):
         self._pending_arm_z_delta_steps = 0
         self._actual_arm_x = self._initial_arm_x_m
         self._actual_arm_z = self._initial_arm_z_m
-        self._desired_left_gripper = 0.0
-        self._desired_right_gripper = 0.0
-        self._pending_servo_angle_deg = self._servo_angle_deg
+        self._desired_left_gripper = float(self._gripper_min_us)
+        self._desired_right_gripper = float(self._gripper_min_us)
+        self._last_gripper_us_sent = None
 
         self._last_left_ticks = None
         self._last_right_ticks = None
@@ -435,20 +417,13 @@ class MegaDriverNode(Node):
 
     def _on_left_gripper_cmd(self, msg: Float64) -> None:
         self._desired_left_gripper = float(msg.data)
-        self._pending_servo_angle_deg = self._gripper_to_servo_angle(
-            self._desired_left_gripper
-        )
 
     def _on_right_gripper_cmd(self, msg: Float64) -> None:
         self._desired_right_gripper = float(msg.data)
 
-    def _gripper_to_servo_angle(self, value_rad: float) -> int:
-        value = max(self._gripper_min_rad, min(self._gripper_max_rad, float(value_rad)))
-        fraction = (value - self._gripper_min_rad) / (self._gripper_max_rad - self._gripper_min_rad)
-        angle = self._servo_min_angle_deg + fraction * (
-            self._servo_max_angle_deg - self._servo_min_angle_deg
-        )
-        return int(round(angle))
+    def _gripper_us_from_command(self, value: float) -> int:
+        pulse_us = int(round(value))
+        return max(self._gripper_min_us, min(self._gripper_max_us, pulse_us))
 
     def _meters_to_z_steps(self, meters: float) -> int:
         millimeters = meters * 1000.0
@@ -484,13 +459,13 @@ class MegaDriverNode(Node):
         self._pending_arm_z_delta_steps = 0
         self._publish_arm_state()
 
-    def _maybe_send_servo(self) -> None:
-        if self._pending_servo_angle_deg == self._servo_angle_deg:
+    def _maybe_send_gripper(self) -> None:
+        gripper_us = self._gripper_us_from_command(self._desired_left_gripper)
+        if gripper_us == self._last_gripper_us_sent:
             return
 
-        angle = self._pending_servo_angle_deg
-        self._send_expect(f"S {angle}", "OK SERVO")
-        self._servo_angle_deg = angle
+        self._send_expect(f"SERVO {gripper_us}", f"OK SERVO {gripper_us}")
+        self._last_gripper_us_sent = gripper_us
 
     def _publish_arm_state(self) -> None:
         x_msg = Float64()
@@ -664,7 +639,7 @@ class MegaDriverNode(Node):
             self._maybe_send_motion(self._desired_motion_command())
             self._maybe_send_arm_x()
             self._maybe_send_arm_z()
-            self._maybe_send_servo()
+            self._maybe_send_gripper()
             self._poll_odometry()
         except Exception as exc:
             self.get_logger().warning(f"Mega driver loop failed: {exc}")

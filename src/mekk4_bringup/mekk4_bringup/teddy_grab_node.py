@@ -18,18 +18,17 @@ PARAM_DEFAULTS = {
     "z_state_topic": "/robotarm/z_position_state",
     "publish_period_s": 0.05,
     "position_tolerance_m": 0.003,
-    "pre_x": 0.0,
-    "pre_z": 0.12,
-    "reach_x": 0.12,
-    "reach_z": 0.01,
-    "carry_x": 0.0,
-    "carry_z": 0.2,
-    "gripper_open": 0.45,
-    "gripper_closed": -0.45,
-    "pre_hold_s": 0.8,
-    "reach_hold_s": 1.2,
-    "close_hold_s": 0.8,
-    "lift_hold_s": 1.0,
+    "safe_x": 0.09,
+    "safe_z": 0.12,
+    "lower_z": 0.01,
+    "grab_x": 0.15,
+    "lift_z": 0.21,
+    "final_x": 0.0,
+    "gripper_open": 500.0,
+    "gripper_closed": 1800.0,
+    "move_hold_s": 0.2,
+    "grab_hold_s": 0.8,
+    "final_hold_s": 0.5,
 }
 
 
@@ -43,10 +42,12 @@ class TeddyGrabNode(Node):
         self.enabled = bool(self.param("enabled"))
         self.trigger_mode = str(self.param("trigger_mode"))
         self.state = "idle"
+        self.step_index = -1
         self.state_started_at = self.now_s()
         self.done = False
         self.current_x: float | None = None
         self.current_z: float | None = None
+        self.sequence = self.make_sequence()
 
         self.x_pub = self.create_publisher(Float64, self.param("x_topic"), 10)
         self.z_pub = self.create_publisher(Float64, self.param("z_topic"), 10)
@@ -72,7 +73,8 @@ class TeddyGrabNode(Node):
             return
         if msg.data != self.trigger_mode:
             return
-        self.set_state("pre_grab")
+        self.step_index = 0
+        self.set_state(self.sequence[self.step_index]["name"])
 
     def on_x_state(self, msg: Float64) -> None:
         self.current_x = float(msg.data)
@@ -81,33 +83,91 @@ class TeddyGrabNode(Node):
         self.current_z = float(msg.data)
 
     def on_timer(self) -> None:
-        if not self.enabled or self.state == "idle":
+        if not self.enabled or self.done or self.state == "idle":
             return
 
         elapsed = self.now_s() - self.state_started_at
+        step = self.sequence[self.step_index]
+        self.publish_targets(step["x"], step["z"], step["gripper"])
 
-        if self.state == "pre_grab":
-            self.publish_targets(self.param("pre_x"), self.param("pre_z"), self.param("gripper_open"))
-            if self.ready_for_next(elapsed, self.param("pre_hold_s"), self.param("pre_x"), self.param("pre_z")):
-                self.set_state("reach")
-        elif self.state == "reach":
-            self.publish_targets(self.param("reach_x"), self.param("reach_z"), self.param("gripper_open"))
-            if self.ready_for_next(elapsed, self.param("reach_hold_s"), self.param("reach_x"), self.param("reach_z")):
-                self.set_state("close")
-        elif self.state == "close":
-            self.publish_targets(self.param("reach_x"), self.param("reach_z"), self.param("gripper_closed"))
-            if self.ready_for_next(elapsed, self.param("close_hold_s"), self.param("reach_x"), self.param("reach_z")):
-                self.set_state("lift")
-        elif self.state == "lift":
-            self.publish_targets(self.param("carry_x"), self.param("carry_z"), self.param("gripper_closed"))
-            if self.ready_for_next(elapsed, self.param("lift_hold_s"), self.param("carry_x"), self.param("carry_z")):
-                self.set_state("done")
-                self.done = True
+        if not self.ready_for_next(elapsed, step["hold_s"], step["x"], step["z"]):
+            return
+
+        self.step_index += 1
+        if self.step_index >= len(self.sequence):
+            self.set_state("done")
+            self.done = True
+            return
+
+        self.set_state(self.sequence[self.step_index]["name"])
 
     def set_state(self, state: str) -> None:
         self.state = state
         self.state_started_at = self.now_s()
         self.get_logger().info(f"state={state}")
+
+    def make_sequence(self) -> list[dict[str, float | str]]:
+        safe_x = float(self.param("safe_x"))
+        safe_z = float(self.param("safe_z"))
+        lower_z = float(self.param("lower_z"))
+        grab_x = float(self.param("grab_x"))
+        lift_z = float(self.param("lift_z"))
+        final_x = float(self.param("final_x"))
+        open_gripper = float(self.param("gripper_open"))
+        closed_gripper = float(self.param("gripper_closed"))
+        move_hold_s = float(self.param("move_hold_s"))
+
+        return [
+            {
+                "name": "safe_x_90mm",
+                "x": safe_x,
+                "z": safe_z,
+                "gripper": open_gripper,
+                "hold_s": move_hold_s,
+            },
+            {
+                "name": "lower_z_10mm",
+                "x": safe_x,
+                "z": lower_z,
+                "gripper": open_gripper,
+                "hold_s": move_hold_s,
+            },
+            {
+                "name": "reach_x_150mm",
+                "x": grab_x,
+                "z": lower_z,
+                "gripper": open_gripper,
+                "hold_s": move_hold_s,
+            },
+            {
+                "name": "grab_servo",
+                "x": grab_x,
+                "z": lower_z,
+                "gripper": closed_gripper,
+                "hold_s": float(self.param("grab_hold_s")),
+            },
+            {
+                "name": "retract_x_90mm",
+                "x": safe_x,
+                "z": lower_z,
+                "gripper": closed_gripper,
+                "hold_s": move_hold_s,
+            },
+            {
+                "name": "lift_z_210mm",
+                "x": safe_x,
+                "z": lift_z,
+                "gripper": closed_gripper,
+                "hold_s": move_hold_s,
+            },
+            {
+                "name": "home_x_0mm",
+                "x": final_x,
+                "z": lift_z,
+                "gripper": closed_gripper,
+                "hold_s": float(self.param("final_hold_s")),
+            },
+        ]
 
     def publish_targets(self, x: float, z: float, gripper: float) -> None:
         x_msg = Float64()
@@ -123,7 +183,7 @@ class TeddyGrabNode(Node):
         self.left_gripper_pub.publish(left_msg)
 
         right_msg = Float64()
-        right_msg.data = -float(gripper)
+        right_msg.data = float(gripper)
         self.right_gripper_pub.publish(right_msg)
 
     def ready_for_next(self, elapsed: float, hold_s: float, target_x: float, target_z: float) -> bool:
