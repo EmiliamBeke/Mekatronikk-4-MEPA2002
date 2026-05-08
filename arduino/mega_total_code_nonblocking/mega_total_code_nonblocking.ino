@@ -312,12 +312,17 @@ bool startup_home_arm() {
     Serial.println("ERR ARM STARTUP HOME Z");
     return false;
   }
+
   move_axis_relative(z_axis, mm_to_steps(kStartupZClearanceMm, kZStepsPerMm));
-  move_axis_relative(x_axis, -mm_to_steps(kStartupXMaxMm, kXStepsPerMm));
-  while (x_axis.moving || z_axis.moving) {
-    update_axis(x_axis, "X");
+  while (z_axis.moving) {
     update_axis(z_axis, "Z");
   }
+
+  move_axis_relative(x_axis, -mm_to_steps(kStartupXMaxMm, kXStepsPerMm));
+  while (x_axis.moving) {
+    update_axis(x_axis, "X");
+  }
+
   Serial.print("OK ARM STARTUP HOME X=");
   Serial.print(x_axis.position);
   Serial.print(" Z=");
