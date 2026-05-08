@@ -154,15 +154,17 @@ def generate_launch_description():
         ],
     )
 
+    # Start teddy_grab when teddy detector is enabled (`use_teddy`).
+    # This allows running teddy-related safety/arm logic without the approach controller.
     teddy_grab_node = Node(
         package='mekk4_bringup',
         executable='teddy_grab_node',
         name='teddy_grab',
         output='screen',
-        condition=IfCondition(use_teddy_approach),
+        condition=IfCondition(use_teddy),
         parameters=[
             {'use_sim_time': use_sim_time},
-            {'enabled': ParameterValue(use_teddy_approach, value_type=bool)},
+            {'enabled': ParameterValue(use_teddy, value_type=bool)},
         ],
     )
 

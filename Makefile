@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: build shell up down ws lidar-setup lidar-test mega-upload mega-test mega-motor-test mega-terminal mega-keyboard mega-calibrate pc-mega-keyboard pc-ros-keyboard sim-build sim-stop sim sim-headless sim-topics sim-nav2 pi-bringup pi-teddy-grab pc-teddy-rviz camera-stop camera-reload
+.PHONY: build shell up down ws lidar-setup lidar-test mega-upload mega-test mega-motor-test mega-terminal mega-keyboard mega-calibrate pc-mega-keyboard pc-ros-keyboard sim-build sim-stop sim sim-headless sim-topics sim-nav2 pi-bringup pc-teddy-rviz camera-stop camera-reload
 
 MEGA_UPLOAD_DEFAULT_SKETCH := mega_total_code_nonblocking
 MEGA_UPLOAD_SKETCH := $(firstword $(filter-out mega-upload,$(MAKECMDGOALS)))
@@ -86,18 +86,6 @@ sim-nav2:
 	
 pi-bringup:
 	bash ./scripts/pi_bringup.sh
-
-# Start minimal set for testing teddy grab on the real robot:
-# - mega_driver_node (serial port)
-# - robotarm_safety_node
-# - teddy_grab_node (enabled)
-# Keeps all three processes running inside the ros container.
-pi-teddy-grab:
-	docker compose run --rm ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && trap 'kill 0' EXIT; \
-	  ros2 run mekk4_bringup mega_driver_node --ros-args -p port:=/dev/ttyACM0 -p baudrate:=115200 & \
-	  ros2 run mekk4_bringup robotarm_safety_node & \
-	  ros2 run mekk4_bringup teddy_grab_node --ros-args -p enabled:=true & \
-	  wait"
 
 pc-teddy-rviz:
 	bash ./scripts/pc_teddy_rviz.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"
