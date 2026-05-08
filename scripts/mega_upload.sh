@@ -101,9 +101,16 @@ echo "[mega-upload] Using ${MEGA_PORT}" >&2
 echo "[mega-upload] Sketch ${SKETCH_DIR}/${SKETCH_NAME}.ino" >&2
 echo "[mega-upload] FQBN ${MEGA_FQBN}" >&2
 
+COMPILE_ARGS=()
+if [[ "${SKETCH_NAME}" == "mega_total_code_nonblocking" ]]; then
+  # STM32duino VL53L4ED 1.0.1 uses float_t without defining it when built for AVR.
+  COMPILE_ARGS+=(--build-property 'compiler.cpp.extra_flags=-Dfloat_t=float')
+fi
+
 "${ARDUINO_CLI}" compile \
   --fqbn "${MEGA_FQBN}" \
   --build-path "${BUILD_PATH}" \
+  "${COMPILE_ARGS[@]}" \
   --upload \
   -p "${MEGA_PORT}" \
   "${SKETCH_DIR}"
