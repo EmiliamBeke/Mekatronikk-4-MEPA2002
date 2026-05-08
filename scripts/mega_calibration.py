@@ -283,6 +283,7 @@ def print_straight_trim_calibration(
     current_right_cmd_scale: float,
     left_m_per_tick: float,
     right_m_per_tick: float,
+    drift_direction: str,
 ) -> dict[str, float]:
     left_metric = abs(delta_left)
     right_metric = abs(delta_right)
@@ -300,19 +301,31 @@ def print_straight_trim_calibration(
     suggested_left_cmd_scale = current_left_cmd_scale
     suggested_right_cmd_scale = current_right_cmd_scale
     faster_side = "balanced"
+    correction_basis = "encoder_metric"
 
-    if left_metric > right_metric:
+    if drift_direction == "right":
         faster_side = "left"
         suggested_left_cmd_scale = current_left_cmd_scale * ratio
-    elif right_metric > left_metric:
+        correction_basis = "observed_drift"
+    elif drift_direction == "left":
         faster_side = "right"
         suggested_right_cmd_scale = current_right_cmd_scale * ratio
+        correction_basis = "observed_drift"
+    else:
+        if left_metric > right_metric:
+            faster_side = "left"
+            suggested_left_cmd_scale = current_left_cmd_scale * ratio
+        elif right_metric > left_metric:
+            faster_side = "right"
+            suggested_right_cmd_scale = current_right_cmd_scale * ratio
 
     print()
     print("[mega-cal] Straight trim")
     print(f"[mega-cal]   comparison_metric={metric_label}")
     print(f"[mega-cal]   left_metric={left_metric:.9f}")
     print(f"[mega-cal]   right_metric={right_metric:.9f}")
+    print(f"[mega-cal]   observed_drift={drift_direction}")
+    print(f"[mega-cal]   correction_basis={correction_basis}")
     print(f"[mega-cal]   faster_side={faster_side}")
     print(
         f"[mega-cal]   current_left_cmd_scale={current_left_cmd_scale:.9f}"
@@ -553,6 +566,15 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("forward", "reverse"),
         default="forward",
         help="Direction to drive during the trim run",
+    )
+    straight_trim.add_argument(
+        "--drift-direction",
+        choices=("left", "right", "none"),
+        default="none",
+        help=(
+            "Observed robot drift during the run. If set, right drift reduces left_cmd_scale "
+            "and left drift reduces right_cmd_scale."
+        ),
     )
     straight_trim.add_argument(
         "--left-cmd-scale",
@@ -837,6 +859,7 @@ def handle_straight_trim(ser: serial.Serial, args: argparse.Namespace) -> int:
         args.right_cmd_scale,
         args.left_m_per_tick,
         args.right_m_per_tick,
+        args.drift_direction,
     )
     maybe_update_config(args, updates)
     return 0

@@ -65,8 +65,13 @@ Mega-driveren vanlig ROS-differensialmiks, fordi roboten svinger riktig vei da.
 Brukes for å få roboten til å kjøre rettere før meter-per-tick måles.
 
 ```bash
-make mega-calibrate ARGS="straight-trim --pwm 160 --duration 3.0 --left-cmd-scale 1.0 --right-cmd-scale 1.0"
+make mega-calibrate ARGS="straight-trim --pwm 160 --duration 3.0 --left-cmd-scale 1.0 --right-cmd-scale 1.0 --drift-direction right"
 ```
+
+Sett `--drift-direction right` hvis roboten driver mot høyre; da reduseres
+`left_cmd_scale`. Sett `--drift-direction left` hvis roboten driver mot venstre;
+da reduseres `right_cmd_scale`. Uten drift-retning bruker scriptet bare
+encoder-metrikken.
 
 Resultat:
 
