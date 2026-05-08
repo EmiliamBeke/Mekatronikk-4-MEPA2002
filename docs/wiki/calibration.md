@@ -32,7 +32,7 @@ eksporterer disse som env-vars for `make pi-bringup`.
 2. Sørg for at Mega kjører runtime firmware:
 
 ```bash
-MEGA_SKETCH=mega_keyboard_drive make mega-upload
+make mega-upload mega_total_code_nonblocking
 ```
 
 3. Verifiser kontakt:
@@ -148,6 +148,36 @@ MEGA_PORT=/dev/ttyACM0 make mega-calibrate ARGS="snapshot"
 
 Default i wrapperen er `--no-swap-sides`, fordi dagens wiring er
 `M1/ENC1 = venstre` og `M2/ENC2 = høyre`.
+
+## Arm / Stepper Homing
+
+Arm-homing bruker runtime-firmware `mega_total_code_nonblocking` og sender
+serial-kommandoer direkte til Mega. Stopp ROS-bringup eller andre programmer som
+bruker `/dev/ttyACM0` først.
+
+Home både X- og Z-aksen:
+
+```bash
+make arm-cal
+```
+
+Dette sender `HOME ARM`, som først homer X, deretter Z, løfter Z til
+startup-klaring og flytter X til startup-posisjon.
+
+Home bare X-aksen:
+
+```bash
+make x-cal
+```
+
+Dette sender `HOME X` og endrer ikke Z-aksen.
+
+Hvis port-autodetect bommer:
+
+```bash
+MEGA_PORT=/dev/ttyACM0 make arm-cal
+MEGA_PORT=/dev/ttyACM0 make x-cal
+```
 
 ## Etter Kalibrering
 

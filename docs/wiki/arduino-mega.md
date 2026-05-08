@@ -2,8 +2,9 @@
 
 ## Bunnlinje
 
-Arduino Mega brukes som serial motor- og encoder-interface. ROS Mega-driveren
-forventer runtime firmware `mega_keyboard_drive`.
+Arduino Mega brukes som serial motor-, encoder- og robotarm-interface. ROS
+Mega-driveren forventer runtime firmware `mega_total_code_nonblocking`, som
+rapporterer firmware-ID `MEGA_KEYBOARD_DRIVE`.
 
 ## Sketcher
 
@@ -11,7 +12,7 @@ forventer runtime firmware `mega_keyboard_drive`.
 |---|---|---|
 | [`mega_smoketest`](../../arduino/mega_smoketest) | Serial/LED-test | `MEGA_SMOKETEST` |
 | [`mega_dfr0601_test`](../../arduino/mega_dfr0601_test) | Motor/encoder-test | `MEGA_DFR0601_TEST` |
-| [`mega_keyboard_drive`](../../arduino/mega_keyboard_drive) | Runtime firmware | `MEGA_KEYBOARD_DRIVE` |
+| [`mega_total_code_nonblocking`](../../arduino/mega_total_code_nonblocking) | Runtime firmware | `MEGA_KEYBOARD_DRIVE` |
 
 ## Upload
 
@@ -21,11 +22,11 @@ Kjør på Pi-host, ikke i Docker:
 make mega-upload
 ```
 
-Default sketch i [`Makefile`](../../Makefile) er `mega_keyboard_drive`.
+Default sketch i [`Makefile`](../../Makefile) er `mega_total_code_nonblocking`.
 Du kan også gi sketch-navnet direkte som ekstra argument:
 
 ```bash
-make mega-upload mega_keyboard_drive
+make mega-upload mega_total_code_nonblocking
 make mega-upload mega_dfr0601_test
 make mega-upload mega_smoketest
 ```
@@ -33,7 +34,7 @@ make mega-upload mega_smoketest
 Runtime firmware:
 
 ```bash
-MEGA_SKETCH=mega_keyboard_drive make mega-upload
+make mega-upload mega_total_code_nonblocking
 ```
 
 Overstyr port eller board:
@@ -49,7 +50,7 @@ Oversikt over sketchene:
 |---|---|---|
 | `mega_smoketest` | Serial/LED-test | `make mega-upload mega_smoketest` |
 | `mega_dfr0601_test` | Motor-/encoder-test | `make mega-upload mega_dfr0601_test` |
-| `mega_keyboard_drive` | Runtime firmware | `make mega-upload mega_keyboard_drive` |
+| `mega_total_code_nonblocking` | Runtime firmware | `make mega-upload mega_total_code_nonblocking` |
 
 Motor-/encoder-test bruker egen testfirmware. Last den opp først:
 
@@ -64,7 +65,7 @@ make mega-motor-test
 ```
 
 Testen forventer firmware-ID `MEGA_DFR0601_TEST`. Hvis runtime-firmware
-`mega_keyboard_drive` ligger på Megaen, stopper testen og ber deg laste opp
+`mega_total_code_nonblocking` ligger på Megaen, stopper testen og ber deg laste opp
 `mega_dfr0601_test`.
 
 Denne testen sjekker elektrisk kanal-mapping i firmware:
@@ -79,6 +80,30 @@ være:
 |---|---|---:|---:|---:|---:|---:|
 | Venstre | `M1` | `4` | `5` | `6` | `3` | `2` |
 | Høyre | `M2` | `11` | `12` | `10` | `18` | `19` |
+
+## Arm / Stepper Homing
+
+Disse kommandoene bruker runtime-firmware `mega_total_code_nonblocking`. Stopp
+ROS-bringup eller andre programmer som bruker Mega-porten først.
+
+Home både X og Z:
+
+```bash
+make arm-cal
+```
+
+Home bare X:
+
+```bash
+make x-cal
+```
+
+Hvis port-autodetect bommer:
+
+```bash
+MEGA_PORT=/dev/ttyACM0 make arm-cal
+MEGA_PORT=/dev/ttyACM0 make x-cal
+```
 
 ### Terminal Block Shield v1.1.0 på Arduino Mega
 
@@ -164,7 +189,7 @@ til å se hvilken side som faktisk roterer mellom hvert steg.
 Etter motor-testen, last tilbake runtime-firmware før ROS-bringup:
 
 ```bash
-make mega-upload mega_keyboard_drive
+make mega-upload mega_total_code_nonblocking
 ```
 
 Krav:
@@ -175,7 +200,7 @@ arduino-cli core install arduino:avr
 
 ## Runtime Firmware Kommandoer
 
-Fra [`mega_keyboard_drive.ino`](../../arduino/mega_keyboard_drive/mega_keyboard_drive.ino):
+Fra [`mega_total_code_nonblocking.ino`](../../arduino/mega_total_code_nonblocking/mega_total_code_nonblocking.ino):
 
 | Kommando | Svar | Effekt |
 |---|---|---|

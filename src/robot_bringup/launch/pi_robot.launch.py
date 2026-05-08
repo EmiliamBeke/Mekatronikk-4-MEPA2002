@@ -26,6 +26,16 @@ def generate_launch_description():
         'config',
         'teddy_approach.yaml',
     )
+    default_teddy_grab_params_path = os.path.join(
+        robot_bringup_share,
+        'config',
+        'teddy_grab.yaml',
+    )
+    default_robotarm_params_path = os.path.join(
+        robot_bringup_share,
+        'config',
+        'robotarm_params.yaml',
+    )
     default_rviz_config_path = os.path.join(robot_bringup_share, 'rviz', 'rviz.rviz')
 
     use_nav2 = LaunchConfiguration('use_nav2')
@@ -74,6 +84,8 @@ def generate_launch_description():
     tf_yaw = LaunchConfiguration('tf_yaw')
     params_file = LaunchConfiguration('params_file')
     teddy_approach_params_file = LaunchConfiguration('teddy_approach_params_file')
+    teddy_grab_params_file = LaunchConfiguration('teddy_grab_params_file')
+    robotarm_params_file = LaunchConfiguration('robotarm_params_file')
     nav2_start_delay_s = LaunchConfiguration('nav2_start_delay_s')
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
@@ -167,6 +179,7 @@ def generate_launch_description():
         condition=IfCondition(use_teddy),
         parameters=[
             {'use_sim_time': use_sim_time},
+            teddy_grab_params_file,
             {'enabled': ParameterValue(use_teddy, value_type=bool)},
         ],
     )
@@ -179,6 +192,7 @@ def generate_launch_description():
         condition=IfCondition(use_robotarm_safety),
         parameters=[
             {'use_sim_time': use_sim_time},
+            robotarm_params_file,
         ],
     )
 
@@ -228,6 +242,7 @@ def generate_launch_description():
         condition=IfCondition(use_mega_driver),
         parameters=[
             {'use_sim_time': use_sim_time},
+            robotarm_params_file,
             {
                 'port': ParameterValue(mega_port, value_type=str),
                 'baudrate': ParameterValue(mega_baudrate, value_type=int),
@@ -328,6 +343,14 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'teddy_approach_params_file',
             default_value=default_teddy_approach_params_path,
+        ),
+        DeclareLaunchArgument(
+            'teddy_grab_params_file',
+            default_value=default_teddy_grab_params_path,
+        ),
+        DeclareLaunchArgument(
+            'robotarm_params_file',
+            default_value=default_robotarm_params_path,
         ),
         DeclareLaunchArgument('rviz_config', default_value=default_rviz_config_path),
         DeclareLaunchArgument('use_respawn', default_value='false'),

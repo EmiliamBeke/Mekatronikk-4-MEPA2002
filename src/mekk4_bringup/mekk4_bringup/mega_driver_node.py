@@ -36,6 +36,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("send_period_s", 0.2)
         self.declare_parameter("odom_poll_period_s", 0.05)
         self.declare_parameter("arm_state_poll_period_s", 0.05)
+        self.declare_parameter("init_distance_sensor_on_connect", True)
         self.declare_parameter("cmd_vel_timeout_s", 0.5)
         self.declare_parameter("reply_timeout_s", 2.0)
         self.declare_parameter("base_frame_id", "base_link")
@@ -84,6 +85,9 @@ class MegaDriverNode(Node):
         )
         self._arm_state_poll_period_s = (
             self.get_parameter("arm_state_poll_period_s").get_parameter_value().double_value
+        )
+        self._init_distance_sensor_on_connect = (
+            self.get_parameter("init_distance_sensor_on_connect").get_parameter_value().bool_value
         )
         self._cmd_vel_timeout_s = (
             self.get_parameter("cmd_vel_timeout_s").get_parameter_value().double_value
@@ -256,6 +260,7 @@ class MegaDriverNode(Node):
         self._right_pwm_pub = self.create_publisher(Int32, "mega_driver/right_pwm", 10)
         self._arm_x_state_pub = self.create_publisher(Float64, "/robotarm/x_position_state", 10)
         self._arm_z_state_pub = self.create_publisher(Float64, "/robotarm/z_position_state", 10)
+        self._distance_pub = self.create_publisher(Int32, "/mega/distance_mm", 10)
         self._home_arm_srv = self.create_service(Trigger, "/mega/home_arm", self._on_home_arm)
         self._tf_broadcaster = TransformBroadcaster(self) if self._publish_tf else None
         self._timer = self.create_timer(0.02, self._on_timer)
@@ -324,6 +329,7 @@ class MegaDriverNode(Node):
             if self._reset_encoders_on_connect:
                 self._send_expect("RESET ENC1", "OK RESET ENC1")
                 self._send_expect("RESET ENC2", "OK RESET ENC2")
+            self._try_init_distance_sensor()
             left_ticks_raw, right_ticks_raw = self._read_encoder_pair()
             self._last_left_ticks = left_ticks_raw * self._left_tick_sign
             self._last_right_ticks = right_ticks_raw * self._right_tick_sign
@@ -424,6 +430,14 @@ class MegaDriverNode(Node):
         self._last_motion_command = command
         self._last_motion_sent_at = time.monotonic()
         self._last_stop_sent = command == "STOP"
+
+    def _try_init_distance_sensor(self) -> None:
+        if not self._init_distance_sensor_on_connect:
+            return
+        try:
+            self._send_expect("DIST INIT", "OK DIST INIT")
+        except Exception as exc:
+            self.get_logger().warning(f"Mega distance sensor init failed: {exc}")
 
     def _read_encoder_pair(self) -> tuple[int, int]:
         left_reply = self._send_expect("ENC1", "ENC1 ")
@@ -577,6 +591,11 @@ class MegaDriverNode(Node):
         self._arm_x_state_pub.publish(x_msg)
         self._arm_z_state_pub.publish(z_msg)
 
+    def _publish_distance_state(self, distance_mm: int) -> None:
+        msg = Int32()
+        msg.data = int(distance_mm)
+        self._distance_pub.publish(msg)
+
     def _sync_arm_state_from_mega(self) -> None:
         reply = self._send_expect("STATE", "STATE ")
         state = {}
@@ -588,6 +607,8 @@ class MegaDriverNode(Node):
 
         was_homed = self._arm_homed
         self._arm_homed = state.get("H") == "1"
+        if "D" in state:
+            self._publish_distance_state(int(state["D"]))
         if not self._arm_homed:
             self._active_arm_axis = None
             return
