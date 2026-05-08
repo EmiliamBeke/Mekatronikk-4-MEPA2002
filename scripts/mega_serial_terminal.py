@@ -76,7 +76,7 @@ def main() -> int:
 
             print(
                 "[mega-terminal] Type commands like: ID, PING, STATE, LIMITS, "
-                "BOTH 100 100, ARM X 20, ARM Z 100, S 500, S 1800, DIST, STOP"
+                "HOME ARM, CLEAR ARM STATE, BOTH 100 100, ARM X 20, ARM Z 100, S 500, S 1800, DIST, STOP"
             )
             print("[mega-terminal] Type q or quit to stop and exit.")
 

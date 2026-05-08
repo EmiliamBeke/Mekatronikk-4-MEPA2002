@@ -87,22 +87,6 @@ sim-nav2:
 pi-bringup:
 	bash ./scripts/pi_bringup.sh
 
-# Start minimal set for testing teddy grab on the real robot:
-# - mega_driver_node (serial port)
-# - robotarm_safety_node
-# - teddy_grab_node (enabled)
-# Keeps all three processes running inside the ros container.
-MEGA_PORT ?= /dev/ttyACM0
-MEGA_BAUDRATE ?= 115200
-
-pi-teddy-grab:
-	# Set MEGA_PORT=/dev/ttyUSB0 when calling make to use a different serial device.
-	COMPOSE_MEGA_DEVICE=$(MEGA_PORT) docker compose run --rm ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && trap 'kill 0' EXIT; \
-	  ros2 run mekk4_bringup mega_driver_node --ros-args -p port:=$(MEGA_PORT) -p baudrate:=$(MEGA_BAUDRATE) & \
-	  ros2 run mekk4_bringup robotarm_safety_node & \
-	  ros2 run mekk4_bringup teddy_grab_node --ros-args -p enabled:=true & \
-	  wait"
-
 pc-teddy-rviz:
 	bash ./scripts/pc_teddy_rviz.sh "$(if $(PI_HOST),$(PI_HOST),gruppe5pi5)"
 

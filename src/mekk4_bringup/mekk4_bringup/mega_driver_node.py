@@ -9,6 +9,7 @@ from geometry_msgs.msg import TransformStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from std_msgs.msg import Float64, Int32
+from std_srvs.srv import Trigger
 from tf2_ros import TransformBroadcaster
 
 
@@ -16,7 +17,6 @@ IGNORED_SERIAL_PREFIXES = (
     "MEGA_KEYBOARD_READY",
     "EVENT ",
     "OK HOME ",
-    "OK ARM STARTUP HOME",
 )
 
 
@@ -169,6 +169,7 @@ class MegaDriverNode(Node):
 
         self._serial = None
         self._serial_module = None
+        self._serial_error_count = 0
         self._next_connect_attempt = 0.0
         self._last_motion_command = "STOP"
         self._last_motion_sent_at = 0.0
@@ -187,6 +188,8 @@ class MegaDriverNode(Node):
         self._pending_arm_z_delta_steps = 0
         self._actual_arm_x = self._initial_arm_x_m
         self._actual_arm_z = self._initial_arm_z_m
+        self._arm_homed = False
+        self._warned_arm_not_homed = False
         self._desired_left_gripper = float(self._gripper_min_us)
         self._desired_right_gripper = float(self._gripper_min_us)
         self._last_gripper_us_sent = None
@@ -226,6 +229,7 @@ class MegaDriverNode(Node):
         self._right_pwm_pub = self.create_publisher(Int32, "mega_driver/right_pwm", 10)
         self._arm_x_state_pub = self.create_publisher(Float64, "/robotarm/x_position_state", 10)
         self._arm_z_state_pub = self.create_publisher(Float64, "/robotarm/z_position_state", 10)
+        self._home_arm_srv = self.create_service(Trigger, "/mega/home_arm", self._on_home_arm)
         self._tf_broadcaster = TransformBroadcaster(self) if self._publish_tf else None
         self._timer = self.create_timer(0.02, self._on_timer)
 
@@ -260,6 +264,7 @@ class MegaDriverNode(Node):
         self._last_left_ticks = None
         self._last_right_ticks = None
         self._last_encoder_stamp = None
+        self._serial_error_count = 0
         self._next_connect_attempt = time.monotonic() + self._reconnect_delay_s
 
     def _try_connect(self) -> bool:
@@ -299,12 +304,16 @@ class MegaDriverNode(Node):
             self._last_stop_sent = True
             self._last_motion_sent_at = time.monotonic()
             self._last_poll_at = 0.0
+            self._serial_error_count = 0
             self._sync_arm_state_from_mega()
-            self._desired_arm_x = self._actual_arm_x
-            self._last_arm_x_cmd_m = self._actual_arm_x
-            self._desired_arm_z = self._actual_arm_z
-            self._last_arm_z_cmd_m = self._actual_arm_z
-            self._publish_arm_state()
+            if self._arm_homed:
+                self._desired_arm_x = self._actual_arm_x
+                self._last_arm_x_cmd_m = self._actual_arm_x
+                self._desired_arm_z = self._actual_arm_z
+                self._last_arm_z_cmd_m = self._actual_arm_z
+                self._publish_arm_state()
+            else:
+                self.get_logger().warning("Mega arm is not homed. Call /mega/home_arm before arm motion.")
             self.get_logger().info(f"Connected to Mega on {self._port} @ {self._baudrate}")
             return True
         except Exception as exc:
@@ -347,14 +356,15 @@ class MegaDriverNode(Node):
             return text
         raise RuntimeError("timeout waiting for Mega reply")
 
-    def _send_expect(self, command: str, expected_prefix: str) -> str:
+    def _send_expect(self, command: str, expected_prefix: str, timeout_s: float | None = None) -> str:
         self._serial.write((command + "\n").encode("utf-8"))
         self._serial.flush()
-        reply = self._read_reply(self._reply_timeout_s)
+        reply = self._read_reply(self._reply_timeout_s if timeout_s is None else timeout_s)
         if not reply.startswith(expected_prefix):
             raise RuntimeError(
                 f"unexpected reply to {command!r}: expected prefix {expected_prefix!r}, got {reply!r}"
             )
+        self._serial_error_count = 0
         return reply
 
     def _send_motion(self, command: str) -> None:
@@ -436,6 +446,12 @@ class MegaDriverNode(Node):
     def _maybe_send_arm_x(self) -> None:
         if self._pending_arm_x_delta_steps == 0:
             return
+        if not self._arm_homed:
+            if not self._warned_arm_not_homed:
+                self.get_logger().warning("Ignoring ARM X command until /mega/home_arm succeeds.")
+                self._warned_arm_not_homed = True
+            self._pending_arm_x_delta_steps = 0
+            return
 
         delta_steps = self._pending_arm_x_delta_steps
         self._send_expect(f"ARM X {delta_steps}", "OK ARM X")
@@ -448,6 +464,12 @@ class MegaDriverNode(Node):
 
     def _maybe_send_arm_z(self) -> None:
         if self._pending_arm_z_delta_steps == 0:
+            return
+        if not self._arm_homed:
+            if not self._warned_arm_not_homed:
+                self.get_logger().warning("Ignoring ARM Z command until /mega/home_arm succeeds.")
+                self._warned_arm_not_homed = True
+            self._pending_arm_z_delta_steps = 0
             return
 
         delta_steps = self._pending_arm_z_delta_steps
@@ -467,6 +489,36 @@ class MegaDriverNode(Node):
         self._send_expect(f"SERVO {gripper_us}", "OK SERVO")
         self._last_gripper_us_sent = gripper_us
 
+    def _on_home_arm(self, request: Trigger.Request, response: Trigger.Response) -> Trigger.Response:
+        del request
+        if not self._try_connect():
+            response.success = False
+            response.message = "Mega is not connected."
+            return response
+
+        try:
+            self._send_expect("HOME ARM", "OK ARM STARTUP HOME", self._startup_ready_timeout_s)
+            self._sync_arm_state_from_mega()
+            if not self._arm_homed:
+                raise RuntimeError("Mega reported arm still not homed after HOME ARM.")
+            self._desired_arm_x = self._actual_arm_x
+            self._last_arm_x_cmd_m = self._actual_arm_x
+            self._pending_arm_x_delta_steps = 0
+            self._desired_arm_z = self._actual_arm_z
+            self._last_arm_z_cmd_m = self._actual_arm_z
+            self._pending_arm_z_delta_steps = 0
+            self._warned_arm_not_homed = False
+            self._publish_arm_state()
+        except Exception as exc:
+            response.success = False
+            response.message = f"HOME ARM failed: {exc}"
+            self._close_serial()
+            return response
+
+        response.success = True
+        response.message = "Mega arm homed."
+        return response
+
     def _publish_arm_state(self) -> None:
         x_msg = Float64()
         x_msg.data = float(self._actual_arm_x)
@@ -483,6 +535,10 @@ class MegaDriverNode(Node):
                 continue
             name, value = token.split("=", 1)
             state[name] = value
+
+        self._arm_homed = state.get("H") == "1"
+        if not self._arm_homed:
+            return
 
         if "X" in state:
             self._actual_arm_x = int(state["X"]) / self._arm_x_steps_per_mm / 1000.0
@@ -643,7 +699,16 @@ class MegaDriverNode(Node):
             self._poll_odometry()
         except Exception as exc:
             self.get_logger().warning(f"Mega driver loop failed: {exc}")
-            self._close_serial()
+            self._serial_error_count += 1
+            try:
+                self._serial.reset_input_buffer()
+                self._serial.reset_output_buffer()
+            except Exception:
+                self._close_serial()
+                return
+            if self._serial_error_count >= 3:
+                self.get_logger().warning("Closing Mega serial after 3 consecutive driver failures.")
+                self._close_serial()
 
     def destroy_node(self) -> bool:
         self._close_serial()

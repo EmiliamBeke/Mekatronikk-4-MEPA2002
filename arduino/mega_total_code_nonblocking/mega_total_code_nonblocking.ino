@@ -1,3 +1,4 @@
+#include <EEPROM.h>
 #include <Servo.h>
 #include <Wire.h>
 #include <stdlib.h>
@@ -57,6 +58,10 @@ constexpr unsigned int kXStepPeriodUs = 1000;
 constexpr unsigned int kZStepPeriodUs = 100;
 constexpr long kXHomeMaxSteps = 10000;
 constexpr long kZHomeMaxSteps = 800000;
+constexpr uint32_t kPersistMagic = 0x4D454741UL;
+constexpr uint8_t kPersistVersion = 1;
+constexpr int kPersistAddress = 0;
+constexpr unsigned long kPersistIdleSaveMs = 1000;
 
 struct Axis {
   int step_pin;
@@ -72,6 +77,16 @@ struct Axis {
   long target;
   unsigned long last_step_us;
   bool moving;
+};
+
+struct PersistedArmState {
+  uint32_t magic;
+  uint8_t version;
+  uint8_t homed;
+  long x_position;
+  long z_position;
+  int servo_us;
+  uint8_t checksum;
 };
 
 Axis x_axis = {kXStepPin, kXDirPin, kXEnPin, kXLimitPin, false, kXHomeDir, kXHomeDir, 0, kXStepPeriodUs, 0, 0, 0, false};
@@ -96,6 +111,9 @@ int distance_mm = -1;
 bool distance_ok = false;
 int last_x_limit_state = -1;
 int last_z_limit_state = -1;
+bool arm_homed = false;
+bool persist_dirty = false;
+unsigned long last_motion_or_servo_ms = 0;
 
 Servo gripper_servo;
 VL53L4ED distance_sensor(&Wire, kDistanceXshutPin);
@@ -114,6 +132,75 @@ long mm_to_steps(float mm, float steps_per_mm) {
 
 int clamp_pwm(int speed) {
   return max(-255, min(255, speed));
+}
+
+uint8_t checksum_state(const PersistedArmState &state) {
+  const uint8_t *bytes = reinterpret_cast<const uint8_t *>(&state);
+  uint8_t checksum = 0;
+  for (size_t i = 0; i < sizeof(PersistedArmState) - 1; i++) {
+    checksum ^= bytes[i];
+  }
+  return checksum;
+}
+
+void save_arm_state() {
+  PersistedArmState state;
+  memset(&state, 0, sizeof(state));
+  state.magic = kPersistMagic;
+  state.version = kPersistVersion;
+  state.homed = arm_homed ? 1 : 0;
+  state.x_position = x_axis.position;
+  state.z_position = z_axis.position;
+  state.servo_us = servo_us;
+  state.checksum = checksum_state(state);
+  EEPROM.put(kPersistAddress, state);
+  persist_dirty = false;
+  Serial.println("EVENT ARM STATE SAVED");
+}
+
+bool load_arm_state() {
+  PersistedArmState state;
+  EEPROM.get(kPersistAddress, state);
+  if (state.magic != kPersistMagic || state.version != kPersistVersion ||
+      state.checksum != checksum_state(state)) {
+    return false;
+  }
+
+  arm_homed = state.homed != 0;
+  x_axis.position = state.x_position;
+  x_axis.target = state.x_position;
+  z_axis.position = state.z_position;
+  z_axis.target = state.z_position;
+  servo_us = constrain(state.servo_us, kServoMinUs, kServoMaxUs);
+  persist_dirty = false;
+  return true;
+}
+
+void clear_arm_state() {
+  PersistedArmState state;
+  memset(&state, 0, sizeof(state));
+  EEPROM.put(kPersistAddress, state);
+  arm_homed = false;
+  persist_dirty = false;
+  Serial.println("OK ARM STATE CLEARED");
+}
+
+void mark_persist_dirty() {
+  if (!arm_homed) {
+    return;
+  }
+  persist_dirty = true;
+  last_motion_or_servo_ms = millis();
+}
+
+void maybe_save_arm_state() {
+  if (!persist_dirty || x_axis.moving || z_axis.moving) {
+    return;
+  }
+  if (millis() - last_motion_or_servo_ms < kPersistIdleSaveMs) {
+    return;
+  }
+  save_arm_state();
 }
 
 bool should_flip_pure_spin(int m1, int m2) {
@@ -232,11 +319,17 @@ void pulse_step(const Axis &axis) {
 void move_axis_relative(Axis &axis, long delta) {
   axis.target += delta;
   axis.moving = axis.target != axis.position;
+  if (axis.moving) {
+    mark_persist_dirty();
+  }
 }
 
 void update_axis(Axis &axis, const char *name) {
   if (!axis.moving || axis.position == axis.target) {
-    axis.moving = false;
+    if (axis.moving) {
+      axis.moving = false;
+      mark_persist_dirty();
+    }
     return;
   }
 
@@ -246,6 +339,7 @@ void update_axis(Axis &axis, const char *name) {
     axis.position = axis.home_position;
     axis.target = axis.position;
     axis.moving = false;
+    mark_persist_dirty();
     Serial.print("EVENT ");
     Serial.print(name);
     Serial.println(" LIMIT");
@@ -261,6 +355,7 @@ void update_axis(Axis &axis, const char *name) {
   pulse_step(axis);
   axis.position += logical_dir;
   axis.last_step_us = now;
+  last_motion_or_servo_ms = millis();
 }
 
 void step_blocking(Axis &axis, long physical_dir) {
@@ -305,6 +400,7 @@ bool home_axis(Axis &axis, const char *name, long max_steps) {
 
 bool startup_home_arm() {
   Serial.println("EVENT ARM STARTUP HOME BEGIN");
+  arm_homed = false;
   stop_all();
   x_axis.home_position = mm_to_steps(kStartupXMaxMm, kXStepsPerMm);
   z_axis.home_position = 0;
@@ -331,6 +427,8 @@ bool startup_home_arm() {
   Serial.print(x_axis.position);
   Serial.print(" Z=");
   Serial.println(z_axis.position);
+  arm_homed = true;
+  save_arm_state();
   return true;
 }
 
@@ -391,7 +489,11 @@ void print_state(const char *prefix) {
   Serial.print(" D=");
   Serial.print(distance_mm);
   Serial.print(" S=");
-  Serial.println(servo_us);
+  Serial.print(servo_us);
+  Serial.print(" H=");
+  Serial.print(arm_homed ? 1 : 0);
+  Serial.print(" P=");
+  Serial.println(persist_dirty ? 1 : 0);
 }
 
 void maybe_stream_status() {
@@ -443,6 +545,9 @@ void handle_command(const char *cmd) {
   } else if (strcmp(cmd, "HOME ARM") == 0) {
     stop_all();
     startup_home_arm();
+  } else if (strcmp(cmd, "CLEAR ARM STATE") == 0 || strcmp(cmd, "FORGET ARM") == 0) {
+    stop_all();
+    clear_arm_state();
   } else if (strcmp(cmd, "HOME X") == 0) {
     stop_all();
     home_axis(x_axis, "X", kXHomeMaxSteps);
@@ -460,14 +565,23 @@ void handle_command(const char *cmd) {
     } else if (sscanf(cmd, "M2 %d", &a) == 1) {
       apply_drive(current_m1_speed, a);
     } else if (sscanf(cmd, "ARM X %ld", &steps) == 1 || sscanf(cmd, "X %ld", &steps) == 1) {
+      if (!arm_homed) {
+        Serial.println("ERR ARM NOT HOMED");
+        return;
+      }
       move_axis_relative(x_axis, steps);
       Serial.println("OK ARM X");
     } else if (sscanf(cmd, "ARM Z %ld", &steps) == 1 || sscanf(cmd, "Z %ld", &steps) == 1) {
+      if (!arm_homed) {
+        Serial.println("ERR ARM NOT HOMED");
+        return;
+      }
       move_axis_relative(z_axis, steps);
       Serial.println("OK ARM Z");
     } else if (sscanf(cmd, "SERVO %d", &a) == 1 || sscanf(cmd, "S %d", &a) == 1) {
       servo_us = constrain(a, kServoMinUs, kServoMaxUs);
       gripper_servo.writeMicroseconds(servo_us);
+      mark_persist_dirty();
       Serial.println("OK SERVO");
     } else if (sscanf(cmd, "STREAM %d", &a) == 1) {
       stream_status = a != 0;
@@ -539,8 +653,15 @@ void setup() {
 
   maybe_print_limit_switch_changes();
   reset_command_buffer();
-  if (!startup_home_arm()) {
-    Serial.println("ERR MEGA_KEYBOARD_NOT_READY");
+  if (load_arm_state()) {
+    Serial.print("EVENT ARM STATE LOADED X=");
+    Serial.print(x_axis.position);
+    Serial.print(" Z=");
+    Serial.print(z_axis.position);
+    Serial.print(" H=");
+    Serial.println(arm_homed ? 1 : 0);
+  } else {
+    Serial.println("EVENT ARM STATE EMPTY");
   }
   gripper_servo.attach(kServoPin, kServoMinUs, kServoMaxUs);
   gripper_servo.writeMicroseconds(servo_us);
@@ -555,5 +676,6 @@ void loop() {
   update_axis(x_axis, "X");
   update_axis(z_axis, "Z");
   update_distance();
+  maybe_save_arm_state();
   maybe_stream_status();
 }
