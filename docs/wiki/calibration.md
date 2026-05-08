@@ -70,8 +70,9 @@ make mega-calibrate ARGS="straight-trim --pwm 160 --duration 3.0 --left-cmd-scal
 
 Sett `--drift-direction right` hvis roboten driver mot høyre; da reduseres
 `left_cmd_scale`. Sett `--drift-direction left` hvis roboten driver mot venstre;
-da reduseres `right_cmd_scale`. Uten drift-retning bruker scriptet bare
-encoder-metrikken.
+da reduseres `right_cmd_scale`. Sett `--drift-direction none` hvis roboten går
+rett nok. Driftretning er påkrevd fordi encoder-metrikk alene kan gi feil side
+når fysisk side/fortegn/meter-per-tick ikke stemmer med faktisk drift.
 
 Resultat:
 

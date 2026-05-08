@@ -301,23 +301,18 @@ def print_straight_trim_calibration(
     suggested_left_cmd_scale = current_left_cmd_scale
     suggested_right_cmd_scale = current_right_cmd_scale
     faster_side = "balanced"
-    correction_basis = "encoder_metric"
+    correction_basis = "observed_drift"
 
     if drift_direction == "right":
         faster_side = "left"
         suggested_left_cmd_scale = current_left_cmd_scale * ratio
-        correction_basis = "observed_drift"
     elif drift_direction == "left":
         faster_side = "right"
         suggested_right_cmd_scale = current_right_cmd_scale * ratio
-        correction_basis = "observed_drift"
+    elif drift_direction == "none":
+        correction_basis = "observed_no_drift"
     else:
-        if left_metric > right_metric:
-            faster_side = "left"
-            suggested_left_cmd_scale = current_left_cmd_scale * ratio
-        elif right_metric > left_metric:
-            faster_side = "right"
-            suggested_right_cmd_scale = current_right_cmd_scale * ratio
+        raise RuntimeError("straight-trim needs --drift-direction left, right, or none")
 
     print()
     print("[mega-cal] Straight trim")
@@ -570,10 +565,10 @@ def build_parser() -> argparse.ArgumentParser:
     straight_trim.add_argument(
         "--drift-direction",
         choices=("left", "right", "none"),
-        default="none",
+        required=True,
         help=(
-            "Observed robot drift during the run. If set, right drift reduces left_cmd_scale "
-            "and left drift reduces right_cmd_scale."
+            "Observed robot drift during the run. Use right if the robot drifts right, "
+            "left if it drifts left, or none if it drives straight enough."
         ),
     )
     straight_trim.add_argument(
