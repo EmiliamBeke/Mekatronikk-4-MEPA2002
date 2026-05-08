@@ -22,12 +22,14 @@ class RosKeyboardTeleop:
         self.pub = self.node.create_publisher(Twist, args.topic, 10)
         self.arm_x_pub = self.node.create_publisher(Float64, args.arm_x_topic, 10)
         self.arm_z_pub = self.node.create_publisher(Float64, args.arm_z_topic, 10)
+        self.gripper_pub = self.node.create_publisher(Float64, args.gripper_topic, 10)
         self.node.create_subscription(Float64, args.arm_x_state_topic, self._on_arm_x_state, 10)
         self.node.create_subscription(Float64, args.arm_z_state_topic, self._on_arm_z_state, 10)
 
         self.topic = args.topic
         self.arm_x_topic = args.arm_x_topic
         self.arm_z_topic = args.arm_z_topic
+        self.gripper_topic = args.gripper_topic
         self.speed = max(0.0, args.speed)
         self.turn_speed = max(0.0, args.turn_speed)
         self.speed_step = max(0.01, args.speed_step)
@@ -47,6 +49,10 @@ class RosKeyboardTeleop:
         self.arm_z_speed_step = max(0.001, args.arm_z_speed_step)
         self.max_arm_x_speed = max(self.arm_x_speed, args.max_arm_x_speed)
         self.max_arm_z_speed = max(self.arm_z_speed, args.max_arm_z_speed)
+        self.gripper = clamp(args.gripper_initial, args.gripper_min, args.gripper_max)
+        self.gripper_min = args.gripper_min
+        self.gripper_max = args.gripper_max
+        self.gripper_step = max(0.001, args.gripper_step)
 
         self.pressed_keys: set[str] = set()
         self.release_jobs: dict[str, str] = {}
@@ -68,6 +74,7 @@ class RosKeyboardTeleop:
             value=(
                 "Hold W/S/A/D drive. Y/H arm up/down. J/K arm out/in. "
                 "E/Q drive speed. P/O turn speed. M/N x speed +/-. T/G z speed +/-. "
+                "U/I gripper -/+. "
                 "SPACE stop. - quit."
             )
         )
@@ -143,13 +150,14 @@ class RosKeyboardTeleop:
     def _speed_text(self) -> str:
         return (
             f"drive={self.speed:.2f} m/s  turn={self.turn_speed:.2f} rad/s\n"
-            f"arm_x_speed={self.arm_x_speed:.3f} m/s  arm_z_speed={self.arm_z_speed:.3f} m/s"
+            f"arm_x_speed={self.arm_x_speed:.3f} m/s  arm_z_speed={self.arm_z_speed:.3f} m/s  "
+            f"gripper={self.gripper:.3f} rad"
         )
 
     def _command_text(self, linear_x: float, angular_z: float) -> str:
         return (
             f"cmd_vel=({linear_x:.2f}, {angular_z:.2f})  "
-            f"arm=(x={self.arm_x:.3f}, z={self.arm_z:.3f})"
+            f"arm=(x={self.arm_x:.3f}, z={self.arm_z:.3f})  gripper={self.gripper:.3f}"
         )
 
     def _on_key_press(self, event: tk.Event) -> None:
@@ -190,6 +198,12 @@ class RosKeyboardTeleop:
             self.arm_z_speed = clamp(self.arm_z_speed + self.arm_z_speed_step, 0.0, self.max_arm_z_speed)
         elif key == "g":
             self.arm_z_speed = clamp(self.arm_z_speed - self.arm_z_speed_step, 0.0, self.max_arm_z_speed)
+        elif key == "u":
+            self.gripper = clamp(self.gripper - self.gripper_step, self.gripper_min, self.gripper_max)
+            self._publish_gripper()
+        elif key == "i":
+            self.gripper = clamp(self.gripper + self.gripper_step, self.gripper_min, self.gripper_max)
+            self._publish_gripper()
 
         self.speed_var.set(self._speed_text())
 
@@ -230,6 +244,11 @@ class RosKeyboardTeleop:
         msg = Float64()
         msg.data = float(value)
         publisher.publish(msg)
+
+    def _publish_gripper(self) -> None:
+        msg = Float64()
+        msg.data = float(self.gripper)
+        self.gripper_pub.publish(msg)
 
     def _on_arm_x_state(self, msg: Float64) -> None:
         if "j" in self.pressed_keys or "k" in self.pressed_keys:
@@ -335,6 +354,7 @@ def main() -> int:
     parser.add_argument("--send-period", type=float, default=0.03, help="Seconds between repeated cmd_vel publishes")
     parser.add_argument("--arm-x-topic", default="/robotarm/request/x_position", help="Robot arm x request topic")
     parser.add_argument("--arm-z-topic", default="/robotarm/request/z_position", help="Robot arm z request topic")
+    parser.add_argument("--gripper-topic", default="/gripper/request/left_position", help="Gripper request topic")
     parser.add_argument("--arm-x-state-topic", default="/robotarm/x_position_cmd", help="Robot arm x command feedback topic")
     parser.add_argument("--arm-z-state-topic", default="/robotarm/z_position_cmd", help="Robot arm z command feedback topic")
     parser.add_argument("--arm-x-initial", type=float, default=0.0, help="Initial arm x target in meters")
@@ -349,6 +369,10 @@ def main() -> int:
     parser.add_argument("--arm-z-speed-step", type=float, default=0.001, help="Arm z jog speed increment for T/G")
     parser.add_argument("--max-arm-x-speed", type=float, default=0.050, help="Maximum arm x jog speed in m/s")
     parser.add_argument("--max-arm-z-speed", type=float, default=0.010, help="Maximum arm z jog speed in m/s")
+    parser.add_argument("--gripper-min", type=float, default=-0.785, help="Minimum gripper command in radians")
+    parser.add_argument("--gripper-max", type=float, default=0.785, help="Maximum gripper command in radians")
+    parser.add_argument("--gripper-initial", type=float, default=0.0, help="Initial gripper command in radians")
+    parser.add_argument("--gripper-step", type=float, default=0.05, help="Gripper command increment for U/I")
     args = parser.parse_args(remove_ros_args(args=sys.argv)[1:])
 
     rclpy.init()
