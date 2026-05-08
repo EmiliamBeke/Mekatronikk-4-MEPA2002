@@ -45,7 +45,7 @@ constexpr float kStartupZClearanceMm = 120.0f;
 
 constexpr unsigned int kStepperPulseUs = 10;
 constexpr unsigned int kXStepDelayUs = 1000;
-constexpr unsigned int kZStepDelayUs = 100;
+constexpr unsigned int kZStepDelayUs = 70;
 
 volatile long encoder1_count = 0;
 volatile uint8_t encoder1_state = 0;
