@@ -899,7 +899,7 @@
     <axis xyz="3.8064789415719616e-16 -8.049125398861859e-16 -1.0" />
   </joint>
   <joint name="base_link_to_Chassis" type="fixed">
-    <origin xyz="-0.06325 -0.0915 0.03998292504882827" rpy="0 0 0" />
+    <origin xyz="-0.06164321620590698 -0.09150000000000008 0.024978117942810095" rpy="0 0 0" />
     <parent link="base_link" />
     <child link="Chassis" />
   </joint>

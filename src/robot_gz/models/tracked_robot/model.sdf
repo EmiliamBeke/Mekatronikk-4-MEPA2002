@@ -1,1382 +1,1972 @@
-<sdf xmlns:gz="https://gazebosim.org/schemas" version="1.11">
-  <model name="tracked_robot">
-    <link name="base_link">
-      <inertial>
-        <pose>-0.01486625534524842 -0.0002290471873852562 0.1079008108510118 0 0 0</pose>
-        <mass>3.7449030614111409</mass>
-        <inertia>
-          <ixx>0.050590526999619703</ixx>
-          <ixy>-0.00015728684728166871</ixy>
-          <ixz>-0.01010908826598406</ixz>
-          <iyy>0.081940441237411982</iyy>
-          <iyz>-0.0003793639125789277</iyz>
-          <izz>0.05011532405785666</izz>
-        </inertia>
-      </inertial>
-      <visual name="base_link_fixed_joint_lump__Chassis_visual_visual">
-        <pose>-0.063250000000000001 -0.091499999999999998 0.02306692504882827 0 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Chassis.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__LDriveWheel_visual_visual_1">
-        <pose>-0.1232500000000003 0.076200000000000018 0.038316924974322257 -3.1415926535897931 -3.3306690738754672e-16 -1.8873791418627661e-15</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LDriveWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__LTWheel_visual_visual_2">
-        <pose>0.15674999999999989 0.076199998855590645 0.068066925048828261 1.570796326794897 -4.5437038700002179e-16 -1.8674535998154189e-15</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LTWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__RTWheel_visual_visual_3">
-        <pose>0.15675000000000011 -0.076200000000000004 0.06806692504882822 1.570796326794897 -4.8639851103231072e-16 -1.8687401769933521e-15</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RTWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__RDriveWheel_visual_visual_4">
-        <pose>-0.1232500000000003 -0.076199999999999962 0.03831692497432225 -2.7755575615628859e-16 -4.9960036108132074e-16 -1.8873791418627661e-15</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RDriveWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__Mega-wsheeld-v5-1_visual_visual_5">
-        <pose>-0.1136123541507145 -0.024002657566231791 0.1927972815115068 0.09552542704236483 2.4980018054066022e-16 1.5707963267948972</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Mega-wsheeld-v5-1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__ZStepper_visual_visual_6">
-        <pose>0.015393216205906991 -5.5511151231257827e-17 0.01332660651274451 -5.5511151231258295e-17 -2.7755575615629012e-17 7.7037197775490358e-34</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/ZStepper.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__PI5_visual_visual_7">
-        <pose>0.1042499999999974 0.0067000000000014409 0.094716924974322672 1.570796326794897 0 1.5707963267948957</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/PI5.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__LD06_LiDAR-1_visual_visual_8">
-        <pose>0.1532500000000008 1.165734175856414e-15 0.10581692695622261 1.570796326794897 0 1.5707963267948957</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LD06_LiDAR-1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__BN0085_visual_visual_9">
-        <pose>0.1525699999999999 -4.4331330273372771e-11 0.095816924974322648 -4.4373425918681914e-31 2.454633718507182e-16 1.570796326794897</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/BN0085.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__rps-kamera-v2-2_visual_visual_10">
-        <pose>0.15274999999999991 -0.00010000000000000291 0.075816924974322658 1.570796326794897 -8.8817841970012523e-16 1.5707963267948957</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/rps-kamera-v2-2.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__Unyaktig-batteri-mockup-v1-1_visual_visual_11">
-        <pose>-0.20888002569571601 3.8857805861880479e-16 0.07780915001349456 -1.5707963267948972 4.9960036108132044e-16 -1.570796326794881</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Unyaktig-batteri-mockup-v1-1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__RLeadscrew_visual_visual_12">
-        <pose>0.06619320312723212 -0.028499456255732011 0.5216266065127444 -1.8590599560760131e-16 -2.06285452644195e-16 -2.390060563115415e-32</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RLeadscrew.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__LLeadscrew_visual_visual_13">
-        <pose>0.066193203127232092 0.0274994562556817 0.5216266065127444 -3.1415926535897931 -2.0628545264419451e-16 -7.7181756391690859e-32</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LLeadscrew.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__StøtteStag-1_visual_visual_14">
-        <pose>0.059793203127232103 0.016999999523124799 0.17612660460539589 -1.8590599560760131e-16 -2.2887797940471748e-16 -2.0750540995624424e-32</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/StøtteStag-1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__M1_visual_visual_15">
-        <pose>-0.1232500000000001 0.018199999999999949 0.061316924974322277 -3.1415926535897931 -4.4408920985006262e-16 -1.7763568394002501e-15</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/M1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="base_link_fixed_joint_lump__M2_visual_visual_16">
-        <pose>-0.1232500000000001 -0.018199999999999949 0.061316924974322257 3.944304526105059e-31 -4.4408920985006262e-16 -1.7763568394002501e-15</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/M2.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="overhead_apriltag_20_visual">
-        <pose>0 0 0.24 0 0 0</pose>
-        <cast_shadows>false</cast_shadows>
-        <geometry>
-          <plane>
-            <normal>0 0 1</normal>
-            <size>0.48 0.48</size>
-          </plane>
-        </geometry>
-        <material>
-          <ambient>1 1 1 1</ambient>
-          <diffuse>1 1 1 1</diffuse>
-          <specular>0 0 0 1</specular>
-          <pbr>
-            <metal>
-              <albedo_map>model://apriltag_textures/materials/textures/tag36_11_00020.png</albedo_map>
-              <roughness>1.0</roughness>
-            </metal>
-          </pbr>
-        </material>
-      </visual>
-      <sensor name="camera" type="camera">
-        <pose relative_to="camera_link">0 0 0 0 0 0</pose>
-        <always_on>true</always_on>
-        <update_rate>15</update_rate>
-        <visualize>false</visualize>
-        <topic>/camera</topic>
-        <gz:frame_id>camera_link</gz:frame_id>
-        <camera>
-          <horizontal_fov>1.3962634</horizontal_fov>
-          <image>
-            <width>640</width>
-            <height>480</height>
-            <format>R8G8B8</format>
-          </image>
-          <clip>
-            <near>0.02</near>
-            <far>300</far>
-          </clip>
-        </camera>
-      </sensor>
-      <sensor name="imu" type="imu">
-        <pose relative_to="imu_link">0 0 0 0 0 0</pose>
-        <always_on>true</always_on>
-        <update_rate>100</update_rate>
-        <topic>/imu/data</topic>
-        <gz:frame_id>imu_link</gz:frame_id>
-      </sensor>
-      <sensor name="lidar" type="gpu_lidar">
-        <pose relative_to="lidar_link">0 0 0 0 0 0</pose>
-        <always_on>true</always_on>
-        <update_rate>10</update_rate>
-        <visualize>false</visualize>
-        <topic>/lidar</topic>
-        <gz:frame_id>base_laser</gz:frame_id>
-        <lidar>
-          <scan>
-            <horizontal>
-              <samples>360</samples>
-              <resolution>1</resolution>
-              <min_angle>-3.14159</min_angle>
-              <max_angle>3.14159</max_angle>
-            </horizontal>
-            <vertical>
-              <samples>1</samples>
-              <resolution>1</resolution>
-              <min_angle>0</min_angle>
-              <max_angle>0</max_angle>
-            </vertical>
-          </scan>
-          <range>
-            <min>0.08</min>
-            <max>10.0</max>
-            <resolution>0.01</resolution>
-          </range>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.01</stddev>
-          </noise>
-        </lidar>
-      </sensor>
-    </link>
-    <link name="LTracks">
-      <pose>-0.001557510734135181 0.18240000000000001 -0.0020559556759162968 0.00097071200726441095 0 -1.5707963267948972</pose>
-      <inertial>
-        <mass>0.1</mass>
-        <inertia>
-          <ixx>0.0001</ixx>
-          <iyy>0.0001</iyy>
-          <izz>0.0001</izz>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyz>0</iyz>
-        </inertia>
-      </inertial>
-      <visual name="LTracks_visual">
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LTracks.stl</uri>
-          </mesh>
-        </geometry>
-        <transparency>1.0</transparency>
-      </visual>
-      <collision name="LTracks_drive_proxy_collision">
-        <pose>0.0912 0.01835843 -0.0114 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.030 0.210 0.007</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>0.7</mu>
-              <mu2>150</mu2>
-              <fdir1>0 1 0</fdir1>
-            </ode>
-          </friction>
-        </surface>
-      </collision>
-      <visual name="LTracks_drive_proxy_visual">
-        <pose>0.0912 0.01835843 -0.0114 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.030 0.210 0.007</size>
-          </box>
-        </geometry>
-        <transparency>0.25</transparency>
-        <material>
-          <ambient>0.0 0.25 1.0 1</ambient>
-          <diffuse>0.0 0.25 1.0 1</diffuse>
-        </material>
-      </visual>
-    </link>
-    <link name="RTracks">
-      <pose>-0.0015575107341351949 -9.7144514654701197e-17 -0.0020559556759161858 0.00097071200726441106 1.6263032587282567e-19 -1.5707963267948979</pose>
-      <inertial>
-        <mass>0.1</mass>
-        <inertia>
-          <ixx>0.0001</ixx>
-          <iyy>0.0001</iyy>
-          <izz>0.0001</izz>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyz>0</iyz>
-        </inertia>
-      </inertial>
-      <visual name="RTracks_visual">
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RTracks.stl</uri>
-          </mesh>
-        </geometry>
-        <transparency>1.0</transparency>
-      </visual>
-      <collision name="RTracks_drive_proxy_collision">
-        <pose>0.0912 0.01835843 -0.0114 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.030 0.210 0.007</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>0.7</mu>
-              <mu2>150</mu2>
-              <fdir1>0 1 0</fdir1>
-            </ode>
-          </friction>
-        </surface>
-      </collision>
-      <visual name="RTracks_drive_proxy_visual">
-        <pose>0.0912 0.01835843 -0.0114 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.030 0.210 0.007</size>
-          </box>
-        </geometry>
-        <transparency>0.25</transparency>
-        <material>
-          <ambient>0.0 0.8 0.25 1</ambient>
-          <diffuse>0.0 0.8 0.25 1</diffuse>
-        </material>
-      </visual>
-    </link>
-    <joint name="Chassis_Revolute-1" type="revolute">
-      <pose relative_to="base_link">-0.0067560737940930496 -0.075700000000000003 0.068063227106018198 -1.5707963267948957 4.4408920985006262e-16 -1.570796326794897</pose>
-      <parent>base_link</parent>
-      <child>BRLegs</child>
-      <axis>
-        <xyz>-1 4.9303806576313238e-32 -1.448928193263085e-31</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0.261799</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0.18</spring_reference>
-          <spring_stiffness>350</spring_stiffness>
-          <damping>18</damping>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="BRLegs">
-      <pose relative_to="Chassis_Revolute-1">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0.01549993864504774 0.037918729808493902 -0.042911399924597297 0 -2.4308653429145079e-63 0</pose>
-        <mass>0.066624269603717368</mass>
-        <inertia>
-          <ixx>9.3209571196855136e-05</ixx>
-          <ixy>8.5215220737265302e-11</ixy>
-          <ixz>-9.6435329536572693e-11</ixz>
-          <iyy>6.8330975762154119e-05</iyy>
-          <iyz>3.911847322672697e-05</iyz>
-          <izz>5.8628985513232079e-05</izz>
-        </inertia>
-      </inertial>
-      <visual name="BRLegs_visual_visual">
-        <pose>-0.075700000000000003 0.069974419999999996 0.0051492900000001639 1.570796326794897 3.944304526105059e-31 3.1415926535897918</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/BRLegs.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="BRLegs_fixed_joint_lump__RBWheel_visual_visual_1">
-        <pose>0.00050000000000000738 0.058765323033514727 -0.066502818762074395 3.1415926535897931 -1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RBWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name="BRLegs_Revolute-44" type="revolute">
-      <pose relative_to="BRLegs">0.015499999999999989 0.058765320000000003 -0.066502820000000004 1.570796326794897 0 -1.5707963267948957</pose>
-      <parent>BRLegs</parent>
-      <child>RBWheelColision</child>
-      <axis>
-        <xyz>3.8064789415719651e-16 -8.0491253988618555e-16 -1</xyz>
-        <limit>
-          <lower>-1000000</lower>
-          <upper>1000000</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-      </axis>
-    </joint>
-    <link name="RBWheelColision">
-      <pose relative_to="BRLegs_Revolute-44">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>-3.0335148459847972e-09 1.237925353336777e-09 -7.105427357601002e-17 -1.876739014720737e-47 0 0</pose>
-        <mass>0.46240318633952909</mass>
-        <inertia>
-          <ixx>0.00010693073948690991</ixx>
-          <ixy>-7.5604270179586037e-34</ixy>
-          <ixz>9.4119178326253867e-20</ixz>
-          <iyy>0.00010693073948690299</iyy>
-          <iyz>2.1986451153486991e-18</iyz>
-          <izz>0.00014450099573109839</izz>
-        </inertia>
-      </inertial>
-      <visual name="RBWheelColision_visual">
-        <pose>-0.011209100000000201 0.071652109999999783 0.091199999427795317 -4.4188023411456551e-16 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RBWheelColision.stl</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <ambient>0.95 0.2 0.05 1</ambient>
-          <diffuse>0.95 0.2 0.05 1</diffuse>
-        </material>
-      </visual>
-      <collision name="RBWheelColision_collision_collision">
-        <pose>-0.011209100000000201 0.071652109999999783 0.091199999427795317 -4.4188023411456551e-16 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RBWheelColision.stl</uri>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1.4</mu>
-              <mu2>1.4</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>500000</kp>
-              <kd>50</kd>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <joint name="Chassis_Revolute-2" type="revolute">
-      <pose relative_to="base_link">0.040250006205906942 -0.075700000000000045 0.068066927106018221 -1.5707963267948957 4.4408920985006262e-16 -1.570796326794897</pose>
-      <parent>base_link</parent>
-      <child>FRLegs</child>
-      <axis>
-        <xyz>-1 4.9303806576313238e-32 -1.448928193263085e-31</xyz>
-        <limit>
-          <lower>-0.261799</lower>
-          <upper>0</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>-0.18</spring_reference>
-          <spring_stiffness>350</spring_stiffness>
-          <damping>18</damping>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="FRLegs">
-      <pose relative_to="Chassis_Revolute-2">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0.015499938645685369 0.037900574519914507 0.042928770370565458 0 -2.4308653429145079e-63 0</pose>
-        <mass>0.066624961950021114</mass>
-        <inertia>
-          <ixx>9.3213353477872789e-05</ixx>
-          <ixy>8.5174987417659716e-11</ixy>
-          <ixz>9.6474998894865733e-11</ixz>
-          <iyy>6.8367617288917984e-05</iyy>
-          <iyz>-3.911601140572559e-05</iyz>
-          <izz>5.8596577792667748e-05</izz>
-        </inertia>
-      </inertial>
-      <visual name="FRLegs_visual_visual">
-        <pose>-0.075700000000000045 0.069978119999999963 -0.04185678999999979 1.570796326794897 3.944304526105059e-31 3.1415926535897918</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/FRLegs.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="FRLegs_fixed_joint_lump__RFWheel_visual_visual_1">
-        <pose>0.00050000000000009585 0.058737325244174493 0.066529896391363336 -3.1415926535897931 -1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RFWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name="FRLegs_Revolute-45" type="revolute">
-      <pose relative_to="FRLegs">0.015499999999999989 0.058737329999999997 0.066529899999999989 1.570796326794897 0 -1.5707963267948957</pose>
-      <parent>FRLegs</parent>
-      <child>RFWheelColision</child>
-      <axis>
-        <xyz>3.8064789415719621e-16 -8.0491253988618594e-16 -1</xyz>
-        <limit>
-          <lower>-1000000</lower>
-          <upper>1000000</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-      </axis>
-    </joint>
-    <link name="RFWheelColision">
-      <pose relative_to="FRLegs_Revolute-45">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>4.7558253957191711e-09 -3.608636873764226e-09 -1.243449787580175e-16 -1.8767390147207351e-47 0 0</pose>
-        <mass>0.46240318633952909</mass>
-        <inertia>
-          <ixx>0.00010693073948690911</ixx>
-          <ixy>-1.08420217248551e-19</ixy>
-          <ixz>-3.3956169066794958e-19</ixz>
-          <iyy>0.0001069307394869052</iyy>
-          <iyz>8.9760250836609511e-19</iyz>
-          <izz>0.0001445009957311023</izz>
-        </inertia>
-      </inertial>
-      <visual name="RFWheelColision_visual">
-        <pose>-0.01120909221065996 0.071652105153437548 0.091199999427795261 -4.4188023411456502e-16 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RFWheelColision.stl</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <ambient>0.95 0.2 0.05 1</ambient>
-          <diffuse>0.95 0.2 0.05 1</diffuse>
-        </material>
-      </visual>
-      <collision name="RFWheelColision_collision_collision">
-        <pose>-0.01120909221065996 0.071652105153437548 0.091199999427795261 -4.4188023411456502e-16 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RFWheelColision.stl</uri>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1.4</mu>
-              <mu2>1.4</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>500000</kp>
-              <kd>50</kd>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <joint name="Chassis_Revolute-7" type="revolute">
-      <pose relative_to="base_link">0.04025000620590706 0.075699999999999878 0.068066927106018277 1.570796326794897 4.4408920985006262e-16 -1.570796326794897</pose>
-      <parent>base_link</parent>
-      <child>FLLegs</child>
-      <axis>
-        <xyz>1 4.9303806576313238e-32 -1.448928193263085e-31</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0.261799</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0.18</spring_reference>
-          <spring_stiffness>350</spring_stiffness>
-          <damping>18</damping>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="FLLegs">
-      <pose relative_to="Chassis_Revolute-7">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>-0.01549992722325589 -0.03790017253574187 -0.042928315055855197 0 4.004783512012162e-63 0</pose>
-        <mass>0.066623676641007351</mass>
-        <inertia>
-          <ixx>9.3211987501414542e-05</ixx>
-          <ixy>1.010321497144952e-10</ixy>
-          <ixz>1.144359128873898e-10</ixz>
-          <iyy>6.8366752173165701e-05</iyy>
-          <iyz>-3.9115371795648407e-05</iyz>
-          <izz>5.8595843364243652e-05</izz>
-        </inertia>
-      </inertial>
-      <visual name="FLLegs_visual_visual">
-        <pose>0.075700000000000003 -0.069978120000000005 0.041856789999999998 -1.5707963267948959 5.2322406978944533e-32 4.9303806576313227e-32</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/FLLegs.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="FLLegs_fixed_joint_lump__LFWheel_visual_visual_1">
-        <pose>-0.00050000000000005249 -0.058737325244174583 -0.066529896391363141 -9.1603462307061304e-16 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LFWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name="FLLegs_Revolute-42" type="revolute">
-      <pose relative_to="FLLegs">-0.015499999999999989 -0.058737329999999997 -0.066529899999999989 -1.5707963267948957 0 1.570796326794897</pose>
-      <parent>FLLegs</parent>
-      <child>RFWheelColision-1</child>
-      <axis>
-        <xyz>3.8064789415719631e-16 8.0491253988618594e-16 1</xyz>
-        <limit>
-          <lower>-1000000</lower>
-          <upper>1000000</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-      </axis>
-    </joint>
-    <link name="RFWheelColision-1">
-      <pose relative_to="FLLegs_Revolute-42">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>4.755825313562667e-09 -3.608637246799163e-09 7.105427357601002e-17 0 0 0</pose>
-        <mass>0.46240318633952909</mass>
-        <inertia>
-          <ixx>0.0001069307394869143</ixx>
-          <ixy>-8.8589548433937957e-34</ixy>
-          <ixz>-6.9043037319328214e-19</ixz>
-          <iyy>0.0001069307394869008</iyy>
-          <iyz>-8.3712096761070996e-19</iyz>
-          <izz>0.00014450099573110051</izz>
-        </inertia>
-      </inertial>
-      <visual name="RFWheelColision-1_visual">
-        <pose>-0.01120909221065994 0.071652105153437132 0.091199999427795359 1.2325951644077929e-32 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RFWheelColision-1.stl</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <ambient>0.95 0.2 0.05 1</ambient>
-          <diffuse>0.95 0.2 0.05 1</diffuse>
-        </material>
-      </visual>
-      <collision name="RFWheelColision-1_collision_collision">
-        <pose>-0.01120909221065994 0.071652105153437132 0.091199999427795359 1.2325951644077929e-32 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/RFWheelColision-1.stl</uri>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1.4</mu>
-              <mu2>1.4</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>500000</kp>
-              <kd>50</kd>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <joint name="Chassis_Revolute-8" type="revolute">
-      <pose relative_to="base_link">-0.0067560737940929247 0.075699999999999934 0.068063227106018254 1.570796326794897 4.4408920985006262e-16 -1.570796326794897</pose>
-      <parent>base_link</parent>
-      <child>BLLegs</child>
-      <axis>
-        <xyz>1 4.9303806576313238e-32 -1.448928193263085e-31</xyz>
-        <limit>
-          <lower>-0.261799</lower>
-          <upper>0</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>-0.18</spring_reference>
-          <spring_stiffness>350</spring_stiffness>
-          <damping>18</damping>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="BLLegs">
-      <pose relative_to="Chassis_Revolute-8">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>-0.01549992722249951 -0.037918327630259291 0.042910944792429448 0 4.004783512012162e-63 0</pose>
-        <mass>0.066622984294703591</mass>
-        <inertia>
-          <ixx>9.3208205281884705e-05</ixx>
-          <ixy>1.010798734819786e-10</ixy>
-          <ixz>-1.143888355618992e-10</ixz>
-          <iyy>6.8330111235220353e-05</iyy>
-          <iyz>3.9117848619110189e-05</iyz>
-          <izz>5.862825055747659e-05</izz>
-        </inertia>
-      </inertial>
-      <visual name="BLLegs_visual_visual">
-        <pose>0.075700000000000003 -0.069974420000000009 -0.0051492899999999999 -1.5707963267948959 5.2322406978944533e-32 4.9303806576313227e-32</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/BLLegs.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="BLLegs_fixed_joint_lump__LBWheel_visual_visual_1">
-        <pose>-0.00049999999999994493 -0.058765323033514782 0.06650281876207452 -9.2121338251012544e-16 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LBWheel.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name="BLLegs_Revolute-43" type="revolute">
-      <pose relative_to="BLLegs">-0.015499999999999989 -0.058765320000000003 0.066502820000000004 1.570796326794897 0 1.570796326794897</pose>
-      <parent>BLLegs</parent>
-      <child>LBWheelColision</child>
-      <axis>
-        <xyz>-3.8064789415719651e-16 8.0491253988618555e-16 1</xyz>
-        <limit>
-          <lower>-1000000</lower>
-          <upper>1000000</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-      </axis>
-    </joint>
-    <link name="LBWheelColision">
-      <pose relative_to="BLLegs_Revolute-43">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>-3.033514961447992e-09 -1.2379252023464461e-09 0 0 0 0</pose>
-        <mass>0.46240318633952909</mass>
-        <inertia>
-          <ixx>0.000106930739486916</ixx>
-          <ixy>1.084202172485503e-19</ixy>
-          <ixz>-1.430103892229469e-20</ixz>
-          <iyy>0.0001069307394869043</iyy>
-          <iyz>4.6392163937189151e-19</iyz>
-          <izz>0.00014450099573109921</izz>
-        </inertia>
-      </inertial>
-      <visual name="LBWheelColision_visual">
-        <pose>-0.01120910000000021 -0.071652109999999589 -0.091199999427795331 3.1415926535897931 -1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LBWheelColision.stl</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <ambient>0.95 0.2 0.05 1</ambient>
-          <diffuse>0.95 0.2 0.05 1</diffuse>
-        </material>
-      </visual>
-      <collision name="LBWheelColision_collision_collision">
-        <pose>-0.01120910000000021 -0.071652109999999589 -0.091199999427795331 3.1415926535897931 -1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LBWheelColision.stl</uri>
-          </mesh>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1.4</mu>
-              <mu2>1.4</mu2>
-            </ode>
-          </friction>
-          <contact>
-            <ode>
-              <kp>500000</kp>
-              <kd>50</kd>
-            </ode>
-          </contact>
-        </surface>
-      </collision>
-    </link>
-    <joint name="robotarm_z_joint" type="prismatic">
-      <pose relative_to="base_link">0.066193206205906713 -0.028500000000000261 0.52188560710601828 6.8901856967953331e-16 3.80647894157197e-16 -1.570796326794897</pose>
-      <parent>base_link</parent>
-      <child>Leadscrew-Rigg</child>
-      <axis>
-        <xyz>4.9303806576313238e-32 4.9303806576313238e-32 1</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0.25</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="Leadscrew-Rigg">
-      <pose relative_to="robotarm_z_joint">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>-0.048686558314658727 -0.032369222112992882 -0.33682632663917272 0 0 2.4308653429145079e-63</pose>
-        <mass>0.80849438330389545</mass>
-        <inertia>
-          <ixx>0.00084727228549970335</ixx>
-          <ixy>-0.0002436430662352694</ixy>
-          <ixz>0.0001397880415325847</ixz>
-          <iyy>0.00068616124602953465</iyy>
-          <iyz>0.00017706797130013531</iyz>
-          <izz>0.00096092413880362673</izz>
-        </inertia>
-      </inertial>
-      <visual name="Leadscrew-Rigg_visual_visual">
-        <pose>-0.027999999999975121 -0.011000003078674721 -0.36000000059327369 -3.806478941571969e-16 3.637378840725568e-16 1.570796326794897</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Leadscrew-Rigg.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Leadscrew-Rigg_fixed_joint_lump__Stepper-Gear-9R24.00-m2.741-1_visual_visual_1">
-        <pose>-0.0279999999999751 -0.046000003078678749 -0.32900000059327378 -1.5700924586837769e-16 -1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Stepper-Gear-9R24.00-m2.741-1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Leadscrew-Rigg_fixed_joint_lump__Gear-9R24.00-m2.741-1-1_visual_visual_2">
-        <pose>-0.027999999999975159 0.02399999692132106 -0.32900000059327378 -1.570796326794897 5.5511151231257827e-17 1.5707963267948957</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Gear-9R24.00-m2.741-1-1.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Leadscrew-Rigg_fixed_joint_lump__LeadNutR_visual_visual_3">
-        <pose>2.4882318427899009e-14 -3.0786747018396451e-09 -0.35250000059327369 -5.6655388976479757e-16 4.8620256398729185e-16 1.570796326794897</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LeadNutR.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Leadscrew-Rigg_fixed_joint_lump__Xstepper_visual_visual_4">
-        <pose>-0.069500000953675145 -0.046000003078678957 -0.32900000059327378 -3.1415926535897927 -1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Xstepper.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Leadscrew-Rigg_fixed_joint_lump__LeadNutL_visual_visual_5">
-        <pose>-0.055999999999975132 -3.0786747462485659e-09 -0.35250000059327369 -4.1852415314811016e-16 -3.2121952892376812e-17 1.570796326794897</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/LeadNutL.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name="robotarm_x_joint" type="prismatic">
-      <pose relative_to="Leadscrew-Rigg">-0.028000000000000001 -0.01100000000000001 -0.31900000000000001 -9.8607613152626476e-32 9.8607613152626476e-32 -9.7363336698435271e-32</pose>
-      <parent>Leadscrew-Rigg</parent>
-      <child>Gripper</child>
-      <axis>
-        <xyz>-6.6764900672260206e-32 1 0</xyz>
-        <limit>
-          <lower>0.01</lower>
-          <upper>0.089999999999999997</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="Gripper">
-      <pose relative_to="robotarm_x_joint">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>-0.001335412126388815 0.13901906786714879 -0.10580022851486991 0 0 1.622964831673269e-94</pose>
-        <mass>0.68361946686436115</mass>
-        <inertia>
-          <ixx>0.0047085707576585319</ixx>
-          <ixy>4.4285922466663196e-06</ixy>
-          <ixz>-5.6196714320489981e-05</ixz>
-          <iyy>0.0023451903412148758</iyy>
-          <iyz>0.00122175780759156</iyz>
-          <izz>0.003658825347700987</izz>
-        </inertia>
-      </inertial>
-      <visual name="Gripper_visual_visual">
-        <pose>2.4390975350563338e-14 0.16707499698092601 -0.15480968205719009 -3.8064789415720198e-16 -2.2204460492503801e-16 8.6614487984360617e-16</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Gripper.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Gripper_fixed_joint_lump__Servo_visual_visual_1">
-        <pose>-0.0107499999999756 0.1405749969809259 -0.15480968205719009 -5.6655388976479796e-16 -3.469142038224712e-32 -1.224646799147353e-16</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Servo.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Gripper_fixed_joint_lump__Servo-Gear-8L30.00-m2.1651_visual_visual_2">
-        <pose>2.438500790180598e-14 0.16655699698092591 -0.15480968205719009 1.570796326794897 1.5707963267948966 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Servo-Gear-8L30.00-m2.1651.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Gripper_fixed_joint_lump__ABX00102-Dist-sensor_visual_visual_3">
-        <pose>-0.020499999999975978 0.18499999698092609 -0.14123655720970341 -1.570796326794897 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/ABX00102-Dist-sensor.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Gripper_fixed_joint_lump__Top-Rack-200.0mm-R30.00-m2.1651_visual_visual_4">
-        <pose>0.04369498265449881 0.16707612908150279 -0.14450968205719 -3.1415926535897931 3.4450928483977351e-16 -3.1415926535897918</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Top-Rack-200.0mm-R30.00-m2.1651.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-      <visual name="Gripper_fixed_joint_lump__Bottom-Rack-200.0mm-L30.00-m2.1651_visual_visual_5">
-        <pose>-0.04366271791413473 0.16707624158947121 -0.16500968205719019 3.8064789415720149e-16 3.4450928483977341e-16 -3.1415926535897918</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Bottom-Rack-200.0mm-L30.00-m2.1651.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name="left_gripper_finger_joint" type="revolute">
-      <pose relative_to="Gripper">-0.050000000000000003 0.19514971 -0.15470967999999999 -3.1415926535897931 -5.4738221262688108e-47 -2.0088433502773088e-31</pose>
-      <parent>Gripper</parent>
-      <child>Finger-L-16L30.00-m2.1651</child>
-      <axis>
-        <xyz>4.9303806576313238e-32 4.930380657631326e-32 1.0000000000000011</xyz>
-        <limit>
-          <lower>-3.2288589999999999</lower>
-          <upper>-0.52359900000000004</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="Finger-L-16L30.00-m2.1651">
-      <pose relative_to="left_gripper_finger_joint">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0.0068680458231481006 -0.003114009901573987 0.001675056086278675 0 0 -2.503791303201941e-61</pose>
-        <mass>0.047650149208348612</mass>
-        <inertia>
-          <ixx>1.452610857675738e-05</ixx>
-          <ixy>6.2022278631304664e-06</ixy>
-          <ixz>2.666016491166623e-06</ixz>
-          <iyy>2.8583472022557919e-05</iyy>
-          <iyz>-1.3311426072136151e-06</iyz>
-          <izz>2.6391298869207369e-05</izz>
-        </inertia>
-      </inertial>
-      <visual name="Finger-L-16L30.00-m2.1651_visual_visual">
-        <pose>2.433608869978343e-14 -1.157878024571346e-09 0.01806250229562157 -3.1415926535897931 2.3212558142412679e-16 2.6179938779914931</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Finger-L-16L30.00-m2.1651.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <joint name="right_gripper_finger_joint" type="revolute">
-      <pose relative_to="Gripper">0.050000000000000003 0.19514971 -0.15470967999999999 -3.1415926535897931 -5.4738221262688108e-47 -2.0088433502773088e-31</pose>
-      <parent>Gripper</parent>
-      <child>Finger-R16L30.00-m2.1651Mirror</child>
-      <axis>
-        <xyz>4.9303806576313238e-32 4.930380657631326e-32 1.0000000000000011</xyz>
-        <limit>
-          <lower>0.52359900000000004</lower>
-          <upper>2.96706</upper>
-          <effort>1000000</effort>
-          <velocity>1000000</velocity>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-      </axis>
-    </joint>
-    <link name="Finger-R16L30.00-m2.1651Mirror">
-      <pose relative_to="right_gripper_finger_joint">0 0 0 0 0 0</pose>
-      <inertial>
-        <pose>0.0072789473344129444 -0.0020331106970909829 -0.0016791814166278491 0 0 -2.503791303201941e-61</pose>
-        <mass>0.047559344696753672</mass>
-        <inertia>
-          <ixx>1.421569492470173e-05</ixx>
-          <ixy>5.8435646367210193e-06</ixy>
-          <ixz>-2.8994167820623999e-06</ixz>
-          <iyy>2.8868593743003289e-05</iyy>
-          <iyz>6.9430250711753181e-07</iyz>
-          <izz>2.6360063365784891e-05</izz>
-        </inertia>
-      </inertial>
-      <visual name="Finger-R16L30.00-m2.1651Mirror_visual_visual">
-        <pose>2.4451551894344449e-14 -1.157878237734167e-09 0.031937502772458583 -7.1262203928288945e-17 3.0607540456479498e-16 2.967059728390359</pose>
-        <geometry>
-          <mesh>
-            <scale>0.001 0.001 0.001</scale>
-            <uri>meshes/Finger-R16L30.00-m2.1651Mirror.stl</uri>
-          </mesh>
-        </geometry>
-      </visual>
-    </link>
-    <frame name="Chassis_Revolute-11" attached_to="Chassis">
-      <pose>-0.060000003794092899 0.16470000000000001 0.045250002057189938 1.570796326794897 4.4408920985006262e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="LDriveWheel" attached_to="Chassis_Revolute-11">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Revolute-12" attached_to="Chassis">
-      <pose>0.21999999620590699 0.16719999999999979 0.045000002057190049 1.570796326794897 4.4408920985006262e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="LTWheel" attached_to="Chassis_Revolute-12">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Revolute-5" attached_to="Chassis">
-      <pose>0.21999999620590691 0.01579999999999987 0.045000002057189993 -1.5707963267948957 4.4408920985006262e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="RTWheel" attached_to="Chassis_Revolute-5">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Revolute-6" attached_to="Chassis">
-      <pose>-0.060000003794093003 0.01830000000000009 0.045250002057189889 -1.5707963267948957 4.4408920985006262e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="RDriveWheel" attached_to="Chassis_Revolute-6">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-13" attached_to="Chassis">
-      <pose>-0.064079103794092984 0.043840280000000058 0.087714292057189877 3.1415926535897931 -0.095525427042366093 1.5707963267948959</pose>
-    </frame>
-    <frame name="Mega-wsheeld-v5-1" attached_to="Chassis_Rigid-13">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-14" attached_to="Chassis">
-      <pose>0.078643216205906988 0.091499999999999929 0.058559682057189963 3.806478941571967e-16 3.806478941571971e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="ZStepper" attached_to="Chassis_Rigid-14">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-15" attached_to="Chassis">
-      <pose>0.19199999620590699 0.13719999999999979 0.071750002057190038 3.806478941571967e-16 3.806478941571971e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="PI5" attached_to="Chassis_Rigid-15">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-16" attached_to="Chassis">
-      <pose>0.23059999620590699 0.077399999999999816 0.08275000205719002 3.806478941571967e-16 3.806478941571971e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="LD06_LiDAR-1" attached_to="Chassis_Rigid-16">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-17" attached_to="Chassis">
-      <pose>0.22470999620590701 0.081339999999999829 0.072750002057190011 -3.1415926535897931 3.80647894157197e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="BN0085" attached_to="Chassis_Rigid-17">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-18" attached_to="Chassis">
-      <pose>0.2149999962059069 0.1018999999999998 0.06275000205719003 1.5707963267948957 -1.5707963267948966 0</pose>
-    </frame>
-    <frame name="rps-kamera-v2-2" attached_to="Chassis_Rigid-18">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-19" attached_to="Chassis">
-      <pose>-0.10863002379409289 0.091500000000000109 0.006242222057189899 -1.5707963267948959 -1.9897503558217051e-16 -2.4197823938864136e-15</pose>
-    </frame>
-    <frame name="Unyaktig-batteri-mockup-v1-1" attached_to="Chassis_Rigid-19">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-20" attached_to="Chassis">
-      <pose>0.12944320620590699 0.062999999999999931 -0.001440317942810023 -3.1415926535897931 3.80647894157197e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="RLeadscrew" attached_to="Chassis_Rigid-20">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Leadscrew-Rigg_Revolute-26" attached_to="Leadscrew-Rigg">
-      <pose>-0.028000000000000001 -0.045999999999999999 -0.32900000000000013 1.5707963267948959 2.4651903288156628e-31 -1.6412823737069559e-31</pose>
-    </frame>
-    <frame name="Stepper-Gear-9R24.00-m2.741-1" attached_to="Leadscrew-Rigg_Revolute-26">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Leadscrew-Rigg_Revolute-28" attached_to="Leadscrew-Rigg">
-      <pose>-0.028000000000000001 0.024 -0.32900000000000013 1.5707963267948959 2.4651903288156628e-31 -1.6412823737069559e-31</pose>
-    </frame>
-    <frame name="Gear-9R24.00-m2.741-1-1" attached_to="Leadscrew-Rigg_Revolute-28">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Leadscrew-Rigg_Rigid-23" attached_to="Leadscrew-Rigg">
-      <pose>0 0 -0.35249999999999998 3.1415926535897931 9.8607613152626476e-32 -3.6134346367594858e-31</pose>
-    </frame>
-    <frame name="LeadNutR" attached_to="Leadscrew-Rigg_Rigid-23">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Leadscrew-Rigg_Rigid-25" attached_to="Leadscrew-Rigg">
-      <pose>-0.042999999999999997 -0.045999999999999999 -0.32900000000000013 1.5707963267948959 9.8607613152626476e-32 -9.736333669843526e-32</pose>
-    </frame>
-    <frame name="Xstepper" attached_to="Leadscrew-Rigg_Rigid-25">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Leadscrew-Rigg_Rigid-39" attached_to="Leadscrew-Rigg">
-      <pose>-0.055999999999999987 0 -0.35249999999999998 -3.1415926535897931 -2.9605947323337481e-16 -3.689141079476218e-31</pose>
-    </frame>
-    <frame name="LeadNutL" attached_to="Leadscrew-Rigg_Rigid-39">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Servo_Revolute-32" attached_to="Servo">
-      <pose>-8.8817841970012525e-18 -0.01620000000000001 0.01074999999999999 1.5707963267948957 -1.5707963267948966 0</pose>
-    </frame>
-    <frame name="Servo-Gear-8L30.00-m2.1651" attached_to="Servo_Revolute-32">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Gripper_Rigid-30" attached_to="Gripper">
-      <pose>-0.010749999999999999 0.15057499999999999 -0.15480968000000001 3.1415926535897931 -1.5707963267948966 0</pose>
-    </frame>
-    <frame name="Servo" attached_to="Gripper_Rigid-30">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Gripper_Rigid-31" attached_to="Gripper">
-      <pose>0 0.185 -0.15391656000000001 -3.1415926535897931 1.5707963267948966 0</pose>
-    </frame>
-    <frame name="ABX00102-Dist-sensor" attached_to="Gripper_Rigid-31">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Gripper_Slider-33" attached_to="Gripper">
-      <pose>-0.065087019999999995 0.16570113 -0.13650967999999999 -3.1415926535897931 -4.9303806576313238e-32 -1.775591060142219e-32</pose>
-    </frame>
-    <frame name="Top-Rack-200.0mm-R30.00-m2.1651" attached_to="Gripper_Slider-33">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Gripper_Slider-34" attached_to="Gripper">
-      <pose>0.064920489999999997 0.16570124 -0.17300968 9.8607613152626476e-32 -4.9303806576313238e-32 -1.775591060142219e-32</pose>
-    </frame>
-    <frame name="Bottom-Rack-200.0mm-L30.00-m2.1651" attached_to="Gripper_Slider-34">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-21" attached_to="Chassis">
-      <pose>0.12944320620590699 0.1189999999999999 -0.0014403179428100011 -3.1415926535897931 3.80647894157197e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="LLeadscrew" attached_to="Chassis_Rigid-21">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-27" attached_to="Chassis">
-      <pose>0.057943206205907032 0.1249999999999999 0.056559682057189968 -3.1415926535897931 3.80647894157197e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="StøtteStag-1" attached_to="Chassis_Rigid-27">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-37" attached_to="Chassis">
-      <pose>-0.060000003794092899 0.16270000000000001 0.045250002057189938 1.570796326794897 4.4408920985006262e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="M1" attached_to="Chassis_Rigid-37">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-38" attached_to="Chassis">
-      <pose>-0.060000003794093003 0.020300000000000089 0.045250002057189889 -1.5707963267948957 4.4408920985006262e-16 -1.570796326794897</pose>
-    </frame>
-    <frame name="M2" attached_to="Chassis_Rigid-38">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_Rigid-40" attached_to="Chassis">
-      <pose>0.079995786205907055 0.1671999999999999 0.059998152057189988 3.8063627888551456e-16 -7.8746540832738967e-05 -1.570796326794897</pose>
-    </frame>
-    <frame name="Chassis_Rigid-41" attached_to="Chassis">
-      <pose>0.07999578620590693 0.01579999999999997 0.059998152057189939 3.8064983141271268e-16 -7.8746540832927916e-05 -1.570796326794897</pose>
-    </frame>
-    <frame name="Chassis_to_camera_link" attached_to="Chassis">
-      <pose>0.2149999962059069 0.1018999999999998 0.06275000205719003 0 0 0</pose>
-    </frame>
-    <frame name="camera_link" attached_to="Chassis_to_camera_link">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_to_imu_link" attached_to="Chassis">
-      <pose>0.22470999620590701 0.081339999999999829 0.072750002057190011 0 0 0</pose>
-    </frame>
-    <frame name="imu_link" attached_to="Chassis_to_imu_link">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="Chassis_to_lidar_link" attached_to="Chassis">
-      <pose>0.23059999620590699 0.077399999999999816 0.08275000205719002 0 0 0</pose>
-    </frame>
-    <frame name="lidar_link" attached_to="Chassis_to_lidar_link">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="base_link_to_Chassis" attached_to="base_link">
-      <pose>-0.063250000000000001 -0.091499999999999998 0.02306692504882827 0 0 0</pose>
-    </frame>
-    <frame name="Chassis" attached_to="base_link_to_Chassis">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="BRLegs_Revolute-3" attached_to="BRLegs">
-      <pose>0.015499999999999989 0.058765320000000003 -0.066502820000000004 1.570796326794897 0 -1.5707963267948957</pose>
-    </frame>
-    <frame name="RBWheel" attached_to="BRLegs_Revolute-3">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="FRLegs_Revolute-4" attached_to="FRLegs">
-      <pose>0.015499999999999989 0.058737329999999997 0.066529899999999989 -1.5707963267948959 -5.5511151231257827e-17 -1.5707963267948959</pose>
-    </frame>
-    <frame name="RFWheel" attached_to="FRLegs_Revolute-4">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="FLLegs_Revolute-9" attached_to="FLLegs">
-      <pose>-0.015499999999999989 -0.058737329999999997 -0.066529899999999989 1.570796326794897 0 1.570796326794897</pose>
-    </frame>
-    <frame name="LFWheel" attached_to="FLLegs_Revolute-9">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <frame name="BLLegs_Revolute-10" attached_to="BLLegs">
-      <pose>-0.015499999999999989 -0.058765320000000003 0.066502820000000004 1.570796326794897 0 1.570796326794897</pose>
-    </frame>
-    <frame name="LBWheel" attached_to="BLLegs_Revolute-10">
-      <pose>0 0 0 0 0 0</pose>
-    </frame>
-    <joint name="base_link_to_LTracks" type="fixed">
-      <parent>base_link</parent>
-      <child>LTracks</child>
-    </joint>
-    <joint name="base_link_to_RTracks" type="fixed">
-      <parent>base_link</parent>
-      <child>RTracks</child>
-    </joint>
-    <plugin filename="gz-sim-tracked-vehicle-system" name="gz::sim::systems::TrackedVehicle">
-      <left_track>
-        <link>RTracks</link>
-      </left_track>
-      <right_track>
-        <link>LTracks</link>
-      </right_track>
-      <tracks_separation>0.1824</tracks_separation>
-      <tracks_height>0.007</tracks_height>
-      <steering_efficiency>0.7</steering_efficiency>
-      <topic>/model/tracked_robot/cmd_vel</topic>
-      <odom_publish_frequency>50</odom_publish_frequency>
-      <odom_topic>/wheel/odom</odom_topic>
-      <tf_topic>tf</tf_topic>
-      <frame_id>odom</frame_id>
-      <child_frame_id>base_link</child_frame_id>
-    </plugin>
-    <plugin filename="gz-sim-track-controller-system" name="gz::sim::systems::TrackController">
-      <link>LTracks</link>
-      <min_velocity>-0.5555555555555556</min_velocity>
-      <max_velocity>0.5555555555555556</max_velocity>
-    </plugin>
-    <plugin filename="gz-sim-track-controller-system" name="gz::sim::systems::TrackController">
-      <link>RTracks</link>
-      <min_velocity>-0.5555555555555556</min_velocity>
-      <max_velocity>0.5555555555555556</max_velocity>
-    </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
-      <joint_name>robotarm_x_joint</joint_name>
-      <topic>/robotarm/x_position_cmd</topic>
-      <p_gain>80</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>20</d_gain>
-      <cmd_min>0.01</cmd_min>
-      <cmd_max>0.09</cmd_max>
-    </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
-      <joint_name>robotarm_z_joint</joint_name>
-      <topic>/robotarm/z_position_cmd</topic>
-      <p_gain>80</p_gain>
-      <i_gain>10</i_gain>
-      <d_gain>20</d_gain>
-      <cmd_min>0.0</cmd_min>
-      <cmd_max>0.25</cmd_max>
-    </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
-      <joint_name>left_gripper_finger_joint</joint_name>
-      <topic>/gripper/left_position_cmd</topic>
-      <p_gain>20</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>2</d_gain>
-      <cmd_min>-3.228859</cmd_min>
-      <cmd_max>-0.523599</cmd_max>
-    </plugin>
-    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
-      <joint_name>right_gripper_finger_joint</joint_name>
-      <topic>/gripper/right_position_cmd</topic>
-      <p_gain>20</p_gain>
-      <i_gain>0</i_gain>
-      <d_gain>2</d_gain>
-      <cmd_min>0.523599</cmd_min>
-      <cmd_max>2.96706</cmd_max>
-    </plugin>
-    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
-      <topic>/joint_states</topic>
-      <update_rate>30</update_rate>
-      <joint_name>robotarm_x_joint</joint_name>
-      <joint_name>robotarm_z_joint</joint_name>
-      <joint_name>left_gripper_finger_joint</joint_name>
-      <joint_name>right_gripper_finger_joint</joint_name>
-      <joint_name>Chassis_Revolute-1</joint_name>
-      <joint_name>Chassis_Revolute-2</joint_name>
-      <joint_name>Chassis_Revolute-7</joint_name>
-      <joint_name>Chassis_Revolute-8</joint_name>
-      <joint_name>BRLegs_Revolute-44</joint_name>
-      <joint_name>FRLegs_Revolute-45</joint_name>
-      <joint_name>FLLegs_Revolute-42</joint_name>
-      <joint_name>BLLegs_Revolute-43</joint_name>
-    </plugin>
-  </model>
+<?xml version='1.0' encoding='utf-8'?>
+<sdf version="1.7" xmlns:gz="http://gazebosim.org/schema">
+    <model name="tracked_robot">
+        <!-- Root link for ROS TF. yaw=+pi/2 so base_link X = model Y = track forward direction.
+             World spawn must use yaw=-pi/2 to cancel: base_link world yaw = 0. -->
+        <link name="base_link">
+            <pose>0 0 0 0 0 1.5707963267948972</pose>
+        </link>
+        <link name="Chassis">
+            <pose>0.09150000000000008 -0.06164321620590698 0.024978117942810095 -3.8064789415719685e-16 3.80647894157197e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>1.4907690350907317</mass>
+                <pose>0.08016056471355223 0.09137425589873138 0.04160371992676176 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.00601805889102517</ixx>
+                    <iyy>0.011696228691038965</iyy>
+                    <izz>0.015388922827137485</izz>
+                    <ixy>2.7577451823444063e-05</ixy>
+                    <iyz>6.282850546029949e-06</iyz>
+                    <ixz>-0.0002627279587458808</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Chassis_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Chassis.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Chassis_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Chassis.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+            <!-- Sensors -->
+            <sensor name="camera" type="camera">
+                <pose relative_to="camera_link">0 0 0 0 0 0</pose>
+                <always_on>true</always_on>
+                <update_rate>15</update_rate>
+                <visualize>false</visualize>
+                <topic>/camera</topic>
+                <gz:frame_id>camera_link</gz:frame_id>
+                <camera>
+                    <horizontal_fov>1.3962634</horizontal_fov>
+                    <image>
+                        <width>640</width>
+                        <height>480</height>
+                        <format>R8G8B8</format>
+                    </image>
+                    <clip>
+                        <near>0.02</near>
+                        <far>300</far>
+                    </clip>
+                </camera>
+            </sensor>
+            <sensor name="imu" type="imu">
+                <pose relative_to="imu_link">0 0 0 0 0 0</pose>
+                <always_on>true</always_on>
+                <update_rate>100</update_rate>
+                <topic>/imu/data</topic>
+                <gz:frame_id>imu_link</gz:frame_id>
+            </sensor>
+            <sensor name="lidar" type="gpu_lidar">
+                <pose relative_to="lidar_link">0 0 0 0 0 0</pose>
+                <always_on>true</always_on>
+                <update_rate>10</update_rate>
+                <visualize>false</visualize>
+                <topic>/lidar</topic>
+                <gz:frame_id>base_laser</gz:frame_id>
+                <lidar>
+                    <scan>
+                        <horizontal>
+                            <samples>360</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-3.14159</min_angle>
+                            <max_angle>3.14159</max_angle>
+                        </horizontal>
+                        <vertical>
+                            <samples>1</samples>
+                            <resolution>1</resolution>
+                            <min_angle>0</min_angle>
+                            <max_angle>0</max_angle>
+                        </vertical>
+                    </scan>
+                    <range>
+                        <min>0.08</min>
+                        <max>10.0</max>
+                        <resolution>0.01</resolution>
+                    </range>
+                    <noise>
+                        <type>gaussian</type>
+                        <mean>0</mean>
+                        <stddev>0.01</stddev>
+                    </noise>
+                </lidar>
+            </sensor>
+        </link>
+        <link name="Mega-wsheeld-v5-1">
+            <pose>0.024002657566231798 -0.11200557035662151 0.19470847440548866 0.09552542704236554 6.906036663343288e-16 -3.1415926535897922</pose>
+            <inertial>
+                <mass>0.11143362473176022</mass>
+                <pose>2.6244862814959943e-05 -0.032884354129500054 -0.07280428419151062 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>9.029579201477785e-05</ixx>
+                    <iyy>2.8519640150265962e-05</iyy>
+                    <izz>0.00011029745147072469</izz>
+                    <ixy>-4.679777323338436e-07</ixy>
+                    <iyz>2.0672244187033827e-07</iyz>
+                    <ixz>8.150296181407054e-08</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Mega-wsheeld-v5-1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Mega-wsheeld-v5-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Mega-wsheeld-v5-1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Mega-wsheeld-v5-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="ABX00102-Dist-sensor">
+            <pose>-0.019999999999976006 0.2417999869809261 0.06356024279029658 -1.5707963267948968 -2.2204460492504156e-16 4.1633363423465674e-17</pose>
+            <inertial>
+                <mass>0.0016856916739247086</mass>
+                <pose>0.020500000000005392 0.01268 0.0008030006799999647 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>8.76321038478348e-08</ixx>
+                    <iyy>2.2299455179065312e-07</iyy>
+                    <izz>3.099020216361131e-07</izz>
+                    <ixy>-6.854503093534317e-23</ixy>
+                    <iyz>3.378072423399017e-21</iyz>
+                    <ixz>1.0469984007739633e-23</ixz>
+                </inertia>
+            </inertial>
+            <visual name="ABX00102-Dist-sensor_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/ABX00102-Dist-sensor.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="ABX00102-Dist-sensor_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/ABX00102-Dist-sensor.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LD06_LiDAR-1">
+            <pose>-1.335385389568598e-15 0.15485678379409387 0.10772811985020432 1.570796326794897 3.098100421789638e-16 -3.1415926535897927</pose>
+            <inertial>
+                <mass>0.04311038533159423</mass>
+                <pose>0.00010445701714093902 0.015291217328071127 -8.854672379029564e-08 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>8.243348670481595e-06</ixx>
+                    <iyy>8.943004642017882e-06</iyy>
+                    <izz>8.17300863134303e-06</izz>
+                    <ixy>5.212676289604407e-08</ixy>
+                    <iyz>6.855376574530378e-11</iyz>
+                    <ixz>-8.999748514436658e-08</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LD06_LiDAR-1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LD06_LiDAR-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LD06_LiDAR-1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LD06_LiDAR-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="rps-kamera-v2-2">
+            <pose>9.999999999982602e-05 0.15435678379409293 0.07772811786830436 1.570796326794897 3.438101034099933e-16 -3.1415926535897927</pose>
+            <inertial>
+                <mass>0.003595639137613823</mass>
+                <pose>2.236210304102957e-09 0.0013332123190785213 0.006142469655800763 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>2.4383025335782234e-07</ixx>
+                    <iyy>2.1027707248316164e-07</iyy>
+                    <izz>1.964932144737686e-07</izz>
+                    <ixy>4.136470792045083e-14</ixy>
+                    <iyz>-3.882816611295974e-08</iyz>
+                    <ixz>5.29959704214852e-14</ixz>
+                </inertia>
+            </inertial>
+            <visual name="rps-kamera-v2-2_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/rps-kamera-v2-2.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="rps-kamera-v2-2_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/rps-kamera-v2-2.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="BN0085">
+            <pose>4.433117338972385e-11 0.15417678379409294 0.09772811786830438 3.702395533013361e-16 6.261112660079147e-16 -3.1415926535897922</pose>
+            <inertial>
+                <mass>0.000971518679989001</mass>
+                <pose>1.931312150782909e-11 2.703190590827326e-11 0.0008249999999999958 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>4.057309916859854e-08</ixx>
+                    <iyy>4.9833223025544656e-08</iyy>
+                    <izz>8.99654955931008e-08</izz>
+                    <ixy>1.6676365113934456e-16</ixy>
+                    <iyz>1.7084057681023497e-21</iyz>
+                    <ixz>-5.114373275493785e-24</ixz>
+                </inertia>
+            </inertial>
+            <visual name="BN0085_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/BN0085.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="BN0085_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/BN0085.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Xstepper">
+            <pose>-0.04100000095367515 0.02179998692132104 0.19479679940672623 -3.1415926535897922 -1.5707963267948961 0</pose>
+            <inertial>
+                <mass>0.4621945983755269</mass>
+                <pose>3.339281415424435e-14 -1.1533795105509603e-17 0.008143147171462915 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.0001117819994714133</ixx>
+                    <iyy>0.0001117819994234139</iyy>
+                    <izz>0.00012770754461035146</izz>
+                    <ixy>-1.890234717356061e-21</ixy>
+                    <iyz>6.814096161912015e-20</iyz>
+                    <ixz>-2.914332505979091e-16</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Xstepper_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Xstepper.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Xstepper_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Xstepper.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="ZStepper">
+            <pose>6.2322914685829426e-18 0.016999999999999973 0.015237799406726293 -4.3615904538845517e-16 3.5289231854156804e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.24015056879172078</mass>
+                <pose>-2.3524574945864707e-16 -2.7762971112147023e-06 0.07515489785203207 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.00010350535464925475</ixx>
+                    <iyy>0.00010350735668827586</iyy>
+                    <izz>5.981399662220286e-05</izz>
+                    <ixy>-1.1732863744245472e-19</ixy>
+                    <iyz>-2.9439365478601462e-08</iyz>
+                    <ixz>-1.1743548905165096e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="ZStepper_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/ZStepper.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="ZStepper_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/ZStepper.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="M2">
+            <pose>0.018200000000000043 -0.12164321620590712 0.06322811786830408 -3.8064789415719567e-16 3.806478941571982e-16 1.5707963267948972</pose>
+            <inertial>
+                <mass>0.17887898702311664</mass>
+                <pose>6.450507857882355e-15 -0.02053197240202008 0.00011650899779426508 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>9.180363906081466e-05</ixx>
+                    <iyy>2.656478643490568e-05</iyy>
+                    <izz>9.166018014948634e-05</izz>
+                    <ixy>4.223468123176163e-17</ixy>
+                    <iyz>8.233551945947432e-07</iyz>
+                    <ixz>-7.581099388002605e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="M2_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/M2.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="M2_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/M2.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="M1">
+            <pose>-0.0181999999999999 -0.12164321620590718 0.06322811786830411 3.1415926535897927 3.806478941571982e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.17887898702311664</mass>
+                <pose>6.430270036810314e-15 -0.02053197240202008 -0.00011650899779426295 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>9.180363906081487e-05</ixx>
+                    <iyy>2.656478643490568e-05</iyy>
+                    <izz>9.16601801494859e-05</izz>
+                    <ixy>4.201444372114874e-17</ixy>
+                    <iyz>-8.233551945947387e-07</iyz>
+                    <ixz>7.799265280341558e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="M1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/M1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="M1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/M1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Servo">
+            <pose>-0.010249999999975595 0.19737498698092587 0.04998711794280987 -3.8064789415720075e-16 -2.220446049250383e-16 2.2862306060965623e-29</pose>
+            <inertial>
+                <mass>0.08417757927421474</mass>
+                <pose>0.0002527734566469115 0.0006788781642737252 2.480950802613971e-13 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>1.2966564559254005e-05</ixx>
+                    <iyy>1.449800721994367e-05</iyy>
+                    <izz>2.1979452415781556e-05</izz>
+                    <ixy>-4.056725934208243e-07</ixy>
+                    <iyz>-4.267447328092419e-16</iyz>
+                    <ixz>-1.940771182937779e-16</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Servo_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Servo.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Servo_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Servo.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Unyaktig-batteri-mockup-v1-1">
+            <pose>-2.7200464103316337e-16 -0.20727324190162313 0.07972034290747641 -1.570796326794897 -5.623350092867603e-16 1.83191874294728e-14</pose>
+            <inertial>
+                <mass>0.44056121916666674</mass>
+                <pose>-2.355449200975354e-18 -0.0007922813760561368 0.021557523011846554 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.0005678682111967866</ixx>
+                    <iyy>0.00029613479993706134</iyy>
+                    <izz>0.0007229683485945636</izz>
+                    <ixy>4.771229371365527e-20</ixy>
+                    <iyz>8.917578945477248e-06</iyz>
+                    <ixz>8.197789338919865e-20</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Unyaktig-batteri-mockup-v1-1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Unyaktig-batteri-mockup-v1-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Unyaktig-batteri-mockup-v1-1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Unyaktig-batteri-mockup-v1-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="FLLegs">
+            <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+            <inertial>
+                <mass>0.04732234424542792</mass>
+                <pose>-0.09120000000000004 0.075158744111964 0.040576782782243435 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>6.179916585151207e-05</ixx>
+                    <iyy>4.2783879376001826e-05</iyy>
+                    <izz>4.921655750536732e-05</izz>
+                    <ixy>3.2526065174565133e-19</ixy>
+                    <iyz>2.5751601189587077e-05</iyz>
+                    <ixz>2.710505431213761e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="FLLegs_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/FLLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="FLLegs_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/FLLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="BLLegs">
+            <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+            <inertial>
+                <mass>0.04732165189912416</mass>
+                <pose>-0.09119999999999998 -0.03843769240329648 0.04055906662315621 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>6.179656945654659e-05</ixx>
+                    <iyy>4.280508754708165e-05</iyy>
+                    <izz>4.9192301414139564e-05</izz>
+                    <ixy>2.710505431213761e-19</ixy>
+                    <iyz>-2.575320182095629e-05</iyz>
+                    <ixz>2.168404344971009e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="BLLegs_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/BLLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="BLLegs_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/BLLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="FRLegs">
+            <pose>-3.198355865866429e-17 2.1094237467877976e-16 3.9968028886505634e-17 -3.1415926535897927 7.612957883143931e-16 -3.141592653589793</pose>
+            <inertial>
+                <mass>0.04732234424542792</mass>
+                <pose>-0.09120000000000004 0.07515874411196403 -0.040576782782243144 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>6.179916585151185e-05</ixx>
+                    <iyy>4.278387937600192e-05</iyy>
+                    <izz>4.9216557505366685e-05</izz>
+                    <ixy>1.9723584896911675e-19</ixy>
+                    <iyz>-2.5751601189586572e-05</iyz>
+                    <ixz>1.8015629344503336e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="FRLegs_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/FRLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="FRLegs_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/FRLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="BRLegs">
+            <pose>3.54357812934072e-18 1.6431300764452317e-16 4.440892098500626e-18 -3.1415926535897927 7.612957883143933e-16 -3.141592653589793</pose>
+            <inertial>
+                <mass>0.04732165189912416</mass>
+                <pose>-0.09119999999999996 -0.03843769240329653 -0.040559066623155546 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>6.179656945654667e-05</ixx>
+                    <iyy>4.280508754708161e-05</iyy>
+                    <izz>4.919230141414004e-05</izz>
+                    <ixy>3.448664558275573e-19</ixy>
+                    <iyz>2.575320182095794e-05</iyz>
+                    <ixz>3.698751841944566e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="BRLegs_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/BRLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="BRLegs_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/BRLegs.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Gripper">
+            <pose>0.000500000000024391 0.22387498698092592 0.0499871179428099 -3.806478941572021e-16 -2.2204460492503796e-16 8.661448798436061e-16</pose>
+            <inertial>
+                <mass>0.5425163222161179</mass>
+                <pose>-4.656476655739175e-05 -0.03146370327032117 0.06174298944356076 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.0041970435110420205</ixx>
+                    <iyy>0.0017211098951416207</iyy>
+                    <izz>0.003412257026630377</izz>
+                    <ixy>2.830469105888448e-06</ixy>
+                    <iyz>0.0011078170695914876</iyz>
+                    <ixz>1.0791671084747125e-05</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Gripper_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Gripper.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Gripper_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Gripper.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Leadscrew-Rigg">
+            <pose>0.000500000000024884 0.056799986921325284 0.1637967994067263 -3.8064789415719695e-16 3.637378840725568e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.2552161680137732</mass>
+                <pose>-0.007247046502376641 0.005123533434134697 0.012558743151897216 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.0002642459548445854</ixx>
+                    <iyy>0.00039226422073400055</iyy>
+                    <izz>0.0003672622292433098</izz>
+                    <ixy>5.19587150553132e-05</ixy>
+                    <iyz>-3.300694837829952e-05</iyz>
+                    <ixz>5.813027243363769e-05</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Leadscrew-Rigg_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Leadscrew-Rigg.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Leadscrew-Rigg_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Leadscrew-Rigg.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RLeadscrew">
+            <pose>0.028499456255731758 0.06779998692132541 0.5235377994067263 -3.7370900025328953e-16 3.6026843712060323e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.31432199985843523</mass>
+                <pose>8.113823265394252e-17 -5.437442929688751e-07 -0.2498705000000001 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.006557125383132949</ixx>
+                    <iyy>0.006557125383132946</iyy>
+                    <izz>3.929024998230654e-06</izz>
+                    <ixy>1.8818766202651255e-18</ixy>
+                    <iyz>-2.519174195816632e-19</iyz>
+                    <ixz>-1.07544748846474e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RLeadscrew_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RLeadscrew.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RLeadscrew_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RLeadscrew.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LeadNutR">
+            <pose>0.028500000000024884 0.06779998692132531 0.17129679940672624 -3.2513674292593853e-16 3.637378840725569e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.03449007966719112</mass>
+                <pose>4.440892098473243e-17 -3.4028335704761063e-13 -1.0313220957025006e-28 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>1.9041634831149103e-06</ixx>
+                    <iyy>1.9041634639065299e-06</iyy>
+                    <izz>2.5499387618405322e-06</izz>
+                    <ixy>1.3552527140607759e-20</ixy>
+                    <iyz>2.6853179113746275e-20</iyz>
+                    <ixz>-2.0269350976772134e-22</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LeadNutR_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LeadNutR.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LeadNutR_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LeadNutR.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="StøtteStag-1">
+            <pose>-0.016999999523124944 0.061399986921325124 0.17803779749937762 -3.8064789415719665e-16 3.3767591036008073e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.06992645940152016</mass>
+                <pose>-0.0651000000000046 0.016500000476849984 0.12567614279085487 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.001154901647839924</ixx>
+                    <iyy>0.0011549016478399014</iyy>
+                    <izz>2.184855757403461e-07</izz>
+                    <ixy>4.235164736270212e-20</ixy>
+                    <iyz>-8.368202560300098e-20</iyz>
+                    <ixz>-6.708113623280914e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="StøtteStag-1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/StøtteStag-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="StøtteStag-1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/StøtteStag-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LLeadscrew">
+            <pose>-0.02749945625568198 0.06779998692132537 0.5235377994067263 -3.1415926535897927 3.602684371206038e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.3143219998584353</mass>
+                <pose>9.002089218414385e-17 -5.437442929688751e-07 0.24987050000000005 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.006557125383132984</ixx>
+                    <iyy>0.006557125383132984</iyy>
+                    <izz>3.929024998230654e-06</izz>
+                    <ixy>1.8818766202651325e-18</ixy>
+                    <iyz>2.5191741958164897e-19</iyz>
+                    <ixz>1.075447488464532e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LLeadscrew_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LLeadscrew.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LLeadscrew_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LLeadscrew.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Stepper-Gear-9R24.00-m2.741-1">
+            <pose>0.0005000000000249011 0.021799986921321252 0.19479679940672626 7.57838899431275e-16 -1.570796326794896 0</pose>
+            <inertial>
+                <mass>0.011184599309797512</mass>
+                <pose>9.948983858976125e-12 -3.111657598253715e-11 2.821287835297341e-11 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>9.477710389925056e-07</ixx>
+                    <iyy>9.47771008391684e-07</iyy>
+                    <izz>1.1528587359188337e-06</izz>
+                    <ixy>-1.9901337040889805e-14</ixy>
+                    <iyz>-7.897158216469034e-19</iyz>
+                    <ixz>-7.940428728243386e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Stepper-Gear-9R24.00-m2.741-1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Stepper-Gear-9R24.00-m2.741-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Stepper-Gear-9R24.00-m2.741-1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Stepper-Gear-9R24.00-m2.741-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Gear-9R24.00-m2.741-1-1">
+            <pose>0.0005000000000248447 0.09179998692132108 0.19479679940672626 -1.570796326794897 3.6776137690708296e-16 1.5707963267948972</pose>
+            <inertial>
+                <mass>0.01091885827041561</mass>
+                <pose>1.015886041955129e-11 -3.182936580969913e-11 2.8899514448177418e-11 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>9.378174871989284e-07</ixx>
+                    <iyy>9.378174561564596e-07</iyy>
+                    <izz>1.150667701182217e-06</izz>
+                    <ixy>-1.996916085396756e-14</ixy>
+                    <iyz>-7.928787439166907e-19</iyz>
+                    <ixz>-7.916049774035895e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Gear-9R24.00-m2.741-1-1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Gear-9R24.00-m2.741-1-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Gear-9R24.00-m2.741-1-1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Gear-9R24.00-m2.741-1-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="PI5">
+            <pose>-0.006700000000001604 0.10585678379409043 0.0966281178683044 1.570796326794897 3.2513674292595096e-16 -3.1415926535897927</pose>
+            <inertial>
+                <mass>0.01309093635557877</mass>
+                <pose>-0.00900437198436208 0.003408342282335392 -0.0039007712148104693 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>3.7760474127176245e-06</ixx>
+                    <iyy>1.2088625209880466e-05</iyy>
+                    <izz>8.765668782811345e-06</izz>
+                    <ixy>6.827585355427614e-07</ixy>
+                    <iyz>3.7283034391290555e-07</iyz>
+                    <ixz>-2.197335239899541e-06</ixz>
+                </inertia>
+            </inertial>
+            <visual name="PI5_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/PI5.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="PI5_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/PI5.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Finger-R16L30.00-m2.1651Mirror">
+            <pose>0.05050000000002444 0.25194970115787824 0.0181496172275414 3.141592653589793 -3.06075404564795e-16 -2.9670597283903595</pose>
+            <inertial>
+                <mass>0.047559344696753665</mass>
+                <pose>-0.007521409535154871 0.0007382460969896543 -0.033616684189086435 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>1.2658917072928051e-05</ixx>
+                    <iyy>3.042537159477682e-05</iyy>
+                    <izz>2.636006336578482e-05</izz>
+                    <ixy>2.9853612912261943e-06</ixy>
+                    <iyz>-1.8027605144310146e-07</iyz>
+                    <ixz>2.975932491299286e-06</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Finger-R16L30.00-m2.1651Mirror_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Finger-R16L30.00-m2.1651Mirror.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Finger-R16L30.00-m2.1651Mirror_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Finger-R16L30.00-m2.1651Mirror.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Top-Rack-200.0mm-R30.00-m2.1651">
+            <pose>0.044194982654498796 0.22387611908150276 0.06028711794280997 -3.1415926535897927 3.4450928483977336e-16 -3.1415926535897922</pose>
+            <inertial>
+                <mass>0.02617962275433629</mass>
+                <pose>0.015921655148515935 0.0006331440113154685 -0.006591676971949438 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>8.652074671140827e-07</ixx>
+                    <iyy>5.9737789176413916e-05</iyy>
+                    <izz>5.992421572194765e-05</izz>
+                    <ixy>4.838558392978088e-07</ixy>
+                    <iyz>5.7308515056685187e-08</iyz>
+                    <ixz>3.4007141145275963e-07</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Top-Rack-200.0mm-R30.00-m2.1651_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Top-Rack-200.0mm-R30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Top-Rack-200.0mm-R30.00-m2.1651_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Top-Rack-200.0mm-R30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Bottom-Rack-200.0mm-L30.00-m2.1651">
+            <pose>-0.043162717914134736 0.22387623158947115 0.0397871179428098 3.806478941572016e-16 3.4450928483977336e-16 -3.1415926535897922</pose>
+            <inertial>
+                <mass>0.02619004416035449</mass>
+                <pose>-0.0157469309263512 -0.0006338246686674759 -0.006466116381924253 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>8.685665796026841e-07</ixx>
+                    <iyy>5.977821754345828e-05</iyy>
+                    <izz>5.9962018623100586e-05</izz>
+                    <ixy>4.830662767777207e-07</ixy>
+                    <iyz>-8.379233628862599e-08</iyz>
+                    <ixz>-3.1990294009204445e-07</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Bottom-Rack-200.0mm-L30.00-m2.1651_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Bottom-Rack-200.0mm-L30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Bottom-Rack-200.0mm-L30.00-m2.1651_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Bottom-Rack-200.0mm-L30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Servo-Gear-8L30.00-m2.1651">
+            <pose>0.0005000000000243921 0.22335698698092593 0.04998711794280984 1.5707963267948966 1.5707963267948961 0</pose>
+            <inertial>
+                <mass>0.002870206785412932</mass>
+                <pose>-2.2422630863469557e-09 -1.132196105623721e-09 -8.094859199864856e-05 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>1.1070519089534002e-07</ixx>
+                    <iyy>1.1070664527709385e-07</iyy>
+                    <izz>1.7437457174903346e-07</izz>
+                    <ixy>2.151184354809301e-13</ixy>
+                    <iyz>1.1237990608439323e-15</iyz>
+                    <ixz>2.002202952428161e-15</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Servo-Gear-8L30.00-m2.1651_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Servo-Gear-8L30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Servo-Gear-8L30.00-m2.1651_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Servo-Gear-8L30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="Finger-L-16L30.00-m2.1651">
+            <pose>-0.04949999999997567 0.25194970115787807 0.03202461770437842 3.027691622235631e-16 -2.321255814241267e-16 -2.6179938779914935</pose>
+            <inertial>
+                <mass>0.04765014920834861</mass>
+                <pose>-0.007504906529028762 0.0007372122319143253 0.016387446209342897 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>1.2669162548676806e-05</ixx>
+                    <iyy>3.0440418050638323e-05</iyy>
+                    <izz>2.63912988692073e-05</izz>
+                    <ixy>2.985902995581803e-06</ixy>
+                    <iyz>-1.802049316764719e-07</iyz>
+                    <ixz>2.974409311865346e-06</ixz>
+                </inertia>
+            </inertial>
+            <visual name="Finger-L-16L30.00-m2.1651_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Finger-L-16L30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="Finger-L-16L30.00-m2.1651_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Finger-L-16L30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LTWheel">
+            <pose>-0.07619999885559083 0.15835678379409296 0.06997811794280995 1.5707963267948961 3.806478941571971e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.01930133239557942</mass>
+                <pose>-1.9652196726263173e-14 3.432174222765e-16 -0.014999748791732603 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>4.013475199122978e-06</ixx>
+                    <iyy>4.0134725009754935e-06</iyy>
+                    <izz>4.477610695690975e-06</izz>
+                    <ixy>-3.066295047732258e-12</ixy>
+                    <iyz>2.6928378617619934e-20</iyz>
+                    <ixz>-5.150333908954722e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LTWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LTWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LTWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LTWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LDriveWheel">
+            <pose>-0.07619999999999996 -0.12164321620590743 0.040228117868304054 3.141592653589793 3.80647894157197e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.03296579662050264</mass>
+                <pose>3.419860423056529e-05 -0.01545726951062167 -0.0298724840924713 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>6.008971414222884e-06</ixx>
+                    <iyy>6.416538578882426e-06</iyy>
+                    <izz>6.063064954487589e-06</izz>
+                    <ixy>-5.420722484816145e-09</ixy>
+                    <iyz>-2.017140354797431e-08</iyz>
+                    <ixz>1.5634898593895998e-08</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LDriveWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LDriveWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LDriveWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LDriveWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RBWheel">
+            <pose>0.07620000000000002 -0.0716521087620744 0.01120909696648527 1.5707963267948961 3.8064789415719725e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.019302617704593204</mass>
+                <pose>-1.966746194560518e-14 2.229963052704882e-16 0.014999788229299248 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>4.0136515741846965e-06</ixx>
+                    <iyy>4.0136216691450685e-06</iyy>
+                    <izz>4.477702670703386e-06</izz>
+                    <ixy>4.454172778902617e-12</ixy>
+                    <iyz>-1.711730681583001e-20</iyz>
+                    <ixz>-5.204543946781691e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RBWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RBWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RBWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RBWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RDriveWheel">
+            <pose>0.07620000000000007 -0.12164321620590729 0.040228117868304096 -6.026924990822282e-16 3.80647894157197e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.03296508821145091</mass>
+                <pose>3.423506470672529e-05 -0.015457189210133978 0.0298725089529577 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>6.008866105006242e-06</ixx>
+                    <iyy>6.416414177530142e-06</iyy>
+                    <izz>6.062937296905384e-06</izz>
+                    <ixy>-5.420977719288356e-09</ixy>
+                    <iyz>2.014137129717271e-08</iyz>
+                    <ixz>-1.566916591302146e-08</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RDriveWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RDriveWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RDriveWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RDriveWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LFWheel">
+            <pose>-0.07620000000000006 0.10838668639136316 0.011240794755825421 1.5707963267948961 3.8064789415719537e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.01930133239557942</mass>
+                <pose>-1.965152019543773e-14 3.4176027896018455e-16 -0.014999748791732609 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>4.013475199122948e-06</ixx>
+                    <iyy>4.013472500975383e-06</iyy>
+                    <izz>4.4776106956909464e-06</izz>
+                    <ixy>-3.066295034179729e-12</ixy>
+                    <iyz>7.034563190723969e-21</iyz>
+                    <ixz>-5.123416882929427e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LFWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LFWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LFWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LFWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LBWheel">
+            <pose>-0.07619999999999995 -0.07165210876207452 0.01120909696648522 1.5707963267948961 3.8045815877700883e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.01930133239557942</mass>
+                <pose>-1.966034993880201e-14 3.4186359830875005e-16 -0.014999748791732607 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>4.013475199122921e-06</ixx>
+                    <iyy>4.013472500975275e-06</iyy>
+                    <izz>4.4776106956908905e-06</izz>
+                    <ixy>-3.066295030790836e-12</ixy>
+                    <iyz>3.6155892971733924e-21</iyz>
+                    <ixz>-5.150537472074344e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LBWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LBWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LBWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LBWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RFWheel">
+            <pose>0.0762000000000001 0.10838668639136334 0.011240794755825501 1.5707963267948961 3.528935736519033e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.01930261770459319</mass>
+                <pose>-1.9658606181892957e-14 2.390126750731307e-16 0.014999788229299248 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>4.0136515741846965e-06</ixx>
+                    <iyy>4.01362166914507e-06</iyy>
+                    <izz>4.477702670703359e-06</izz>
+                    <ixy>4.454172782402145e-12</ixy>
+                    <iyz>-1.019977049062041e-20</iyz>
+                    <ixz>-5.204558676933243e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RFWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RFWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RFWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RFWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RTWheel">
+            <pose>0.07619999999999988 0.15835678379409318 0.06997811794280995 1.5707963267948961 3.8064789415719705e-16 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.01930261770459319</mass>
+                <pose>-1.9659126591588488e-14 2.344157415720795e-16 0.01499978822929926 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>4.013651574184727e-06</ixx>
+                    <iyy>4.013621669145072e-06</iyy>
+                    <izz>4.477702670703334e-06</izz>
+                    <ixy>4.454172761626975e-12</ixy>
+                    <iyz>-2.718701056033709e-20</iyz>
+                    <ixz>-5.258924137076348e-18</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RTWheel_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RTWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RTWheel_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RTWheel.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RTracks">
+            <pose>1.0658141036401502e-16 4.9273059957786194e-05 -0.00014476278193439995 0.0009707120072640304 -3.805757496339463e-16 -1.112486316165012e-16</pose>
+            <inertial>
+                <mass>0.12017843301436808</mass>
+                <pose>0.09119999999999995 0.018327104257870826 0.04702245821288157 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.0015067502474651415</ixx>
+                    <iyy>0.00025369506158998367</iyy>
+                    <izz>0.0012710819508273143</izz>
+                    <ixy>8.476372916646254e-20</ixy>
+                    <iyz>6.478035304875583e-07</iyz>
+                    <ixz>-3.0657458415126685e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RTracks_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RTracks.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RTracks_drive_proxy_collision">
+                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.030 0.210 0.007</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>0.7</mu>
+                            <mu2>150</mu2>
+                            <fdir1>0 1 0</fdir1>
+                        </ode>
+                    </friction>
+                </surface>
+            </collision>
+            <visual name="RTracks_drive_proxy_visual">
+                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.030 0.210 0.007</size>
+                    </box>
+                </geometry>
+                <transparency>0.25</transparency>
+                <material>
+                    <ambient>0.0 0.8 0.25 1</ambient>
+                    <diffuse>0.0 0.8 0.25 1</diffuse>
+                </material>
+            </visual>
+        </link>
+        <link name="LTracks">
+            <pose>-0.18240000000000003 4.927305995761855e-05 -0.00014476278193459535 0.0009707120072640304 -3.805853933038537e-16 1.1216047918531813e-17</pose>
+            <inertial>
+                <mass>0.12017843301436808</mass>
+                <pose>0.09119999999999999 0.018327104257870867 0.04702245821288173 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.0015067502474651418</ixx>
+                    <iyy>0.0002536950615899849</iyy>
+                    <izz>0.0012710819508273254</izz>
+                    <ixy>2.2988515331597554e-19</ixy>
+                    <iyz>6.478035304887869e-07</iyz>
+                    <ixz>1.2692173341543413e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LTracks_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LTracks.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LTracks_drive_proxy_collision">
+                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.030 0.210 0.007</size>
+                    </box>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>0.7</mu>
+                            <mu2>150</mu2>
+                            <fdir1>0 1 0</fdir1>
+                        </ode>
+                    </friction>
+                </surface>
+            </collision>
+            <visual name="LTracks_drive_proxy_visual">
+                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.030 0.210 0.007</size>
+                    </box>
+                </geometry>
+                <transparency>0.25</transparency>
+                <material>
+                    <ambient>0.0 0.25 1.0 1</ambient>
+                    <diffuse>0.0 0.25 1.0 1</diffuse>
+                </material>
+            </visual>
+        </link>
+        <link name="LeadNutL">
+            <pose>-0.027499999999975135 0.06779998692132526 0.17129679940672632 -3.251367429259387e-16 6.767841083918194e-17 1.5707963267948974</pose>
+            <inertial>
+                <mass>0.03449007966719112</mass>
+                <pose>4.440892098473243e-17 -3.4028335704761063e-13 -1.0314535725200366e-28 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>1.9041634831149103e-06</ixx>
+                    <iyy>1.9041634639065299e-06</iyy>
+                    <izz>2.549938761840505e-06</izz>
+                    <ixy>1.3552527140607765e-20</ixy>
+                    <iyz>2.6853179113746278e-20</iyz>
+                    <ixz>-1.1505620921075996e-23</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LeadNutL_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LeadNutL.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LeadNutL_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LeadNutL.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RBWheelColision">
+            <pose>5.72204630344686e-10 -2.9309887850104134e-16 -1.5987211554602254e-16 -4.3389313044584354e-16 3.142285307071099e-17 -1.1102230246251595e-16</pose>
+            <inertial>
+                <mass>0.4624031863395291</mass>
+                <pose>0.09119999942779541 -0.07165210876207438 0.011209096966485282 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.00014450099573109826</ixx>
+                    <iyy>0.00010693073948690295</iyy>
+                    <izz>0.00010693073948690992</izz>
+                    <ixy>-2.2444473748896338e-18</ixy>
+                    <iyz>8.540669016519813e-22</iyz>
+                    <ixz>-1.1178028616419158e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RBWheelColision_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RBWheelColision.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RBWheelColision_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RBWheelColision.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RFWheelColision">
+            <pose>5.722046858558372e-10 0.1800387951534375 3.1697789340077165e-05 -4.414245288694418e-16 -1.9098260998713462e-17 1.1102230246251552e-16</pose>
+            <inertial>
+                <mass>0.4624031863395291</mass>
+                <pose>0.09119999942779541 -0.07165210876207435 0.011209096966485286 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.00014450099573110227</ixx>
+                    <iyy>0.00010693073948690518</iyy>
+                    <izz>0.00010693073948690905</izz>
+                    <ixy>-8.635114577136447e-19</ixy>
+                    <iyz>-1.0837148834970312e-19</iyz>
+                    <ixz>3.273028429171571e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RFWheelColision_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RFWheelColision.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RFWheelColision_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RFWheelColision.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="LBWheelColision">
+            <pose>-0.18239999942779536 -4.884981308350689e-16 -2.4424906541753446e-16 6.5111790476045084e-18 1.2208971272322876e-17 1.6653345369377348e-16</pose>
+            <inertial>
+                <mass>0.4624031863395291</mass>
+                <pose>0.0911999994277953 -0.0716521087620743 0.011209096966485282 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.00014450099573109902</ixx>
+                    <iyy>0.00010693073948690417</iyy>
+                    <izz>0.00010693073948691599</izz>
+                    <ixy>-4.559804067768998e-19</ixy>
+                    <iyz>-1.0772397205805828e-19</iyz>
+                    <ixz>-1.3055143265239989e-21</ixz>
+                </inertia>
+            </inertial>
+            <visual name="LBWheelColision_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LBWheelColision.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="LBWheelColision_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LBWheelColision.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <link name="RFWheelColision-1">
+            <pose>-0.18239999942779542 0.18003879515343704 3.1697789340028315e-05 3.6327445817366954e-18 -5.3987765590367846e-17 -1.6653345369377353e-16</pose>
+            <inertial>
+                <mass>0.4624031863395291</mass>
+                <pose>0.09119999942779528 -0.07165210876207422 0.011209096966485279 0.0 0.0 0.0</pose>
+                <inertia>
+                    <ixx>0.00014450099573110026</ixx>
+                    <iyy>0.00010693073948690057</iyy>
+                    <izz>0.00010693073948691418</izz>
+                    <ixy>8.495541926356189e-19</ixy>
+                    <iyz>3.884520644921842e-22</iyz>
+                    <ixz>7.10504363813401e-19</ixz>
+                </inertia>
+            </inertial>
+            <visual name="RFWheelColision-1_visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RFWheelColision-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </visual>
+            <collision name="RFWheelColision-1_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/RFWheelColision-1.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+            </collision>
+        </link>
+        <joint name="Chassis_Revolute-1" type="revolute">
+            <pose>-0.07570000000000006 -0.005149000000000186 -0.06997399999999994 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>BRLegs</child>
+            <axis>
+                <xyz expressed_in="__model__">-1.0 -0.0 -0.0</xyz>
+                <limit>
+                    <lower>0.0</lower>
+                    <upper>0.261799</upper>
+                    <effort>1000000</effort>
+                    <velocity>1000000</velocity>
+                </limit>
+                <dynamics>
+                    <spring_reference>0.18</spring_reference>
+                    <spring_stiffness>350</spring_stiffness>
+                    <damping>18</damping>
+                </dynamics>
+            </axis>
+        </joint>
+        <joint name="Chassis_Revolute-2" type="revolute">
+            <pose>-0.07570000000000009 0.04185699999999977 -0.06997799999999992 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>FRLegs</child>
+            <axis>
+                <xyz expressed_in="__model__">-1.0 -0.0 -0.0</xyz>
+                <limit>
+                    <lower>-0.261799</lower>
+                    <upper>0.0</upper>
+                    <effort>1000000</effort>
+                    <velocity>1000000</velocity>
+                </limit>
+                <dynamics>
+                    <spring_reference>-0.18</spring_reference>
+                    <spring_stiffness>350</spring_stiffness>
+                    <damping>18</damping>
+                </dynamics>
+            </axis>
+        </joint>
+        <joint name="BRLegs_Revolute-3" type="revolute">
+            <pose>1.0876207439017302e-07 -9.696648527577383e-08 0.014999999999999996 0.0 0.0 0.0</pose>
+            <parent>BRLegs</parent>
+            <child>RBWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 -0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="FRLegs_Revolute-4" type="revolute">
+            <pose>3.136086366446485e-07 2.0524417449274255e-07 0.014999999999999913 0.0 0.0 0.0</pose>
+            <parent>FRLegs</parent>
+            <child>RFWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">-1.0 0.0 -0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Chassis_Revolute-5" type="revolute">
+            <pose>2.1620590681712305e-07 -1.1794280994885455e-07 -0.000499999999999876 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>RTWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">-1.0 -0.0 -0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Chassis_Revolute-6" type="revolute">
+            <pose>2.162059072795424e-07 0.003000000000000055 0.029999882131695906 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>RDriveWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">-1.0 -0.0 -0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Chassis_Revolute-7" type="revolute">
+            <pose>-0.0757 0.041857 0.069978 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>FLLegs</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+                <limit>
+                    <lower>0.0</lower>
+                    <upper>0.261799</upper>
+                    <effort>1000000</effort>
+                    <velocity>1000000</velocity>
+                </limit>
+                <dynamics>
+                    <spring_reference>0.18</spring_reference>
+                    <spring_stiffness>350</spring_stiffness>
+                    <damping>18</damping>
+                </dynamics>
+            </axis>
+        </joint>
+        <joint name="Chassis_Revolute-8" type="revolute">
+            <pose>-0.0757 -0.005149 0.069974 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>BLLegs</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+                <limit>
+                    <lower>-0.261799</lower>
+                    <upper>0.0</upper>
+                    <effort>1000000</effort>
+                    <velocity>1000000</velocity>
+                </limit>
+                <dynamics>
+                    <spring_reference>-0.18</spring_reference>
+                    <spring_stiffness>350</spring_stiffness>
+                    <damping>18</damping>
+                </dynamics>
+            </axis>
+        </joint>
+        <joint name="FLLegs_Revolute-9" type="revolute">
+            <pose>3.136086368499095e-07 2.0524417458202864e-07 -0.01499999999999994 0.0 0.0 0.0</pose>
+            <parent>FLLegs</parent>
+            <child>LFWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="BLLegs_Revolute-10" type="revolute">
+            <pose>1.0876207453994901e-07 -9.696648521540119e-08 -0.01500000000000005 0.0 0.0 0.0</pose>
+            <parent>BLLegs</parent>
+            <child>LBWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Chassis_Revolute-11" type="revolute">
+            <pose>2.162059074134908e-07 0.002999999999999967 -0.029999882131695944 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>LDriveWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Chassis_Revolute-12" type="revolute">
+            <pose>2.1620590703834447e-07 -1.1794280994922448e-07 0.0004999988555908219 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>LTWheel</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Chassis_Rigid-13" type="fixed">
+            <pose>-0.023657342433768144 0.005831146445100726 -0.08295083029845894 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>Mega-wsheeld-v5-1</child>
+        </joint>
+        <joint name="Chassis_Rigid-14" type="fixed">
+            <pose>3.652959471414381e-18 -2.3557458822019342e-17 0.06830020059327371 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>ZStepper</child>
+        </joint>
+        <joint name="Chassis_Rigid-15" type="fixed">
+            <pose>0.03899999999999841 9.988213169561644e-05 0.024500216205909645 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>PI5</child>
+        </joint>
+        <joint name="Chassis_Rigid-16" type="fixed">
+            <pose>-0.014100000000001339 -1.1985020431352417e-07 0.014100216205906117 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>LD06_LiDAR-1</child>
+        </joint>
+        <joint name="Chassis_Rigid-17" type="fixed">
+            <pose>-0.010159999955668833 -0.008890216205907039 -1.1786830438315194e-07 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>BN0085</child>
+        </joint>
+        <joint name="Chassis_Rigid-18" type="fixed">
+            <pose>0.01049999999999983 0.009999882131695654 -0.0009997837940929329 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>rps-kamera-v2-2</child>
+        </joint>
+        <joint name="Chassis_Rigid-19" type="fixed">
+            <pose>9.225455665855479e-16 0.048500342907476575 0.03700024190162333 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>Unyaktig-batteri-mockup-v1-1</child>
+        </joint>
+        <joint name="Chassis_Rigid-20" type="fixed">
+            <pose>1.3078674767907941e-08 -5.437442680560862e-07 -0.4999997994067263 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>RLeadscrew</child>
+        </joint>
+        <joint name="Chassis_Rigid-21" type="fixed">
+            <pose>1.3078674809542182e-08 -5.437443178322416e-07 0.4999997994067263 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>LLeadscrew</child>
+        </joint>
+        <joint name="robotarm_z_joint" type="prismatic">
+            <pose>0.011000013078674568 -0.027999999999975277 0.36000020059327364 0.0 0.0 0.0</pose>
+            <parent>RLeadscrew</parent>
+            <child>Leadscrew-Rigg</child>
+            <axis>
+                <xyz expressed_in="__model__">-0.0 0.0 1.0</xyz>
+                <limit>
+                    <lower>0.0</lower>
+                    <upper>0.25</upper>
+                </limit>
+            </axis>
+        </joint>
+        <joint name="Leadscrew-Rigg_Rigid-23" type="fixed">
+            <pose>1.3078674684918692e-08 2.4882873463663903e-14 2.0059327376920088e-07 0.0 0.0 0.0</pose>
+            <parent>Leadscrew-Rigg</parent>
+            <child>LeadNutR</child>
+        </joint>
+        <joint name="Leadscrew-Rigg_Rigid-25" type="fixed">
+            <pose>2.0059327376043226e-07 -1.3078678939003943e-08 0.02650000095367519 0.0 0.0 0.0</pose>
+            <parent>Leadscrew-Rigg</parent>
+            <child>Xstepper</child>
+        </joint>
+        <joint name="Leadscrew-Rigg_Revolute-26" type="revolute">
+            <pose>2.005932737414451e-07 1.3078678747641056e-08 2.490108805554369e-14 0.0 0.0 0.0</pose>
+            <parent>Leadscrew-Rigg</parent>
+            <child>Stepper-Gear-9R24.00-m2.741-1</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Chassis_Rigid-27" type="fixed">
+            <pose>-0.06509998692132508 0.016500000476875148 -0.09649979749937762 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>StøtteStag-1</child>
+        </joint>
+        <joint name="Leadscrew-Rigg_Revolute-28" type="revolute">
+            <pose>1.3078678931521747e-08 -2.005932737414453e-07 2.484470953658883e-14 0.0 0.0 0.0</pose>
+            <parent>Leadscrew-Rigg</parent>
+            <child>Gear-9R24.00-m2.741-1-1</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="robotarm_x_joint" type="prismatic">
+            <pose>-2.4501307459178207e-14 -0.1670749869809259 0.15480988205718993 0.0 0.0 0.0</pose>
+            <parent>Leadscrew-Rigg</parent>
+            <child>Gripper</child>
+            <axis>
+                <xyz expressed_in="__model__">-0.0 1.0 -0.0</xyz>
+                <limit>
+                    <lower>0.01</lower>
+                    <upper>0.09</upper>
+                </limit>
+            </axis>
+        </joint>
+        <joint name="Gripper_Rigid-30" type="fixed">
+            <pose>-2.4405824609706215e-14 0.010000013019074118 -1.1794280986889988e-07 0.0 0.0 0.0</pose>
+            <parent>Gripper</parent>
+            <child>Servo</child>
+        </joint>
+        <joint name="Gripper_Rigid-31" type="fixed">
+            <pose>0.020499999999975982 0.012680242790296581 1.3019073877929347e-08 0.0 0.0 0.0</pose>
+            <parent>Gripper</parent>
+            <child>ABX00102-Dist-sensor</child>
+        </joint>
+        <joint name="Servo_Revolute-32" type="revolute">
+            <pose>1.1794280984486783e-07 -2.4392068598674702e-14 -0.00021801301907406473 0.0 0.0 0.0</pose>
+            <parent>Servo</parent>
+            <child>Servo-Gear-8L30.00-m2.1651</child>
+            <axis>
+                <xyz expressed_in="__model__">0.0 1.0 -0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Gripper_Slider-33" type="prismatic">
+            <pose>0.10878198265449869 -0.0013751190815026717 -0.007999882057190062 0.0 0.0 0.0</pose>
+            <parent>Gripper</parent>
+            <child>Top-Rack-200.0mm-R30.00-m2.1651</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="Gripper_Slider-34" type="prismatic">
+            <pose>-0.10858271791413462 0.0013752315894712268 -0.00800011794280983 0.0 0.0 0.0</pose>
+            <parent>Gripper</parent>
+            <child>Bottom-Rack-200.0mm-L30.00-m2.1651</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="right_gripper_finger_joint" type="revolute">
+            <pose>-5.18933657783551e-08 2.9430204269261924e-07 -0.03193738277245858 0.0 0.0 0.0</pose>
+            <parent>Gripper</parent>
+            <child>Finger-R16L30.00-m2.1651Mirror</child>
+            <axis>
+                <xyz expressed_in="__model__">0.0 -0.0 -1.0</xyz>
+                <limit>
+                    <lower>0.523599</lower>
+                    <upper>2.96706</upper>
+                </limit>
+            </axis>
+        </joint>
+        <joint name="left_gripper_finger_joint" type="revolute">
+            <pose>-1.4942103989005114e-07 -2.588048814805392e-07 0.018062382295621567 0.0 0.0 0.0</pose>
+            <parent>Gripper</parent>
+            <child>Finger-L-16L30.00-m2.1651</child>
+            <axis>
+                <xyz expressed_in="__model__">0.0 -0.0 -1.0</xyz>
+                <limit>
+                    <lower>-3.228859</lower>
+                    <upper>-0.523599</upper>
+                </limit>
+            </axis>
+        </joint>
+        <joint name="Chassis_Rigid-37" type="fixed">
+            <pose>2.162059072204627e-07 -0.053000000000000116 -0.006999882131695907 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>M1</child>
+        </joint>
+        <joint name="Chassis_Rigid-38" type="fixed">
+            <pose>2.1620590707963082e-07 -0.05299999999999997 0.006999882131695894 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>M2</child>
+        </joint>
+        <joint name="Leadscrew-Rigg_Rigid-39" type="fixed">
+            <pose>1.3078674740429903e-08 2.4865526228904132e-14 2.0059327368593415e-07 0.0 0.0 0.0</pose>
+            <parent>Leadscrew-Rigg</parent>
+            <child>LeadNutL</child>
+        </joint>
+        <joint name="Chassis_Rigid-40" type="fixed">
+            <pose>0.10670000000000006 0.01838634604993215 0.08510295503333694 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>LTracks</child>
+        </joint>
+        <joint name="Chassis_Rigid-41" type="fixed">
+            <pose>0.07569999999999992 0.018386346049931963 0.08510295503333666 0.0 0.0 0.0</pose>
+            <parent>Chassis</parent>
+            <child>RTracks</child>
+        </joint>
+        <joint name="FLLegs_Revolute-42" type="revolute">
+            <pose>0.09119999942779534 -0.07165179515343696 0.011209302210659964 0.0 0.0 0.0</pose>
+            <parent>FLLegs</parent>
+            <child>RFWheelColision-1</child>
+            <axis>
+                <xyz expressed_in="__model__">-1.0 -0.0 -0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="BLLegs_Revolute-43" type="revolute">
+            <pose>0.09119999942779528 -0.0716519999999995 0.011209000000000243 0.0 0.0 0.0</pose>
+            <parent>BLLegs</parent>
+            <child>LBWheelColision</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="BRLegs_Revolute-44" type="revolute">
+            <pose>0.09119999942779536 -0.07165199999999973 0.011209000000000127 0.0 0.0 0.0</pose>
+            <parent>BRLegs</parent>
+            <child>RBWheelColision</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 -0.0 0.0</xyz>
+            </axis>
+        </joint>
+        <joint name="FRLegs_Revolute-45" type="revolute">
+            <pose>0.0911999994277953 -0.07165179515343749 0.01120930221065989 0.0 0.0 0.0</pose>
+            <parent>FRLegs</parent>
+            <child>RFWheelColision</child>
+            <axis>
+                <xyz expressed_in="__model__">1.0 -0.0 0.0</xyz>
+            </axis>
+        </joint>
+
+        <!-- ROS root joint -->
+        <joint name="base_link_to_Chassis" type="fixed">
+            <parent>base_link</parent>
+            <child>Chassis</child>
+        </joint>
+
+        <!-- Sensor frame definitions (positions in Chassis frame) -->
+        <frame name="camera_link" attached_to="Chassis">
+            <pose>0.2149999962059069 0.1018999999999998 0.06275000205719003 0 0 0</pose>
+        </frame>
+        <frame name="imu_link" attached_to="Chassis">
+            <pose>0.22470999620590701 0.081339999999999829 0.072750002057190011 0 0 0</pose>
+        </frame>
+        <frame name="lidar_link" attached_to="Chassis">
+            <pose>0.23059999620590699 0.077399999999999816 0.08275000205719002 0 0 0</pose>
+        </frame>
+
+        <!-- TrackedVehicle: left/right swapped because LTracks is on the +Y (left) side
+             and RTracks is near origin. The old model had them swapped - keep that. -->
+        <plugin filename="gz-sim-tracked-vehicle-system" name="gz::sim::systems::TrackedVehicle">
+            <left_track>
+                <link>RTracks</link>
+            </left_track>
+            <right_track>
+                <link>LTracks</link>
+            </right_track>
+            <tracks_separation>0.1824</tracks_separation>
+            <tracks_height>0.007</tracks_height>
+            <steering_efficiency>0.7</steering_efficiency>
+            <topic>/model/tracked_robot/cmd_vel</topic>
+            <odom_publish_frequency>50</odom_publish_frequency>
+            <odom_topic>/wheel/odom</odom_topic>
+            <tf_topic>tf</tf_topic>
+            <frame_id>odom</frame_id>
+            <child_frame_id>base_link</child_frame_id>
+        </plugin>
+        <plugin filename="gz-sim-track-controller-system" name="gz::sim::systems::TrackController">
+            <link>LTracks</link>
+            <min_velocity>-0.5555555555555556</min_velocity>
+            <max_velocity>0.5555555555555556</max_velocity>
+        </plugin>
+        <plugin filename="gz-sim-track-controller-system" name="gz::sim::systems::TrackController">
+            <link>RTracks</link>
+            <min_velocity>-0.5555555555555556</min_velocity>
+            <max_velocity>0.5555555555555556</max_velocity>
+        </plugin>
+        <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+            <joint_name>robotarm_x_joint</joint_name>
+            <topic>/robotarm/x_position_cmd</topic>
+            <p_gain>80</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>20</d_gain>
+            <cmd_min>0.01</cmd_min>
+            <cmd_max>0.09</cmd_max>
+        </plugin>
+        <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+            <joint_name>robotarm_z_joint</joint_name>
+            <topic>/robotarm/z_position_cmd</topic>
+            <p_gain>80</p_gain>
+            <i_gain>10</i_gain>
+            <d_gain>20</d_gain>
+            <cmd_min>0.0</cmd_min>
+            <cmd_max>0.25</cmd_max>
+        </plugin>
+        <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+            <joint_name>left_gripper_finger_joint</joint_name>
+            <topic>/gripper/left_position_cmd</topic>
+            <p_gain>20</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>2</d_gain>
+            <cmd_min>-3.228859</cmd_min>
+            <cmd_max>-0.523599</cmd_max>
+        </plugin>
+        <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+            <joint_name>right_gripper_finger_joint</joint_name>
+            <topic>/gripper/right_position_cmd</topic>
+            <p_gain>20</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>2</d_gain>
+            <cmd_min>0.523599</cmd_min>
+            <cmd_max>2.96706</cmd_max>
+        </plugin>
+        <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+            <topic>/joint_states</topic>
+            <update_rate>30</update_rate>
+            <joint_name>robotarm_x_joint</joint_name>
+            <joint_name>robotarm_z_joint</joint_name>
+            <joint_name>left_gripper_finger_joint</joint_name>
+            <joint_name>right_gripper_finger_joint</joint_name>
+            <joint_name>Chassis_Revolute-1</joint_name>
+            <joint_name>Chassis_Revolute-2</joint_name>
+            <joint_name>Chassis_Revolute-7</joint_name>
+            <joint_name>Chassis_Revolute-8</joint_name>
+            <joint_name>BRLegs_Revolute-44</joint_name>
+            <joint_name>FRLegs_Revolute-45</joint_name>
+            <joint_name>FLLegs_Revolute-42</joint_name>
+            <joint_name>BLLegs_Revolute-43</joint_name>
+        </plugin>
+        <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+            <publish_link_pose>true</publish_link_pose>
+            <publish_sensor_pose>false</publish_sensor_pose>
+            <publish_collision_pose>false</publish_collision_pose>
+            <publish_visual_pose>false</publish_visual_pose>
+            <publish_nested_model_pose>false</publish_nested_model_pose>
+        </plugin>
+    </model>
 </sdf>
