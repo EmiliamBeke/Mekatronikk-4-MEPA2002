@@ -69,6 +69,7 @@ def generate_launch_description():
     default_ekf_params = os.path.join(robot_bringup_share, 'config', 'ekf.yaml')
     default_apriltag_params = os.path.join(robot_bringup_share, 'config', 'apriltag_overhead.yaml')
     default_overhead_odom_params = os.path.join(robot_bringup_share, 'config', 'overhead_odom.yaml')
+    default_robotarm_params = os.path.join(robot_bringup_share, 'config', 'robotarm_sim_params.yaml')
     workspace_root = os.path.abspath(os.path.join(robot_bringup_share, '..', '..', '..', '..'))
     default_teddy_model = os.path.join(workspace_root, 'models', 'yolo26n_ncnn_model')
 
@@ -154,6 +155,9 @@ def generate_launch_description():
             '--z-topic', '/robotarm/request/z_position',
             '--left-gripper-topic', '/gripper/request/left_position',
             '--right-gripper-topic', '/gripper/request/right_position',
+            '--gripper-min', '-2.96706',
+            '--gripper-max', '-0.523599',
+            '--gripper-initial', '-0.523599',
         ],
     )
 
@@ -180,6 +184,7 @@ def generate_launch_description():
             'ekf_params_file': ekf_params_file,
             'nav2_start_delay_s': nav2_start_delay_s,
             'rviz_config': rviz_config,
+            'robotarm_params_file': default_robotarm_params,
         }.items(),
     )
 
@@ -209,7 +214,7 @@ def generate_launch_description():
         ],
     )
     # Gazebo can publish lidar scans with scoped frame ids like
-    # "tracked_robot/chassis/lidar". Provide an alias frame so Nav2's
+    # "tracked_robot/base_link/lidar". Provide an alias frame so Nav2's
     # collision_monitor can resolve transforms reliably.
     lidar_scoped_frame_alias_tf = Node(
         package='tf2_ros',
@@ -219,7 +224,7 @@ def generate_launch_description():
             '--x', '0', '--y', '0', '--z', '0',
             '--roll', '0', '--pitch', '0', '--yaw', '0',
             '--frame-id', 'lidar_link',
-            '--child-frame-id', 'tracked_robot/chassis/lidar',
+            '--child-frame-id', 'tracked_robot/base_link/lidar',
         ],
     )
     lidar_scoped_base_laser_alias_tf = Node(
@@ -234,7 +239,7 @@ def generate_launch_description():
         ],
     )
     # Gazebo IMU messages can use scoped frame ids like
-    # "tracked_robot/chassis/imu". Provide an alias to imu_link so EKF
+    # "tracked_robot/base_link/imu". Provide an alias to imu_link so EKF
     # can resolve the sensor->base transform.
     imu_scoped_frame_alias_tf = Node(
         package='tf2_ros',
@@ -244,7 +249,7 @@ def generate_launch_description():
             '--x', '0', '--y', '0', '--z', '0',
             '--roll', '0', '--pitch', '0', '--yaw', '0',
             '--frame-id', 'imu_link',
-            '--child-frame-id', 'tracked_robot/chassis/imu',
+            '--child-frame-id', 'tracked_robot/base_link/imu',
         ],
     )
 
@@ -494,7 +499,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'sim_track_width_eff_m',
-            default_value='0.184',
+            default_value='0.1824',
             description='Effective track width for sim cmd_vel conversion.'
         ),
         DeclareLaunchArgument(
