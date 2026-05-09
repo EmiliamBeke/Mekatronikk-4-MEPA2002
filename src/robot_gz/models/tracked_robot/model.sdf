@@ -1,8 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <sdf version="1.7" xmlns:gz="http://gazebosim.org/schema">
     <model name="tracked_robot">
-        <!-- Root link for ROS TF. yaw=+pi/2 so base_link X = model Y = track forward direction.
-             World spawn must use yaw=-pi/2 to cancel: base_link world yaw = 0. -->
         <link name="base_link">
             <pose>0 0 0 0 0 1.5707963267948972</pose>
         </link>
@@ -1247,10 +1245,10 @@
             </collision>
         </link>
         <link name="RTracks">
-            <pose>1.0658141036401502e-16 4.9273059957786194e-05 -0.00014476278193439995 0.0009707120072640304 -3.805757496339463e-16 -1.112486316165012e-16</pose>
+            <pose>1.0658141036401502e-16 4.9273059957786194e-05 -0.00014476278193439995 0.0009707120072640304 0 1.5707963267948972</pose>
             <inertial>
                 <mass>0.12017843301436808</mass>
-                <pose>0.09119999999999995 0.018327104257870826 0.04702245821288157 0.0 0.0 0.0</pose>
+                <pose>0.018327104257870826 -0.09119999999999995 0.04702245821288157 0 0 -1.5707963267948972</pose>
                 <inertia>
                     <ixx>0.0015067502474651415</ixx>
                     <iyy>0.00025369506158998367</iyy>
@@ -1261,6 +1259,7 @@
                 </inertia>
             </inertial>
             <visual name="RTracks_visual">
+                <pose>0 0 0 0 0 -1.5707963267948972</pose>
                 <geometry>
                     <mesh>
                         <uri>meshes/RTracks.stl</uri>
@@ -1269,7 +1268,7 @@
                 </geometry>
             </visual>
             <collision name="RTracks_drive_proxy_collision">
-                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <pose>0.018 -0.0912 -0.013271 0 0 -1.5707963267948972</pose>
                 <geometry>
                     <box>
                         <size>0.030 0.210 0.007</size>
@@ -1286,7 +1285,7 @@
                 </surface>
             </collision>
             <visual name="RTracks_drive_proxy_visual">
-                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <pose>0.018 -0.0912 -0.013271 0 0 -1.5707963267948972</pose>
                 <geometry>
                     <box>
                         <size>0.030 0.210 0.007</size>
@@ -1300,10 +1299,10 @@
             </visual>
         </link>
         <link name="LTracks">
-            <pose>-0.18240000000000003 4.927305995761855e-05 -0.00014476278193459535 0.0009707120072640304 -3.805853933038537e-16 1.1216047918531813e-17</pose>
+            <pose>-0.18240000000000003 4.927305995761855e-05 -0.00014476278193459535 0.0009707120072640304 0 1.5707963267948972</pose>
             <inertial>
                 <mass>0.12017843301436808</mass>
-                <pose>0.09119999999999999 0.018327104257870867 0.04702245821288173 0.0 0.0 0.0</pose>
+                <pose>0.018327104257870867 -0.09119999999999999 0.04702245821288173 0 0 -1.5707963267948972</pose>
                 <inertia>
                     <ixx>0.0015067502474651418</ixx>
                     <iyy>0.0002536950615899849</iyy>
@@ -1314,6 +1313,7 @@
                 </inertia>
             </inertial>
             <visual name="LTracks_visual">
+                <pose>0 0 0 0 0 -1.5707963267948972</pose>
                 <geometry>
                     <mesh>
                         <uri>meshes/LTracks.stl</uri>
@@ -1322,7 +1322,7 @@
                 </geometry>
             </visual>
             <collision name="LTracks_drive_proxy_collision">
-                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <pose>0.018 -0.0912 -0.013271 0 0 -1.5707963267948972</pose>
                 <geometry>
                     <box>
                         <size>0.030 0.210 0.007</size>
@@ -1339,7 +1339,7 @@
                 </surface>
             </collision>
             <visual name="LTracks_drive_proxy_visual">
-                <pose>0.0912 0.018 -0.013271 0 0 0</pose>
+                <pose>0.018 -0.0912 -0.013271 0 0 -1.5707963267948972</pose>
                 <geometry>
                     <box>
                         <size>0.030 0.210 0.007</size>
@@ -1771,6 +1771,16 @@
             <child>Top-Rack-200.0mm-R30.00-m2.1651</child>
             <axis>
                 <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+                <limit>
+                    <lower>-0.02</lower>
+                    <upper>0.02</upper>
+                    <effort>50</effort>
+                    <velocity>0.5</velocity>
+                </limit>
+                <dynamics>
+                    <damping>5.0</damping>
+                    <friction>0.5</friction>
+                </dynamics>
             </axis>
         </joint>
         <joint name="Gripper_Slider-34" type="prismatic">
@@ -1779,6 +1789,16 @@
             <child>Bottom-Rack-200.0mm-L30.00-m2.1651</child>
             <axis>
                 <xyz expressed_in="__model__">1.0 0.0 0.0</xyz>
+                <limit>
+                    <lower>-0.02</lower>
+                    <upper>0.02</upper>
+                    <effort>50</effort>
+                    <velocity>0.5</velocity>
+                </limit>
+                <dynamics>
+                    <damping>5.0</damping>
+                    <friction>0.5</friction>
+                </dynamics>
             </axis>
         </joint>
         <joint name="right_gripper_finger_joint" type="revolute">
@@ -1880,14 +1900,14 @@
             <pose>0.23059999620590699 0.077399999999999816 0.08275000205719002 0 0 0</pose>
         </frame>
 
-        <!-- TrackedVehicle: left/right swapped because LTracks is on the +Y (left) side
-             and RTracks is near origin. The old model had them swapped - keep that. -->
+        <!-- TrackedVehicle: LTracks at X=-0.182 (left side in model frame after track yaw),
+             RTracks at X≈0 (right side). -->
         <plugin filename="gz-sim-tracked-vehicle-system" name="gz::sim::systems::TrackedVehicle">
             <left_track>
-                <link>RTracks</link>
+                <link>LTracks</link>
             </left_track>
             <right_track>
-                <link>LTracks</link>
+                <link>RTracks</link>
             </right_track>
             <tracks_separation>0.1824</tracks_separation>
             <tracks_height>0.007</tracks_height>

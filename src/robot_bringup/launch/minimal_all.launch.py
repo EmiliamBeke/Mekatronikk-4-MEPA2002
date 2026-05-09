@@ -224,7 +224,7 @@ def generate_launch_description():
             '--x', '0', '--y', '0', '--z', '0',
             '--roll', '0', '--pitch', '0', '--yaw', '0',
             '--frame-id', 'lidar_link',
-            '--child-frame-id', 'tracked_robot/base_link/lidar',
+            '--child-frame-id', 'tracked_robot/Chassis/lidar',
         ],
     )
     lidar_scoped_base_laser_alias_tf = Node(
@@ -249,7 +249,7 @@ def generate_launch_description():
             '--x', '0', '--y', '0', '--z', '0',
             '--roll', '0', '--pitch', '0', '--yaw', '0',
             '--frame-id', 'imu_link',
-            '--child-frame-id', 'tracked_robot/base_link/imu',
+            '--child-frame-id', 'tracked_robot/Chassis/imu',
         ],
     )
 
