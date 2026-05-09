@@ -1,91 +1,155 @@
 #include <Wire.h>
 #include <vl53l4ed_class.h>
 
-#define XSHUT_PIN 7
+constexpr int kXshutPin = -1;  // Ikke bruk XSHUT i denne testen.
+constexpr uint8_t kDistanceI2cAddress = 0x29;
+constexpr uint32_t kWireTimeoutUs = 25000;
+constexpr uint16_t kSignalThresholdKcps = 0;
+constexpr int kOffsetMm = 15;
+constexpr unsigned long kRetryPeriodMs = 2000;
 
-const int OFFSET_MM = 15;
+VL53L4ED sensor(&Wire, kXshutPin);
 
-VL53L4ED sensor(&Wire, XSHUT_PIN);
+bool sensor_ready = false;
+unsigned long last_init_attempt_ms = 0;
 
-void setup() {
-  Serial.begin(115200);
-  delay(2000);
+bool i2c_device_present(uint8_t address) {
+  Wire.beginTransmission(address);
+  return Wire.endTransmission() == 0;
+}
 
-  Serial.println("Starter VL53L4ED...");
+void print_i2c_scan() {
+  Serial.println("I2C scan begin");
+  bool found_any = false;
+  for (uint8_t address = 1; address < 127; address++) {
+    Wire.beginTransmission(address);
+    const uint8_t error = Wire.endTransmission();
+    if (error == 0) {
+      found_any = true;
+      Serial.print("I2C device 0x");
+      if (address < 16) {
+        Serial.print("0");
+      }
+      Serial.println(address, HEX);
+    }
+  }
+  if (!found_any) {
+    Serial.println("I2C scan none");
+  }
+  Serial.println("I2C scan end");
+}
 
-  Wire.begin();           // Arduino Mega: SDA = 20, SCL = 21
-  Wire.setClock(100000);  // Stabil I2C-hastighet
+bool init_distance_sensor() {
+  Serial.println("DIST INIT begin");
 
-  // Reset sensoren via XSHUT
-  pinMode(XSHUT_PIN, OUTPUT);
-  digitalWrite(XSHUT_PIN, LOW);
-  delay(200);
-  digitalWrite(XSHUT_PIN, HIGH);
-  delay(1000);
+  if (!i2c_device_present(kDistanceI2cAddress)) {
+    Serial.println("ERR DIST I2C 0x29 not found");
+    print_i2c_scan();
+    return false;
+  }
 
-  int status;
-
-  status = sensor.begin();
-  Serial.print("begin status: ");
-  Serial.println(status);
-
+  int status = sensor.begin();
   if (status != 0) {
-    Serial.println("sensor.begin() feilet");
-    while (1);
+    Serial.print("ERR DIST BEGIN ");
+    Serial.println(status);
+    return false;
   }
 
   status = sensor.InitSensor();
-  Serial.print("InitSensor status: ");
-  Serial.println(status);
-
   if (status != 0) {
-    Serial.println("InitSensor() feilet");
-    while (1);
+    Serial.print("ERR DIST INIT ");
+    Serial.println(status);
+    return false;
+  }
+
+  status = sensor.VL53L4ED_SetSignalThreshold(kSignalThresholdKcps);
+  if (status != 0) {
+    Serial.print("ERR DIST SIGNAL_THRESHOLD ");
+    Serial.println(status);
+    return false;
   }
 
   status = sensor.VL53L4ED_StartRanging();
-  Serial.print("StartRanging status: ");
-  Serial.println(status);
-
   if (status != 0) {
-    Serial.println("StartRanging() feilet");
-    while (1);
+    Serial.print("ERR DIST START ");
+    Serial.println(status);
+    return false;
   }
 
-  Serial.println("VL53L4ED klar!");
+  Serial.println("OK DIST INIT");
+  return true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  Serial.println("VL53L4ED distance test, no XSHUT");
+  Serial.println("Mega I2C: SDA=20 SCL=21");
+
+  Wire.begin();
+  Wire.setClock(100000);
+  Wire.setWireTimeout(kWireTimeoutUs, true);
+  delay(50);
+
+  sensor_ready = init_distance_sensor();
+  last_init_attempt_ms = millis();
 }
 
 void loop() {
-  uint8_t dataReady = 0;
-  VL53L4ED_ResultsData_t result;
-
-  int status = sensor.VL53L4ED_CheckForDataReady(&dataReady);
-
-  if (status != 0) {
-    Serial.print("CheckForDataReady feil: ");
-    Serial.println(status);
-    delay(500);
+  if (!sensor_ready) {
+    if (millis() - last_init_attempt_ms >= kRetryPeriodMs) {
+      last_init_attempt_ms = millis();
+      sensor_ready = init_distance_sensor();
+    }
     return;
   }
 
-  if (dataReady) {
-    sensor.VL53L4ED_ClearInterrupt();
-    sensor.VL53L4ED_GetResult(&result);
-
-    int rawDistance = result.distance_mm;
-    int calibratedDistance = rawDistance - OFFSET_MM;
-
-    // Hindrer negativ avstand
-    if (calibratedDistance < 0) {
-      calibratedDistance = 0;
-    }
-
-    Serial.print("Rå avstand: ");
-    Serial.print(rawDistance);
-    Serial.print(" mm | Kalibrert avstand: ");
-    Serial.print(calibratedDistance);
-    Serial.println(" mm");
+  uint8_t data_ready = 0;
+  int status = sensor.VL53L4ED_CheckForDataReady(&data_ready);
+  if (status != 0) {
+    Serial.print("ERR DIST READY ");
+    Serial.println(status);
+    sensor_ready = false;
+    return;
   }
 
-  delay(20);
-} 
+  if (!data_ready) {
+    delay(20);
+    return;
+  }
+
+  VL53L4ED_ResultsData_t result;
+  sensor.VL53L4ED_ClearInterrupt();
+  status = sensor.VL53L4ED_GetResult(&result);
+  if (status != 0) {
+    Serial.print("ERR DIST RESULT ");
+    Serial.println(status);
+    sensor_ready = false;
+    return;
+  }
+
+  const int raw_distance_mm = result.distance_mm;
+  const bool valid_distance = result.range_status == 0 && raw_distance_mm > 0;
+  const int calibrated_distance_mm = valid_distance ? max(0, raw_distance_mm - kOffsetMm) : -1;
+
+  Serial.print("DIST raw=");
+  Serial.print(raw_distance_mm);
+  Serial.print(" calibrated=");
+  Serial.print(calibrated_distance_mm);
+  Serial.print(" status=");
+  Serial.print(result.range_status);
+  Serial.print(" signal=");
+  Serial.print(result.signal_per_spad_kcps);
+  Serial.print(" spads=");
+  Serial.print(result.number_of_spad);
+  Serial.print(" ambient=");
+  Serial.print(result.ambient_per_spad_kcps);
+  Serial.print(" sigma=");
+  Serial.print(result.sigma_mm);
+  Serial.print(" valid=");
+  Serial.print(valid_distance ? 1 : 0);
+  Serial.println(" mm");
+
+  delay(50);
+}

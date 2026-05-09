@@ -28,7 +28,7 @@ PARAM_DEFAULTS = {
     "z_max": 0.3,
     "gripper_min": 500.0,
     "gripper_max": 1800.0,
-    "lidar_x_threshold": 0.09,
+    "lidar_x_threshold": 0.08,
     "lidar_z_clearance": 0.12,
     "max_x_step_per_publish": 0.005,
     "max_z_step_per_publish": 0.001,

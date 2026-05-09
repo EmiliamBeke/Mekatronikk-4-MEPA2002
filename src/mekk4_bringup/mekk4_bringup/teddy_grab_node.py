@@ -31,9 +31,9 @@ PARAM_DEFAULTS = {
     "distance_timeout_s": 0.5,
     "detector_status_timeout_s": 1.0,
     "scan_timeout_s": 0.5,
-    "safe_x": 0.11,
+    "safe_x": 0.095,
     "safe_z": 0.12,
-    "lower_z": 0.01,
+    "lower_z": 0.04,
     "grab_x": 0.15,
     "approach_x_max": 0.18,
     "approach_x_step_m": 0.002,
@@ -47,7 +47,7 @@ PARAM_DEFAULTS = {
     "require_state_feedback": True,
     "use_distance_contact": True,
     "require_distance_feedback": True,
-    "contact_distance_mm": 0,
+    "contact_distance_mm": 20,
     "contact_hold_s": 0.25,
     "use_detector_dy_for_grab_z": False,
     "dy_to_z_gain_m": 0.04,
@@ -87,7 +87,7 @@ class TeddyGrabNode(Node):
         self.front_lidar_points = 0
         self.scan_received_at = -math.inf
         self.contact_started_at: float | None = None
-        self.reach_x_target = float(self.param("grab_x"))
+        self.reach_x_target = self.initial_reach_x_target()
         self.grab_z_target = float(self.param("lower_z"))
         self.sequence = self.make_sequence()
 
@@ -120,7 +120,7 @@ class TeddyGrabNode(Node):
         if msg.data != self.trigger_mode:
             return
         self.grab_z_target = self.compute_grab_z()
-        self.reach_x_target = float(self.param("grab_x"))
+        self.reach_x_target = self.initial_reach_x_target()
         self.contact_started_at = None
         self.sequence = self.make_sequence()
         self.step_index = 0
@@ -190,6 +190,11 @@ class TeddyGrabNode(Node):
         self.state_started_at = self.now_s()
         self.get_logger().info(f"state={state}")
 
+    def initial_reach_x_target(self) -> float:
+        if bool(self.param("use_distance_contact")):
+            return float(self.param("safe_x"))
+        return float(self.param("grab_x"))
+
     def make_sequence(self) -> list[dict[str, float | str]]:
         safe_x = float(self.param("safe_x"))
         safe_z = float(self.param("safe_z"))
@@ -201,9 +206,9 @@ class TeddyGrabNode(Node):
         closed_gripper = float(self.param("gripper_closed"))
         move_hold_s = float(self.param("move_hold_s"))
 
-        return [
+        sequence = [
             {
-                "name": "safe_x_110mm",
+                "name": "safe_x",
                 "x": safe_x,
                 "z": safe_z,
                 "gripper": open_gripper,
@@ -216,49 +221,62 @@ class TeddyGrabNode(Node):
                 "gripper": open_gripper,
                 "hold_s": move_hold_s,
             },
-            {
-                "name": "reach_x_150mm",
-                "x": grab_x,
-                "z": lower_z,
-                "gripper": open_gripper,
-                "hold_s": move_hold_s,
-            },
-            {
-                "name": "reach_until_contact",
-                "x": grab_x,
-                "z": lower_z,
-                "gripper": open_gripper,
-                "hold_s": 0.0,
-            },
-            {
-                "name": "grab_servo",
-                "x": grab_x,
-                "z": lower_z,
-                "gripper": closed_gripper,
-                "hold_s": float(self.param("grab_hold_s")),
-            },
-            {
-                "name": "retract_x_90mm",
-                "x": safe_x,
-                "z": lower_z,
-                "gripper": closed_gripper,
-                "hold_s": move_hold_s,
-            },
-            {
-                "name": "lift_z_210mm",
-                "x": safe_x,
-                "z": lift_z,
-                "gripper": closed_gripper,
-                "hold_s": move_hold_s,
-            },
-            {
-                "name": "home_x_0mm",
-                "x": final_x,
-                "z": lift_z,
-                "gripper": closed_gripper,
-                "hold_s": float(self.param("final_hold_s")),
-            },
         ]
+
+        if bool(self.param("use_distance_contact")):
+            sequence.append(
+                {
+                    "name": "reach_until_contact",
+                    "x": grab_x,
+                    "z": lower_z,
+                    "gripper": open_gripper,
+                    "hold_s": 0.0,
+                }
+            )
+        else:
+            sequence.append(
+                {
+                    "name": "reach_x_150mm",
+                    "x": grab_x,
+                    "z": lower_z,
+                    "gripper": open_gripper,
+                    "hold_s": move_hold_s,
+                }
+            )
+
+        sequence.extend(
+            [
+                {
+                    "name": "grab_servo",
+                    "x": grab_x,
+                    "z": lower_z,
+                    "gripper": closed_gripper,
+                    "hold_s": float(self.param("grab_hold_s")),
+                },
+                {
+                    "name": "retract_x_safe",
+                    "x": safe_x,
+                    "z": lower_z,
+                    "gripper": closed_gripper,
+                    "hold_s": move_hold_s,
+                },
+                {
+                    "name": "lift_z_210mm",
+                    "x": safe_x,
+                    "z": lift_z,
+                    "gripper": closed_gripper,
+                    "hold_s": move_hold_s,
+                },
+                {
+                    "name": "home_x_0mm",
+                    "x": final_x,
+                    "z": lift_z,
+                    "gripper": closed_gripper,
+                    "hold_s": float(self.param("final_hold_s")),
+                },
+            ]
+        )
+        return sequence
 
     def compute_grab_z(self) -> float:
         base_z = float(self.param("lower_z"))
@@ -356,6 +374,10 @@ class TeddyGrabNode(Node):
         if contact:
             if self.contact_started_at is None:
                 self.contact_started_at = now
+                self.get_logger().info(
+                    "distance contact detected: %d mm <= %d mm"
+                    % (self.distance_mm, int(self.param("contact_distance_mm")))
+                )
             if now - self.contact_started_at >= float(self.param("contact_hold_s")):
                 self.finish_contact_step()
             return
@@ -372,10 +394,10 @@ class TeddyGrabNode(Node):
 
     def finish_contact_step(self) -> None:
         for step in self.sequence:
-            if step["name"] in ("grab_servo", "retract_x_90mm", "lift_z_210mm", "home_x_0mm"):
+            if step["name"] in ("grab_servo", "retract_x_safe", "lift_z_210mm", "home_x_0mm"):
                 if step["name"] == "grab_servo":
                     step["x"] = self.reach_x_target
-                elif step["name"] == "retract_x_90mm":
+                elif step["name"] == "retract_x_safe":
                     step["z"] = self.grab_z_target
                 elif step["name"] == "lift_z_210mm":
                     step["x"] = float(self.param("safe_x"))

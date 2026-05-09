@@ -30,22 +30,21 @@ teddy_grab:
     require_state_feedback: true
 
     # Sequence positions in meters.
-    safe_x: 0.11
+    safe_x: 0.085
     safe_z: 0.12
-    lower_z: 0.01
+    lower_z: 0.03
     grab_x: 0.15
     approach_x_max: 0.18
     approach_x_step_m: 0.002
     lift_z: 0.21
     final_x: 0.0
 
-    # Continue moving X forward until the VL53 distance sensor has reported
-    # contact for long enough. Firmware distance is offset and clamped, so 0 mm
-    # means the sensor sees the object at/inside the calibrated near point.
+    # Continue moving X forward until the VL53 distance sensor reports <= 20 mm
+    # for long enough.
     use_distance_contact: true
     require_distance_feedback: true
-    contact_distance_mm: 0
-    contact_hold_s: 0.25
+    contact_distance_mm: 35
+    contact_hold_s: 0.10
 
     # Optional rough image-to-height correction from teddy_detector dy only.
     # This is empirical, not geometric calibration.

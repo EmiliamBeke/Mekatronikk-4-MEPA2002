@@ -38,14 +38,17 @@ constexpr int kZEnPin = 52;
 constexpr int kZLimitPin = 44;
 constexpr int kZLimitActiveState = HIGH;
 constexpr long kZHomeDir = -1;
+constexpr int kArmStepperEnableActiveState = LOW;
 
 constexpr int kServoPin = 46;
 constexpr int kServoHomeUs = 500;
 constexpr int kServoClosedUs = 1800;
 constexpr int kServoMinUs = 500;
 constexpr int kServoMaxUs = 2500;
+constexpr unsigned long kHomeGripperOpenDelayMs = 500;
 constexpr int kDistanceXshutPin = -1;
-constexpr int kDistanceOffsetMm = 15;
+constexpr int kDistanceNoReadingMm = 9999;
+constexpr int kDistanceContactMm = 20;
 
 constexpr float kXStepsPerMm = 18.65f;
 constexpr float kZStepsPerMm = 2929.0f;
@@ -107,16 +110,20 @@ bool stream_status = false;
 unsigned long last_status_ms = 0;
 unsigned long last_distance_ms = 0;
 int servo_us = kServoHomeUs;
-int distance_mm = -1;
+int distance_mm = kDistanceNoReadingMm;
+bool distance_contact = false;
 bool distance_ok = false;
 int last_x_limit_state = -1;
 int last_z_limit_state = -1;
 bool arm_homed = false;
+bool arm_steppers_enabled = false;
 bool persist_dirty = false;
 unsigned long last_motion_or_servo_ms = 0;
 
 Servo gripper_servo;
 VL53L4ED distance_sensor(&Wire, kDistanceXshutPin);
+
+void step_blocking(Axis &axis, long physical_dir);
 
 constexpr int8_t kQuadratureDelta[16] = {
   0, -1, 1, 0,
@@ -255,6 +262,26 @@ void motor_output(int ina, int inb, int pwm_pin, int speed) {
   analogWrite(pwm_pin, abs(speed));
 }
 
+void set_arm_steppers_enabled(bool enabled) {
+  arm_steppers_enabled = enabled;
+  const int level = enabled ? kArmStepperEnableActiveState : !kArmStepperEnableActiveState;
+  digitalWrite(kXEnPin, level);
+  digitalWrite(kZEnPin, level);
+}
+
+void open_gripper_for_homing() {
+  if (servo_us == kServoHomeUs) {
+    return;
+  }
+
+  servo_us = kServoHomeUs;
+  gripper_servo.writeMicroseconds(servo_us);
+  mark_persist_dirty();
+  Serial.print("EVENT SERVO OPEN ");
+  Serial.println(servo_us);
+  delay(kHomeGripperOpenDelayMs);
+}
+
 void apply_drive(int m1, int m2) {
   current_m1_speed = clamp_pwm(m1);
   current_m2_speed = clamp_pwm(m2);
@@ -324,6 +351,42 @@ void move_axis_relative(Axis &axis, long delta) {
   }
 }
 
+bool move_axis_relative_blocking(Axis &axis, const char *name, long delta) {
+  if (delta == 0) {
+    axis.target = axis.position;
+    axis.moving = false;
+    return true;
+  }
+
+  set_arm_steppers_enabled(true);
+  axis.moving = true;
+  const long logical_dir = delta > 0 ? 1 : -1;
+  const long physical_dir = logical_dir > 0 ? axis.positive_dir : -axis.positive_dir;
+  const long count = labs(delta);
+
+  for (long i = 0; i < count; i++) {
+    if (physical_dir == axis.home_dir && limit_active(axis)) {
+      axis.position = axis.home_position;
+      axis.target = axis.position;
+      axis.moving = false;
+      mark_persist_dirty();
+      Serial.print("EVENT ");
+      Serial.print(name);
+      Serial.println(" LIMIT");
+      return false;
+    }
+
+    step_blocking(axis, physical_dir);
+    axis.position += logical_dir;
+    last_motion_or_servo_ms = millis();
+  }
+
+  axis.target = axis.position;
+  axis.moving = false;
+  mark_persist_dirty();
+  return true;
+}
+
 void update_axis(Axis &axis, const char *name) {
   if (!axis.moving || axis.position == axis.target) {
     if (axis.moving) {
@@ -365,6 +428,7 @@ void step_blocking(Axis &axis, long physical_dir) {
 }
 
 bool home_axis(Axis &axis, const char *name, long max_steps) {
+  set_arm_steppers_enabled(true);
   const long backoff = name[0] == 'X'
                          ? mm_to_steps(kHomeBackoffMm, kXStepsPerMm)
                          : mm_to_steps(kHomeBackoffMm, kZStepsPerMm);
@@ -400,6 +464,7 @@ bool home_axis(Axis &axis, const char *name, long max_steps) {
 
 bool startup_home_arm() {
   Serial.println("EVENT ARM STARTUP HOME BEGIN");
+  open_gripper_for_homing();
   arm_homed = false;
   stop_all();
   x_axis.home_position = mm_to_steps(kStartupXMaxMm, kXStepsPerMm);
@@ -435,10 +500,28 @@ bool startup_home_arm() {
 void init_distance_sensor() {
   Wire.begin();
   Wire.setClock(100000);
-  delay(10);
-  if (distance_sensor.begin() != 0 || distance_sensor.InitSensor() != 0 ||
-      distance_sensor.VL53L4ED_StartRanging() != 0) {
-    Serial.println("ERR DIST INIT");
+  delay(50);
+
+  const int begin_status = distance_sensor.begin();
+  if (begin_status != 0) {
+    Serial.print("ERR DIST BEGIN ");
+    Serial.println(begin_status);
+    distance_ok = false;
+    return;
+  }
+
+  const int init_status = distance_sensor.InitSensor();
+  if (init_status != 0) {
+    Serial.print("ERR DIST INIT ");
+    Serial.println(init_status);
+    distance_ok = false;
+    return;
+  }
+
+  const int start_status = distance_sensor.VL53L4ED_StartRanging();
+  if (start_status != 0) {
+    Serial.print("ERR DIST START ");
+    Serial.println(start_status);
     distance_ok = false;
     return;
   }
@@ -451,14 +534,27 @@ void update_distance() {
     return;
   }
   last_distance_ms = millis();
+
   uint8_t ready = 0;
   if (distance_sensor.VL53L4ED_CheckForDataReady(&ready) != 0 || !ready) {
     return;
   }
+
   VL53L4ED_ResultsData_t result;
   distance_sensor.VL53L4ED_ClearInterrupt();
-  distance_sensor.VL53L4ED_GetResult(&result);
-  distance_mm = max(0, static_cast<int>(result.distance_mm) - kDistanceOffsetMm);
+  if (distance_sensor.VL53L4ED_GetResult(&result) != 0) {
+    distance_mm = kDistanceNoReadingMm;
+    distance_contact = false;
+    return;
+  }
+
+  if (result.distance_mm > 0) {
+    distance_mm = static_cast<int>(result.distance_mm);
+    distance_contact = distance_mm <= kDistanceContactMm;
+  } else {
+    distance_mm = kDistanceNoReadingMm;
+    distance_contact = false;
+  }
 }
 
 void maybe_stop_on_watchdog() {
@@ -492,10 +588,14 @@ void print_state(const char *prefix) {
   Serial.print(limit_active(z_axis) ? 1 : 0);
   Serial.print(" D=");
   Serial.print(distance_mm);
+  Serial.print(" DC=");
+  Serial.print(distance_contact ? 1 : 0);
   Serial.print(" SERVO=");
   Serial.print(servo_us);
   Serial.print(" H=");
   Serial.print(arm_homed ? 1 : 0);
+  Serial.print(" EH=");
+  Serial.print(arm_steppers_enabled ? 1 : 0);
   Serial.print(" P=");
   Serial.println(persist_dirty ? 1 : 0);
 }
@@ -513,6 +613,7 @@ void reset_command_buffer() {
 }
 
 void handle_command(const char *cmd) {
+  int a = 0;
   if (strcmp(cmd, "PING") == 0) {
     Serial.println("PONG");
   } else if (strcmp(cmd, "ID") == 0) {
@@ -537,6 +638,11 @@ void handle_command(const char *cmd) {
   } else if (strcmp(cmd, "DIST") == 0) {
     Serial.print("DIST ");
     Serial.println(distance_mm);
+  } else if (strcmp(cmd, "DIST?") == 0) {
+    Serial.print("DIST D=");
+    Serial.print(distance_mm);
+    Serial.print(" DC=");
+    Serial.println(distance_contact ? 1 : 0);
   } else if (strcmp(cmd, "DIST INIT") == 0) {
     init_distance_sensor();
   } else if (strcmp(cmd, "LIMITS") == 0) {
@@ -556,12 +662,17 @@ void handle_command(const char *cmd) {
     clear_arm_state();
   } else if (strcmp(cmd, "HOME X") == 0) {
     stop_all();
+    open_gripper_for_homing();
     home_axis(x_axis, "X", kXHomeMaxSteps);
   } else if (strcmp(cmd, "HOME Z") == 0) {
     stop_all();
+    open_gripper_for_homing();
     home_axis(z_axis, "Z", kZHomeMaxSteps);
+  } else if (sscanf(cmd, "ARM HOLD %d", &a) == 1 || sscanf(cmd, "HOLD %d", &a) == 1) {
+    set_arm_steppers_enabled(a != 0);
+    Serial.print("OK ARM HOLD ");
+    Serial.println(arm_steppers_enabled ? 1 : 0);
   } else {
-    int a = 0;
     int b = 0;
     long steps = 0;
     if (sscanf(cmd, "BOTH %d %d", &a, &b) == 2 || sscanf(cmd, "D %d %d", &a, &b) == 2) {
@@ -575,14 +686,14 @@ void handle_command(const char *cmd) {
         Serial.println("ERR ARM NOT HOMED");
         return;
       }
-      move_axis_relative(x_axis, steps);
+      move_axis_relative_blocking(x_axis, "X", steps);
       Serial.println("OK ARM X");
     } else if (sscanf(cmd, "ARM Z %ld", &steps) == 1 || sscanf(cmd, "Z %ld", &steps) == 1) {
       if (!arm_homed) {
         Serial.println("ERR ARM NOT HOMED");
         return;
       }
-      move_axis_relative(z_axis, steps);
+      move_axis_relative_blocking(z_axis, "Z", steps);
       Serial.println("OK ARM Z");
     } else if (sscanf(cmd, "SERVO %d", &a) == 1 || sscanf(cmd, "S %d", &a) == 1) {
       servo_us = constrain(a, kServoMinUs, kServoMaxUs);
@@ -641,10 +752,9 @@ void setup() {
   pinMode(kZLimitPin, INPUT_PULLUP);
   digitalWrite(kXStepPin, LOW);
   digitalWrite(kXDirPin, LOW);
-  digitalWrite(kXEnPin, LOW);
   digitalWrite(kZStepPin, LOW);
   digitalWrite(kZDirPin, LOW);
-  digitalWrite(kZEnPin, LOW);
+  set_arm_steppers_enabled(true);
 
   Serial.begin(kBaudrate);
   while (!Serial && millis() < 3000) {

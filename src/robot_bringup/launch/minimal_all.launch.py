@@ -25,6 +25,7 @@ def generate_launch_description():
     use_ekf = LaunchConfiguration('use_ekf')
     use_teddy = LaunchConfiguration('use_teddy')
     use_teddy_approach = LaunchConfiguration('use_teddy_approach')
+    use_teddy_grab = LaunchConfiguration('use_teddy_grab')
     use_overhead_apriltag = LaunchConfiguration('use_overhead_apriltag')
     nav2_start_delay_s = LaunchConfiguration('nav2_start_delay_s')
     gui_config = LaunchConfiguration('gui_config')
@@ -165,6 +166,9 @@ def generate_launch_description():
             'use_lidar': 'false',
             'use_teddy': use_teddy,
             'use_teddy_approach': use_teddy_approach,
+            'use_teddy_grab': PythonExpression([
+                "'", use_teddy, "' == 'true' and '", use_teddy_grab, "' == 'true'",
+            ]),
             'use_imu': 'false',
             'use_mega_driver': 'false',
             'use_ekf': use_ekf,
@@ -447,6 +451,11 @@ def generate_launch_description():
             'use_teddy_approach',
             default_value='true',
             description='Run teddy_approach in sim.'
+        ),
+        DeclareLaunchArgument(
+            'use_teddy_grab',
+            default_value='true',
+            description='Run teddy_grab in sim.'
         ),
         DeclareLaunchArgument(
             'use_overhead_apriltag',

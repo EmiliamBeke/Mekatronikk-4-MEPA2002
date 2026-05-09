@@ -42,6 +42,7 @@ def generate_launch_description():
     use_lidar = LaunchConfiguration('use_lidar')
     use_teddy = LaunchConfiguration('use_teddy')
     use_teddy_approach = LaunchConfiguration('use_teddy_approach')
+    use_teddy_grab = LaunchConfiguration('use_teddy_grab')
     use_imu = LaunchConfiguration('use_imu')
     use_mega_driver = LaunchConfiguration('use_mega_driver')
     use_ekf = LaunchConfiguration('use_ekf')
@@ -169,18 +170,16 @@ def generate_launch_description():
         ],
     )
 
-    # Start teddy_grab when teddy detector is enabled (`use_teddy`).
-    # This allows running teddy-related safety/arm logic without the approach controller.
     teddy_grab_node = Node(
         package='mekk4_bringup',
         executable='teddy_grab_node',
         name='teddy_grab',
         output='screen',
-        condition=IfCondition(use_teddy),
+        condition=IfCondition(use_teddy_grab),
         parameters=[
             {'use_sim_time': use_sim_time},
             teddy_grab_params_file,
-            {'enabled': ParameterValue(use_teddy, value_type=bool)},
+            {'enabled': ParameterValue(use_teddy_grab, value_type=bool)},
         ],
     )
 
@@ -298,6 +297,7 @@ def generate_launch_description():
         DeclareLaunchArgument('use_lidar', default_value='true'),
         DeclareLaunchArgument('use_teddy', default_value='false'),
         DeclareLaunchArgument('use_teddy_approach', default_value='false'),
+        DeclareLaunchArgument('use_teddy_grab', default_value='false'),
         DeclareLaunchArgument('use_imu', default_value='false'),
         DeclareLaunchArgument('use_mega_driver', default_value='false'),
         DeclareLaunchArgument('use_ekf', default_value='false'),

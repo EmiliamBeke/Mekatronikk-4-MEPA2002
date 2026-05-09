@@ -68,6 +68,8 @@ SKETCH_INPUT="${1:-${MEGA_SKETCH:-mega_smoketest}}"
 MEGA_PORT="${MEGA_PORT:-}"
 MEGA_FQBN="${MEGA_FQBN:-arduino:avr:mega}"
 ARDUINO_CLI="${ARDUINO_CLI:-arduino-cli}"
+ARDUINO_LIBRARIES="${ARDUINO_LIBRARIES:-${HOME}/Arduino/libraries}"
+ARDUINO_USER_LIBRARIES="${ARDUINO_USER_LIBRARIES:-${HOME}/.arduino15/libraries}"
 
 if ! command -v "${ARDUINO_CLI}" >/dev/null 2>&1; then
   echo "[mega-upload] Missing ${ARDUINO_CLI} on host." >&2
@@ -102,7 +104,13 @@ echo "[mega-upload] Sketch ${SKETCH_DIR}/${SKETCH_NAME}.ino" >&2
 echo "[mega-upload] FQBN ${MEGA_FQBN}" >&2
 
 COMPILE_ARGS=()
-if [[ "${SKETCH_NAME}" == "mega_total_code_nonblocking" ]]; then
+if [[ -d "${ARDUINO_LIBRARIES}" ]]; then
+  COMPILE_ARGS+=(--libraries "${ARDUINO_LIBRARIES}")
+fi
+if [[ -d "${ARDUINO_USER_LIBRARIES}" ]]; then
+  COMPILE_ARGS+=(--libraries "${ARDUINO_USER_LIBRARIES}")
+fi
+if [[ "${SKETCH_NAME}" == "mega_total_code_nonblocking" || "${SKETCH_NAME}" == "mega_distance_test" ]]; then
   # STM32duino VL53L4ED 1.0.1 uses float_t without defining it when built for AVR.
   COMPILE_ARGS+=(--build-property 'compiler.cpp.extra_flags=-Dfloat_t=float')
 fi
