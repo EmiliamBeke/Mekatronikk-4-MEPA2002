@@ -16,8 +16,9 @@ mega_driver:
     init_distance_sensor_on_connect: true
 
     # Servo pulse range used by the gripper command path.
+    # Servo: 0–270° maps to 500–2500 µs. ~1800 µs = teddy grip position.
     gripper_min_us: 500
-    gripper_max_us: 1800
+    gripper_max_us: 2500
 
 robotarm_safety:
   ros__parameters:
@@ -57,8 +58,9 @@ robotarm_safety:
     lidar_z_clearance: 0.12
 
     # Gripper pulse clamp in microseconds.
+    # Servo: 0–270° = 500–2500 µs; ~1800 µs = teddy grip.
     gripper_min: 500.0
-    gripper_max: 1800.0
+    gripper_max: 2500.0
 
     # Startup command state before feedback arrives.
     initial_x: 0.0

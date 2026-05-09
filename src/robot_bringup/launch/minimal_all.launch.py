@@ -105,8 +105,8 @@ def generate_launch_description():
             '/model/tracked_robot/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
             '/robotarm/x_position_cmd@std_msgs/msg/Float64]gz.msgs.Double',
             '/robotarm/z_position_cmd@std_msgs/msg/Float64]gz.msgs.Double',
-            '/gripper/left_position_cmd@std_msgs/msg/Float64]gz.msgs.Double',
-            '/gripper/right_position_cmd@std_msgs/msg/Float64]gz.msgs.Double',
+            '/sim/gripper/left_angle_cmd@std_msgs/msg/Float64]gz.msgs.Double',
+            '/sim/gripper/right_angle_cmd@std_msgs/msg/Float64]gz.msgs.Double',
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
             '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
             '/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
@@ -155,9 +155,33 @@ def generate_launch_description():
             '--z-topic', '/robotarm/request/z_position',
             '--left-gripper-topic', '/gripper/request/left_position',
             '--right-gripper-topic', '/gripper/request/right_position',
-            '--gripper-min', '-2.96706',
-            '--gripper-max', '-0.523599',
-            '--gripper-initial', '-0.523599',
+            '--x-min', '0.01',
+            '--x-max', '0.09',
+            '--z-min', '0.0',
+            '--z-max', '0.25',
+            '--gripper-min', '500',
+            '--gripper-max', '2500',
+            '--x-initial', '0.01',
+            '--z-initial', '0.12',
+            '--gripper-initial', '500',
+        ],
+    )
+    gripper_sim_adapter = Node(
+        package='robot_sim_control',
+        executable='gripper_sim_adapter',
+        output='screen',
+        parameters=[
+            {'use_sim_time': True},
+            {'input_topic': '/gripper/left_position_cmd'},
+            {'left_output_topic': '/sim/gripper/left_angle_cmd'},
+            {'right_output_topic': '/sim/gripper/right_angle_cmd'},
+            {'pwm_min_us': 500.0},
+            {'pwm_max_us': 2500.0},
+            {'left_open_rad': -0.523599},
+            {'left_closed_rad': -3.228859},
+            {'right_open_rad': 0.523599},
+            {'right_closed_rad': 2.96706},
+            {'initial_pwm_us': 500.0},
         ],
     )
 
@@ -177,7 +201,9 @@ def generate_launch_description():
             'use_mega_driver': 'false',
             'use_ekf': use_ekf,
             'use_joint_states': 'false',
-            'use_robotarm_safety': 'true',
+            # TEMP: safety node bypassed in sim for direct joint control debugging.
+            # Re-enable by setting back to 'true'.
+            'use_robotarm_safety': 'false',
             'use_sim_time': 'true',
             'rviz': rviz_enabled,
             'params_file': params_file,
@@ -201,6 +227,19 @@ def generate_launch_description():
                 "' != 'true'",
             ])
         ),
+        arguments=[
+            '--topic', '/cmd_vel_manual',
+            # TEMP: bypass robotarm_safety in sim by publishing directly to *_cmd topics.
+            '--arm-x-topic', '/robotarm/x_position_cmd',
+            '--arm-z-topic', '/robotarm/z_position_cmd',
+            '--gripper-topic', '/gripper/left_position_cmd',
+            '--right-gripper-topic', '/gripper/right_position_cmd',
+            '--arm-x-min', '0.01', '--arm-x-max', '0.09',
+            '--arm-z-min', '0.0', '--arm-z-max', '0.25',
+            '--arm-x-initial', '0.01', '--arm-z-initial', '0.12',
+            '--gripper-min', '500', '--gripper-max', '2500',
+            '--gripper-initial', '500',
+        ],
     )
     lidar_static_tf = Node(
         package='tf2_ros',
@@ -384,7 +423,7 @@ def generate_launch_description():
             sim_camera_udp_stream,
             annotated_camera_bridge,
             keyboard_teleop,
-            robotarm_gui,
+            gripper_sim_adapter,
         ]
     )
 

@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'tracked_cmd_vel_adapter = robot_sim_control.tracked_cmd_vel_adapter:main',
+            'gripper_sim_adapter = robot_sim_control.gripper_sim_adapter:main',
             'robotarm_gui = robot_sim_control.robotarm_gui:main',
         ],
     },

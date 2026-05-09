@@ -115,7 +115,7 @@ class RobotarmGui:
         return (
             f"x={self.x_var.get():.3f} m   "
             f"z={self.z_var.get():.3f} m   "
-            f"g={self.gripper_var.get():.3f} rad"
+            f"g={self.gripper_var.get():.0f} µs"
         )
 
     def _on_slider_changed(self) -> None:
@@ -141,13 +141,12 @@ class RobotarmGui:
         gripper_position = clamp(
             float(self.gripper_var.get()), self.gripper_min, self.gripper_max
         )
-        left_msg = Float64()
-        left_msg.data = gripper_position
-        self.left_gripper_pub.publish(left_msg)
-
-        right_msg = Float64()
-        right_msg.data = -gripper_position
-        self.right_gripper_pub.publish(right_msg)
+        # One physical servo: publish the same PWM µs value to both legacy topics
+        # so the gripper_sim_adapter (and the real Mega driver) sees consistent input.
+        pwm_msg = Float64()
+        pwm_msg.data = gripper_position
+        self.left_gripper_pub.publish(pwm_msg)
+        self.right_gripper_pub.publish(pwm_msg)
 
     def _spin_ros(self) -> None:
         if self.closed:
@@ -175,15 +174,15 @@ def main() -> int:
     parser.add_argument("--z-topic", default="/robotarm/request/z_position")
     parser.add_argument("--left-gripper-topic", default="/gripper/request/left_position")
     parser.add_argument("--right-gripper-topic", default="/gripper/request/right_position")
-    parser.add_argument("--x-min", type=float, default=-0.2)
-    parser.add_argument("--x-max", type=float, default=0.2)
+    parser.add_argument("--x-min", type=float, default=0.01)
+    parser.add_argument("--x-max", type=float, default=0.09)
     parser.add_argument("--z-min", type=float, default=0.0)
-    parser.add_argument("--z-max", type=float, default=0.3)
-    parser.add_argument("--gripper-min", type=float, default=-0.785)
-    parser.add_argument("--gripper-max", type=float, default=0.785)
-    parser.add_argument("--x-initial", type=float, default=0.0)
-    parser.add_argument("--z-initial", type=float, default=0.227)
-    parser.add_argument("--gripper-initial", type=float, default=0.0)
+    parser.add_argument("--z-max", type=float, default=0.25)
+    parser.add_argument("--gripper-min", type=float, default=500.0)
+    parser.add_argument("--gripper-max", type=float, default=2500.0)
+    parser.add_argument("--x-initial", type=float, default=0.01)
+    parser.add_argument("--z-initial", type=float, default=0.12)
+    parser.add_argument("--gripper-initial", type=float, default=500.0)
     args = parser.parse_args(remove_ros_args(args=sys.argv)[1:])
 
     rclpy.init()

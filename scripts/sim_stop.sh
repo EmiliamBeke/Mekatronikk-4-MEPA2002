@@ -48,6 +48,14 @@ for pattern in "${patterns[@]}"; do
   fi
 done
 
+# Clean stale Fast-DDS shared-memory segments left behind by killed processes.
+# These cause noisy "RTPS_TRANSPORT_SHM Error ... open_and_lock_file failed" spam
+# and slow new node startup while the transport falls back.
+shm_uid="$(id -u)"
+rm -f /dev/shm/fastrtps_* 2>/dev/null || true
+rm -f "/dev/shm/sem.fastrtps_"* 2>/dev/null || true
+rm -rf "/tmp/fastrtps_interprocess_${shm_uid}" 2>/dev/null || true
+
 if [[ "${found}" == "1" ]]; then
   echo "[sim-stop] Stopped existing sim/ROS processes." >&2
 else

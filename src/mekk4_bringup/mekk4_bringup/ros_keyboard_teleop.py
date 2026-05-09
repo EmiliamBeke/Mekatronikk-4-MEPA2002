@@ -5,6 +5,7 @@ import argparse
 import sys
 import time
 import tkinter as tk
+from tkinter import ttk
 
 import rclpy
 from geometry_msgs.msg import Twist
@@ -23,6 +24,9 @@ class RosKeyboardTeleop:
         self.arm_x_pub = self.node.create_publisher(Float64, args.arm_x_topic, 10)
         self.arm_z_pub = self.node.create_publisher(Float64, args.arm_z_topic, 10)
         self.gripper_pub = self.node.create_publisher(Float64, args.gripper_topic, 10)
+        self.right_gripper_pub = self.node.create_publisher(
+            Float64, args.right_gripper_topic, 10
+        )
         self.node.create_subscription(Float64, args.arm_x_state_topic, self._on_arm_x_state, 10)
         self.node.create_subscription(Float64, args.arm_z_state_topic, self._on_arm_z_state, 10)
 
@@ -60,12 +64,17 @@ class RosKeyboardTeleop:
         self.last_sent_at = 0.0
         self.last_tick_at = time.monotonic()
         self.closed = False
+        self._suppress_slider_cb = False
 
         self.root = tk.Tk()
         self.root.title("ROS Keyboard Teleop")
-        self.root.geometry("620x310")
+        self.root.geometry("640x520")
         self.root.configure(bg="#111111")
         self.root.protocol("WM_DELETE_WINDOW", self.close)
+
+        self.arm_x_var = tk.DoubleVar(value=self.arm_x)
+        self.arm_z_var = tk.DoubleVar(value=self.arm_z)
+        self.gripper_var = tk.DoubleVar(value=self.gripper)
 
         self.status_var = tk.StringVar(value=f"Publishing to {self.topic}")
         self.command_var = tk.StringVar(value=self._command_text(0.0, 0.0))
@@ -142,6 +151,29 @@ class RosKeyboardTeleop:
         )
         focus_hint.pack()
 
+        self._add_slider("X", self.arm_x_var, self.arm_x_min, self.arm_x_max,
+                         self._on_arm_x_slider, resolution=0.001)
+        self._add_slider("Z", self.arm_z_var, self.arm_z_min, self.arm_z_max,
+                         self._on_arm_z_slider, resolution=0.001)
+        self._add_slider("G", self.gripper_var, self.gripper_min, self.gripper_max,
+                         self._on_gripper_slider, resolution=1.0)
+
+    def _add_slider(self, label_text, variable, low, high, callback, resolution):
+        frame = tk.Frame(self.root, bg="#111111")
+        frame.pack(fill="x", padx=22, pady=4)
+        label = tk.Label(
+            frame, text=label_text, width=2, anchor="w",
+            font=("TkDefaultFont", 11, "bold"), fg="#f5f5f5", bg="#111111",
+        )
+        label.pack(side="left")
+        slider = tk.Scale(
+            frame, from_=low, to=high, resolution=resolution, orient="horizontal",
+            variable=variable, command=lambda v: callback(float(v)),
+            length=520, fg="#f5f5f5", bg="#111111", highlightthickness=0,
+            troughcolor="#333333", takefocus=0,
+        )
+        slider.pack(side="left", padx=(10, 0))
+
     def _bind_keys(self) -> None:
         self.root.bind("<KeyPress>", self._on_key_press)
         self.root.bind("<KeyRelease>", self._on_key_release)
@@ -201,9 +233,11 @@ class RosKeyboardTeleop:
         elif key == "u":
             self.gripper = clamp(self.gripper - self.gripper_step, self.gripper_min, self.gripper_max)
             self._publish_gripper()
+            self._set_var_silent(self.gripper_var, self.gripper)
         elif key == "i":
             self.gripper = clamp(self.gripper + self.gripper_step, self.gripper_min, self.gripper_max)
             self._publish_gripper()
+            self._set_var_silent(self.gripper_var, self.gripper)
 
         self.speed_var.set(self._speed_text())
 
@@ -249,16 +283,44 @@ class RosKeyboardTeleop:
         msg = Float64()
         msg.data = float(self.gripper)
         self.gripper_pub.publish(msg)
+        self.right_gripper_pub.publish(msg)
+
+    def _set_var_silent(self, var: tk.DoubleVar, value: float) -> None:
+        self._suppress_slider_cb = True
+        try:
+            var.set(value)
+        finally:
+            self._suppress_slider_cb = False
+
+    def _on_arm_x_slider(self, value: float) -> None:
+        if self._suppress_slider_cb:
+            return
+        self.arm_x = clamp(value, self.arm_x_min, self.arm_x_max)
+        self._publish_arm(self.arm_x_pub, self.arm_x)
+
+    def _on_arm_z_slider(self, value: float) -> None:
+        if self._suppress_slider_cb:
+            return
+        self.arm_z = clamp(value, self.arm_z_min, self.arm_z_max)
+        self._publish_arm(self.arm_z_pub, self.arm_z)
+
+    def _on_gripper_slider(self, value: float) -> None:
+        if self._suppress_slider_cb:
+            return
+        self.gripper = clamp(value, self.gripper_min, self.gripper_max)
+        self._publish_gripper()
 
     def _on_arm_x_state(self, msg: Float64) -> None:
         if "j" in self.pressed_keys or "k" in self.pressed_keys:
             return
         self.arm_x = clamp(float(msg.data), self.arm_x_min, self.arm_x_max)
+        self._set_var_silent(self.arm_x_var, self.arm_x)
 
     def _on_arm_z_state(self, msg: Float64) -> None:
         if "y" in self.pressed_keys or "h" in self.pressed_keys:
             return
         self.arm_z = clamp(float(msg.data), self.arm_z_min, self.arm_z_max)
+        self._set_var_silent(self.arm_z_var, self.arm_z)
 
     def _update_arm_targets(self, dt: float) -> None:
         x_dir = 0
@@ -280,6 +342,7 @@ class RosKeyboardTeleop:
                 self.arm_x_max,
             )
             self._publish_arm(self.arm_x_pub, self.arm_x)
+            self._set_var_silent(self.arm_x_var, self.arm_x)
 
         if z_dir:
             self.arm_z = clamp(
@@ -288,6 +351,7 @@ class RosKeyboardTeleop:
                 self.arm_z_max,
             )
             self._publish_arm(self.arm_z_pub, self.arm_z)
+            self._set_var_silent(self.arm_z_var, self.arm_z)
 
     def _tick(self) -> None:
         if self.closed:
@@ -355,6 +419,7 @@ def main() -> int:
     parser.add_argument("--arm-x-topic", default="/robotarm/request/x_position", help="Robot arm x request topic")
     parser.add_argument("--arm-z-topic", default="/robotarm/request/z_position", help="Robot arm z request topic")
     parser.add_argument("--gripper-topic", default="/gripper/request/left_position", help="Gripper request topic")
+    parser.add_argument("--right-gripper-topic", default="/gripper/request/right_position", help="Right gripper request topic (mirrors left for the single physical servo)")
     parser.add_argument("--arm-x-state-topic", default="/robotarm/x_position_cmd", help="Robot arm x command feedback topic")
     parser.add_argument("--arm-z-state-topic", default="/robotarm/z_position_cmd", help="Robot arm z command feedback topic")
     parser.add_argument("--arm-x-initial", type=float, default=0.0, help="Initial arm x target in meters")
@@ -370,7 +435,7 @@ def main() -> int:
     parser.add_argument("--max-arm-x-speed", type=float, default=0.050, help="Maximum arm x jog speed in m/s")
     parser.add_argument("--max-arm-z-speed", type=float, default=0.010, help="Maximum arm z jog speed in m/s")
     parser.add_argument("--gripper-min", type=float, default=500.0, help="Minimum gripper pulse width in microseconds")
-    parser.add_argument("--gripper-max", type=float, default=1800.0, help="Maximum gripper pulse width in microseconds")
+    parser.add_argument("--gripper-max", type=float, default=2500.0, help="Maximum gripper pulse width in microseconds")
     parser.add_argument("--gripper-initial", type=float, default=500.0, help="Initial gripper pulse width in microseconds")
     parser.add_argument("--gripper-step", type=float, default=50.0, help="Gripper pulse-width increment for U/I")
     args = parser.parse_args(remove_ros_args(args=sys.argv)[1:])
