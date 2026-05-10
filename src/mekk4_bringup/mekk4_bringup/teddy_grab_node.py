@@ -287,11 +287,8 @@ class TeddyGrabNode(Node):
         self.command_x(self.reach_x)
         self.target_x = self.reach_x
         if self.contact_is_stable():
-            if self.x is not None:
-                self.reach_x = self.x
-                step["x"] = self.reach_x
-                self.target_x = self.reach_x
-                self.command_x(self.reach_x)
+            step["x"] = self.reach_x
+            self.target_x = self.reach_x
             self.patch_reach_x()
             self.next_step()
             return
