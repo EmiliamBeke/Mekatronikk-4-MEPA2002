@@ -15,8 +15,32 @@ def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
 
 
+ARM_COMMAND_TOPICS = {
+    "/robotarm/x_position_cmd",
+    "/robotarm/z_position_cmd",
+    "/gripper/left_position_cmd",
+    "/gripper/right_position_cmd",
+}
+
+
+def reject_command_topics(**topics: str) -> None:
+    for name, topic in topics.items():
+        if topic in ARM_COMMAND_TOPICS:
+            raise ValueError(
+                f"{name} must publish to a request topic, not low-level command topic {topic}. "
+                "Arm commands must pass through robotarm_safety_node."
+            )
+
+
 class RobotarmGui:
     def __init__(self, args: argparse.Namespace) -> None:
+        reject_command_topics(
+            x_topic=args.x_topic,
+            z_topic=args.z_topic,
+            left_gripper_topic=args.left_gripper_topic,
+            right_gripper_topic=args.right_gripper_topic,
+        )
+
         self.node = rclpy.create_node("robotarm_gui")
         self.x_pub = self.node.create_publisher(Float64, args.x_topic, 10)
         self.z_pub = self.node.create_publisher(Float64, args.z_topic, 10)

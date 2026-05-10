@@ -20,6 +20,7 @@ PARAM_DEFAULTS = {
     "x_state_topic": "/robotarm/x_position_state",
     "z_state_topic": "/robotarm/z_position_state",
     "joint_states_topic": "/joint_states",
+    "x_joint_name": "robotarm_x_joint",
     "z_joint_name": "robotarm_z_joint",
     "publish_period_s": 0.05,
     "x_min": -0.2,
@@ -27,9 +28,11 @@ PARAM_DEFAULTS = {
     "z_min": 0.0,
     "z_max": 0.3,
     "gripper_min": 500.0,
-    "gripper_max": 1800.0,
+    "gripper_max": 2500.0,
     "lidar_x_threshold": 0.08,
     "lidar_z_clearance": 0.12,
+    "chassis_x_min_when_low_z": 0.0,
+    "chassis_z_threshold": 0.0,
     "max_x_step_per_publish": 0.005,
     "max_z_step_per_publish": 0.001,
     "initial_x": 0.0,
@@ -70,8 +73,11 @@ class RobotarmSafetyNode(Node):
         self.gripper_max = float(self.param("gripper_max"))
         self.lidar_x_threshold = float(self.param("lidar_x_threshold"))
         self.lidar_z_clearance = float(self.param("lidar_z_clearance"))
+        self.chassis_x_min_when_low_z = float(self.param("chassis_x_min_when_low_z"))
+        self.chassis_z_threshold = float(self.param("chassis_z_threshold"))
         self.max_x_step_per_publish = float(self.param("max_x_step_per_publish"))
         self.max_z_step_per_publish = float(self.param("max_z_step_per_publish"))
+        self.x_joint_name = str(self.param("x_joint_name"))
         self.z_joint_name = str(self.param("z_joint_name"))
 
         if self.max_x_step_per_publish <= 0.0:
@@ -154,8 +160,15 @@ class RobotarmSafetyNode(Node):
         self.create_timer(float(self.param("publish_period_s")), self.on_timer)
 
         self.get_logger().info(
-            "robotarm safety active: z_min=%.3f lidar_clearance=(x<%.3f => z>=%.3f)"
-            % (self.z_min, self.lidar_x_threshold, self.lidar_z_clearance)
+            "robotarm safety active: z_min=%.3f lidar_clearance=(x<%.3f => z>=%.3f) "
+            "chassis_keepout=(z<%.3f => x>=%.3f)"
+            % (
+                self.z_min,
+                self.lidar_x_threshold,
+                self.lidar_z_clearance,
+                self.chassis_z_threshold,
+                self.chassis_x_min_when_low_z,
+            )
         )
 
     def param(self, name: str):
@@ -180,12 +193,11 @@ class RobotarmSafetyNode(Node):
         self.current_z = clamp(float(msg.data), self.z_min, self.z_max)
 
     def on_joint_states(self, msg: JointState) -> None:
-        try:
-            index = msg.name.index(self.z_joint_name)
-        except ValueError:
-            return
-        if index < len(msg.position):
-            self.current_z = float(msg.position[index])
+        for name, value in zip(msg.name, msg.position):
+            if name == self.x_joint_name:
+                self.current_x = clamp(float(value), self.x_min, self.x_max)
+            elif name == self.z_joint_name:
+                self.current_z = clamp(float(value), self.z_min, self.z_max)
 
     def on_timer(self) -> None:
         if self._startup_t0 is None:
@@ -238,19 +250,33 @@ class RobotarmSafetyNode(Node):
         ):
             target_z = self.lidar_z_clearance
 
-        # Move z and x simultaneously; do not gate one behind the other once
-        # we are out of the hard keepout zone.
+        # Chassis keepout: when the arm is below the chassis plane, do not let
+        # x retract behind the chassis front edge. In sim, z=0.13 corresponds
+        # to GUI/display z=0 because the GUI adds a +0.13 m offset.
+        if z_position < self.chassis_z_threshold - z_tol and target_x < self.chassis_x_min_when_low_z:
+            target_x = self.chassis_x_min_when_low_z
+        if x_position < self.chassis_x_min_when_low_z and target_z < self.chassis_z_threshold - z_tol:
+            target_z = self.chassis_z_threshold
+
+        # Move z and x simultaneously; teddy_grab owns single-axis sequencing
+        # when the grab routine is active.
         if abs(z_position - target_z) > 1e-9:
             z_position = step_towards(z_position, target_z, self.max_z_step_per_publish)
 
         if abs(x_position - target_x) > 1e-9:
             x_position = step_towards(x_position, target_x, self.max_x_step_per_publish)
 
+        if self.in_chassis_keepout(x_position, z_position):
+            x_position = self.chassis_x_min_when_low_z
+
         return x_position, z_position
 
     def safe_requested_xz(self) -> tuple[float, float]:
         x_position = self.requested_x
         z_position = self.requested_z
+
+        if self.in_chassis_keepout(x_position, z_position):
+            x_position = clamp(self.chassis_x_min_when_low_z, self.x_min, self.x_max)
 
         if self.in_lidar_keepout(x_position, z_position):
             z_position = clamp(self.lidar_z_clearance, self.z_min, self.z_max)
@@ -259,6 +285,12 @@ class RobotarmSafetyNode(Node):
 
     def in_lidar_keepout(self, x_position: float, z_position: float) -> bool:
         return x_position < self.lidar_x_threshold and z_position < self.lidar_z_clearance
+
+    def in_chassis_keepout(self, x_position: float, z_position: float) -> bool:
+        return (
+            x_position < self.chassis_x_min_when_low_z
+            and z_position < self.chassis_z_threshold
+        )
 
     def publish(self, publisher, value: float) -> None:
         msg = Float64()

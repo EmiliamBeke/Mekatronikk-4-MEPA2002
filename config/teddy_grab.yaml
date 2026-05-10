@@ -2,22 +2,20 @@ teddy_grab:
   ros__parameters:
     enabled: true
     mode_topic: /teddy_approach/mode
-    trigger_mode: close_enough_lidar
+    approach_reset_topic: /teddy_approach/reset
+    trigger_mode: teddy_approach_settled
 
     # While the arm is grabbing, publish zero velocity on the same assist topic
     # Nav2 uses for teddy approach. This keeps the base stopped through cmd_vel_mux.
     cmd_vel_topic: /cmd_vel_teddy
     stop_base_while_active: true
 
-    # Requests go through robotarm_safety before reaching the Mega driver.
-    x_topic: /robotarm/request/x_position
-    z_topic: /robotarm/request/z_position
-    left_gripper_topic: /gripper/request/left_position
-    right_gripper_topic: /gripper/request/right_position
-
     # Feedback from Mega driver.
     x_state_topic: /robotarm/x_position_state
     z_state_topic: /robotarm/z_position_state
+    joint_states_topic: /joint_states
+    x_joint_name: robotarm_x_joint
+    z_joint_name: robotarm_z_joint
     distance_topic: /mega/distance_mm
     teddy_status_topic: /teddy_detector/status
     scan_topic: /lidar
@@ -27,28 +25,25 @@ teddy_grab:
     distance_timeout_s: 0.5
     detector_status_timeout_s: 1.0
     scan_timeout_s: 0.5
+    status_log_period_s: 0.5
     require_state_feedback: true
 
     # Sequence positions in meters.
-    safe_x: 0.015
-    safe_z: 0.12
-    lower_z: 0.03
-    grab_x: 0.08
+    lower_z: 0.00
     approach_x_max: 0.082
     approach_x_step_m: 0.002
     lift_z: 0.21
-    final_x: -0.07
+    final_x: 0.0
 
-    # Continue moving X forward until the VL53 distance sensor reports contact
-    # for long enough.
-    use_distance_contact: true
+    # Extend X outward from final_x until distance contact is stable or the
+    # configured mechanical reach limit is reached.
     require_distance_feedback: true
     contact_distance_mm: 35
-    contact_hold_s: 0.10
+    contact_hold_s: 2.0
 
     # Optional rough image-to-height correction from teddy_detector dy only.
     # This is empirical, not geometric calibration.
-    use_detector_dy_for_grab_z: false
+    use_detector_dy_for_grab_z: true
     dy_to_z_gain_m: 0.04
 
     # Preferred pre-grab Z estimate: sample teddy_detector dy and front LiDAR
@@ -68,9 +63,14 @@ teddy_grab:
 
     # Servo pulse widths in microseconds.
     gripper_open: 500.0
-    gripper_closed: 1800.0
+    gripper_closed: 2000.0
 
     # Per-step hold times.
     move_hold_s: 0.2
-    grab_hold_s: 0.8
+    grab_hold_s: 2.0
+    verify_hold_s: 0.2
     final_hold_s: 0.5
+
+    # Wait this long after teddy_approach reports stop before moving the arm.
+    # Lets the chassis fully decelerate.
+    settle_after_trigger_s: 1.0

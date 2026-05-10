@@ -8,7 +8,7 @@ import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import String
+from std_msgs.msg import Empty, String
 
 
 STATUS_RE = re.compile(r"(?P<key>[A-Za-z_]+)=(?P<value>[^ ]+)")
@@ -22,6 +22,7 @@ PARAM_DEFAULTS = {
     "linear_speed": 0.08,
     "drive_when_not_centered": False,
     "center_tolerance": 0.10,
+    "center_settle_s": 2.0,
     "angular_kp": 1.2,
     "angular_kd": 0.0,
     "min_angular_speed": 0.0,
@@ -32,6 +33,7 @@ PARAM_DEFAULTS = {
     "stop_lidar_min_points": 3,
     "stop_lidar_timeout_s": 0.5,
     "mode_topic": "/teddy_approach/mode",
+    "reset_topic": "/teddy_approach/reset",
 }
 
 
@@ -111,6 +113,7 @@ class TeddyApproachNode(Node):
         self.linear_speed = self.param("linear_speed")
         self.drive_when_not_centered = self.param("drive_when_not_centered")
         self.center_tolerance = self.param("center_tolerance")
+        self.center_settle_s = self.param("center_settle_s")
         self.stop_lidar_distance_m = self.param("stop_lidar_distance_m")
         self.stop_lidar_front_angle_rad = self.param("stop_lidar_front_angle_rad")
         self.stop_lidar_min_points = self.param("stop_lidar_min_points")
@@ -126,19 +129,25 @@ class TeddyApproachNode(Node):
         cmd_vel_topic = self.param("cmd_vel_topic")
         scan_topic = self.param("scan_topic")
         mode_topic = self.param("mode_topic")
+        reset_topic = self.param("reset_topic")
 
         self.cmd_pub = self.create_publisher(Twist, cmd_vel_topic, 10)
         self.mode_pub = self.create_publisher(String, mode_topic, 10)
         self.create_subscription(String, status_topic, self.on_status, 10)
         self.create_subscription(LaserScan, scan_topic, self.on_scan, 10)
+        self.create_subscription(Empty, reset_topic, self.on_reset, 10)
         self.create_timer(self.param("publish_period_s"), self.on_timer)
 
         self.last_seen_at = -1.0
         self.last_dx = 0.0
+        self.centered_since = -1.0
         self.front_distance = math.inf
         self.front_points = 0
         self.last_scan_at = -1.0
         self.last_mode = ""
+        # Once we publish teddy_approach_settled, stop driving so teddy_grab owns
+        # the base. Stays latched until the node is restarted.
+        self.handed_off = False
 
         self.get_logger().info(
             "teddy approach enabled=%s status=%s cmd=%s scan=%s"
@@ -169,6 +178,8 @@ class TeddyApproachNode(Node):
             raise ValueError("stop_lidar_min_points must be at least 1")
         if self.stop_lidar_timeout_s < 0.0:
             raise ValueError("stop_lidar_timeout_s must be zero or greater")
+        if self.center_settle_s < 0.0:
+            raise ValueError("center_settle_s must be zero or greater")
 
     def on_status(self, msg):
         fields = parse_status(msg.data)
@@ -198,23 +209,51 @@ class TeddyApproachNode(Node):
 
         self.last_scan_at = self.now_s()
 
+    def on_reset(self, _msg):
+        self.turn_pid.reset()
+        self.centered_since = -1.0
+        self.handed_off = False
+        self.last_mode = ""
+        self.publish_stop()
+        self.get_logger().info("reset by teddy_grab")
+
     def on_timer(self):
         if not self.enabled:
+            return
+
+        if self.handed_off:
+            self.publish_stop()
+            self.publish_mode("teddy_approach_settled", log_on_change=False)
             return
 
         now = self.now_s()
         if not self.teddy_recent(now):
             self.turn_pid.reset()
+            self.centered_since = -1.0
             self.log_mode("waiting_for_teddy")
             return
 
         cmd = Twist()
         centered = abs(self.last_dx) <= self.center_tolerance
+        if centered:
+            if self.centered_since < 0.0:
+                self.centered_since = now
+        else:
+            self.centered_since = -1.0
+        centered_settled = (
+            self.centered_since >= 0.0
+            and (now - self.centered_since) >= self.center_settle_s
+        )
 
-        if centered and self.lidar_stop_active(now):
+        centered_close = centered and self.lidar_stop_active(now)
+        if centered_close:
             self.turn_pid.reset()
-            self.cmd_pub.publish(cmd)
-            self.log_mode("close_enough_lidar")
+            self.publish_stop()
+            if centered_settled:
+                self.publish_mode("teddy_approach_settled")
+                self.handed_off = True
+            else:
+                self.log_mode("waiting_center_settle")
             return
 
         if centered:
@@ -227,6 +266,9 @@ class TeddyApproachNode(Node):
 
         self.cmd_pub.publish(cmd)
         self.log_mode("approaching" if centered else "centering")
+
+    def publish_stop(self):
+        self.cmd_pub.publish(Twist())
 
     def teddy_recent(self, now):
         return self.last_seen_at >= 0.0 and (now - self.last_seen_at) <= self.lost_timeout_s
@@ -241,12 +283,23 @@ class TeddyApproachNode(Node):
         )
 
     def log_mode(self, mode):
+        self.publish_mode(mode)
+
+    def publish_mode(self, mode, log_on_change=True):
+        should_log = log_on_change and mode != self.last_mode
+        if not should_log and mode == self.last_mode and log_on_change:
+            return
+
         if mode == self.last_mode:
+            msg = String()
+            msg.data = mode
+            self.mode_pub.publish(msg)
             return
         msg = String()
         msg.data = mode
         self.mode_pub.publish(msg)
-        self.get_logger().info(f"mode={mode}")
+        if should_log:
+            self.get_logger().info(f"mode={mode}")
         self.last_mode = mode
 
 

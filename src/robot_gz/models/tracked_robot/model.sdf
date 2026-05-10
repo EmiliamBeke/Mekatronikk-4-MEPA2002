@@ -25,6 +25,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Chassis_collision">
                 <geometry>
@@ -33,6 +38,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
             <!-- Sensors -->
             <sensor name="camera" type="camera">
@@ -118,6 +128,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Mega-wsheeld-v5-1_collision">
                 <geometry>
@@ -126,6 +141,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="ABX00102-Dist-sensor">
@@ -150,6 +170,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="ABX00102-Dist-sensor_collision">
                 <geometry>
@@ -158,12 +183,45 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
-                        <surface>
-              <contact>
-                <collide_bitmask>0x0000</collide_bitmask>
-              </contact>
-            </surface>
-        </collision>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
+            </collision>
+            <sensor name="dist_sensor" type="gpu_lidar">
+                <!-- Single forward ray approximating the VL53L1X TOF sensor.
+                     The STL bounds are 41 x 25.36 x 1.606 mm, so the ray starts
+                     at the front-face center of the mesh. Rotate sensor ry=-pi/2
+                     so its scanning +x aligns with the link's +z. -->
+                <pose>0.0205 0.01268 0.001606 0 -1.5707963 0</pose>
+                <always_on>true</always_on>
+                <update_rate>30</update_rate>
+                <visualize>false</visualize>
+                <topic>/sim/dist_sensor/scan</topic>
+                <gz:frame_id>dist_sensor_link</gz:frame_id>
+                <lidar>
+                    <scan>
+                        <horizontal>
+                            <samples>1</samples>
+                            <resolution>1</resolution>
+                            <min_angle>0</min_angle>
+                            <max_angle>0</max_angle>
+                        </horizontal>
+                        <vertical>
+                            <samples>1</samples>
+                            <resolution>1</resolution>
+                            <min_angle>0</min_angle>
+                            <max_angle>0</max_angle>
+                        </vertical>
+                    </scan>
+                    <range>
+                        <min>0.005</min>
+                        <max>1.0</max>
+                        <resolution>0.001</resolution>
+                    </range>
+                </lidar>
+            </sensor>
         </link>
         <link name="LD06_LiDAR-1">
             <pose>-1.335385389568598e-15 0.15485678379409387 0.10772811985020432 1.570796326794897 3.098100421789638e-16 -3.1415926535897927</pose>
@@ -186,6 +244,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LD06_LiDAR-1_collision">
                 <geometry>
@@ -194,6 +257,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="rps-kamera-v2-2">
@@ -217,6 +285,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="rps-kamera-v2-2_collision">
                 <geometry>
@@ -225,6 +298,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="BN0085">
@@ -248,6 +326,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="BN0085_collision">
                 <geometry>
@@ -256,6 +339,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="Xstepper">
@@ -280,6 +368,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Xstepper_collision">
                 <geometry>
@@ -316,6 +409,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="ZStepper_collision">
                 <geometry>
@@ -352,6 +450,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="M2_collision">
                 <geometry>
@@ -360,6 +463,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="M1">
@@ -383,6 +491,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="M1_collision">
                 <geometry>
@@ -391,6 +504,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="Servo">
@@ -415,6 +533,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Servo_collision">
                 <geometry>
@@ -451,6 +574,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Unyaktig-batteri-mockup-v1-1_collision">
                 <geometry>
@@ -459,6 +587,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="FLLegs">
@@ -482,6 +615,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="FLLegs_collision">
                 <geometry>
@@ -490,6 +628,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="BLLegs">
@@ -513,6 +656,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="BLLegs_collision">
                 <geometry>
@@ -521,6 +669,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="FRLegs">
@@ -544,6 +697,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="FRLegs_collision">
                 <geometry>
@@ -552,6 +710,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="BRLegs">
@@ -575,6 +738,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="BRLegs_collision">
                 <geometry>
@@ -583,6 +751,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="Gripper">
@@ -607,6 +780,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Gripper_collision">
                 <geometry>
@@ -644,6 +822,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Leadscrew-Rigg_collision">
                 <geometry>
@@ -680,6 +863,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RLeadscrew_collision">
                 <geometry>
@@ -717,6 +905,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LeadNutR_collision">
                 <geometry>
@@ -753,6 +946,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="StøtteStag-1_collision">
                 <geometry>
@@ -789,6 +987,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LLeadscrew_collision">
                 <geometry>
@@ -825,6 +1028,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Stepper-Gear-9R24.00-m2.741-1_collision">
                 <geometry>
@@ -861,6 +1069,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Gear-9R24.00-m2.741-1-1_collision">
                 <geometry>
@@ -897,6 +1110,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="PI5_collision">
                 <geometry>
@@ -905,6 +1123,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="Finger-R16L30.00-m2.1651Mirror">
@@ -929,7 +1152,38 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
+            <collision name="Finger-R16L30.00-m2.1651Mirror_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Finger-R16L30.00-m2.1651Mirror.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+                <surface>
+                    <contact>
+                            <!-- Teddy-only bit. World/static geometry uses 0x0001;
+                                the teddy collider uses 0x0003 so it still rests on
+                                the floor while the fingers only contact the teddy. -->
+                            <collide_bitmask>0x0002</collide_bitmask>
+                        <ode>
+                            <kp>50000</kp>
+                            <kd>100</kd>
+                        </ode>
+                    </contact>
+                    <friction>
+                        <ode>
+                            <mu>8.0</mu>
+                            <mu2>8.0</mu2>
+                        </ode>
+                    </friction>
+                </surface>
+            </collision>
         </link>
         <link name="Top-Rack-200.0mm-R30.00-m2.1651">
             <gravity>0</gravity>
@@ -953,6 +1207,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Top-Rack-200.0mm-R30.00-m2.1651_collision">
                 <geometry>
@@ -990,6 +1249,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Bottom-Rack-200.0mm-L30.00-m2.1651_collision">
                 <geometry>
@@ -1027,6 +1291,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="Servo-Gear-8L30.00-m2.1651_collision">
                 <geometry>
@@ -1064,7 +1333,35 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
+            <collision name="Finger-L-16L30.00-m2.1651_collision">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/Finger-L-16L30.00-m2.1651.stl</uri>
+                        <scale>0.001 0.001 0.001</scale>
+                    </mesh>
+                </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0002</collide_bitmask>
+                        <ode>
+                            <kp>50000</kp>
+                            <kd>100</kd>
+                        </ode>
+                    </contact>
+                    <friction>
+                        <ode>
+                            <mu>8.0</mu>
+                            <mu2>8.0</mu2>
+                        </ode>
+                    </friction>
+                </surface>
+            </collision>
         </link>
         <link name="LTWheel">
             <pose>-0.07619999885559083 0.15835678379409296 0.06997811794280995 1.5707963267948961 3.806478941571971e-16 1.5707963267948974</pose>
@@ -1087,6 +1384,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LTWheel_collision">
                 <geometry>
@@ -1095,6 +1397,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="LDriveWheel">
@@ -1118,6 +1425,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LDriveWheel_collision">
                 <geometry>
@@ -1126,6 +1438,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="RBWheel">
@@ -1149,6 +1466,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RBWheel_collision">
                 <geometry>
@@ -1157,6 +1479,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="RDriveWheel">
@@ -1180,6 +1507,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RDriveWheel_collision">
                 <geometry>
@@ -1188,6 +1520,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="LFWheel">
@@ -1211,6 +1548,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LFWheel_collision">
                 <geometry>
@@ -1219,6 +1561,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="LBWheel">
@@ -1242,6 +1589,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LBWheel_collision">
                 <geometry>
@@ -1250,6 +1602,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="RFWheel">
@@ -1273,6 +1630,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RFWheel_collision">
                 <geometry>
@@ -1281,6 +1643,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="RTWheel">
@@ -1304,6 +1671,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RTWheel_collision">
                 <geometry>
@@ -1312,6 +1684,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0000</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="RTracks">
@@ -1336,6 +1713,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RTracks_drive_proxy_collision">
                 <pose>0.018 -0.0912 -0.013271 0 0 -1.5707963267948972</pose>
@@ -1345,6 +1727,9 @@
                     </box>
                 </geometry>
                 <surface>
+                    <contact>
+                        <collide_bitmask>0x0004</collide_bitmask>
+                    </contact>
                     <friction>
                         <ode>
                             <mu>0.7</mu>
@@ -1390,6 +1775,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LTracks_drive_proxy_collision">
                 <pose>0.018 -0.0912 -0.013271 0 0 -1.5707963267948972</pose>
@@ -1399,6 +1789,9 @@
                     </box>
                 </geometry>
                 <surface>
+                    <contact>
+                        <collide_bitmask>0x0004</collide_bitmask>
+                    </contact>
                     <friction>
                         <ode>
                             <mu>0.7</mu>
@@ -1443,6 +1836,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LeadNutL_collision">
                 <geometry>
@@ -1479,6 +1877,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RBWheelColision_collision">
                 <geometry>
@@ -1487,6 +1890,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0004</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="RFWheelColision">
@@ -1510,6 +1918,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RFWheelColision_collision">
                 <geometry>
@@ -1518,6 +1931,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0004</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="LBWheelColision">
@@ -1541,6 +1959,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="LBWheelColision_collision">
                 <geometry>
@@ -1549,6 +1972,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0004</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <link name="RFWheelColision-1">
@@ -1572,6 +2000,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <material>
+                    <ambient>0.55 0.55 0.58 1</ambient>
+                    <diffuse>0.65 0.65 0.68 1</diffuse>
+                    <specular>0.10 0.10 0.10 1</specular>
+                </material>
             </visual>
             <collision name="RFWheelColision-1_collision">
                 <geometry>
@@ -1580,6 +2013,11 @@
                         <scale>0.001 0.001 0.001</scale>
                     </mesh>
                 </geometry>
+                <surface>
+                    <contact>
+                        <collide_bitmask>0x0004</collide_bitmask>
+                    </contact>
+                </surface>
             </collision>
         </link>
         <joint name="Chassis_Revolute-1" type="revolute">
@@ -1771,7 +2209,6 @@
             <pose>0.011000013078674568 -0.027999999999975277 0.36000020059327364 0.0 0.0 0.0</pose>
             <parent>RLeadscrew</parent>
             <child>Leadscrew-Rigg</child>
-            <initial_position>0.13</initial_position>
             <axis>
                 <xyz expressed_in="__model__">-0.0 0.0 1.0</xyz>
                 <limit>
@@ -1815,7 +2252,6 @@
             <pose>-2.4501307459178207e-14 -0.1670749869809259 0.15480988205718993 0.0 0.0 0.0</pose>
             <parent>Leadscrew-Rigg</parent>
             <child>Gripper</child>
-            <initial_position>-0.07</initial_position>
             <axis>
                 <xyz expressed_in="__model__">-0.0 1.0 -0.0</xyz>
                 <limit>
@@ -1859,7 +2295,6 @@
             <pose>-5.18933657783551e-08 2.9430204269261924e-07 -0.03193738277245858 0.0 0.0 0.0</pose>
             <parent>Gripper</parent>
             <child>Finger-R16L30.00-m2.1651Mirror</child>
-            <initial_position>6.9</initial_position>
             <axis>
                 <xyz expressed_in="__model__">0.0 -0.0 -1.0</xyz>
                 <limit>
@@ -1878,7 +2313,6 @@
             <pose>-1.4942103989005114e-07 -2.588048814805392e-07 0.018062382295621567 0.0 0.0 0.0</pose>
             <parent>Gripper</parent>
             <child>Finger-L-16L30.00-m2.1651</child>
-            <initial_position>3.2</initial_position>
             <axis>
                 <xyz expressed_in="__model__">0.0 -0.0 -1.0</xyz>
                 <limit>
@@ -1962,10 +2396,12 @@
             <pose>0.2149999962059069 0.1018999999999998 0.06275000205719003 0 0 0</pose>
         </frame>
         <frame name="imu_link" attached_to="Chassis">
-            <pose>0.22470999620590701 0.081339999999999829 0.072750002057190011 0 0 0</pose>
+            <!-- Centered on BN0085 mesh; Y forward, X right. -->
+            <pose>0.21582 0.09150 0.07357 0 0 -1.5707963267948966</pose>
         </frame>
         <frame name="lidar_link" attached_to="Chassis">
-            <pose>0.23059999620590699 0.077399999999999816 0.08275000205719002 0 0 0</pose>
+            <!-- Centered on top of LD06 mesh, 5 mm below mesh top. -->
+            <pose>0.21649999620590696 0.09150000000000003 0.11105000205719002 0 0 0</pose>
         </frame>
 
         <!-- TrackedVehicle: LTracks at X=-0.182 (left side in model frame after track yaw),
@@ -2001,11 +2437,11 @@
             <joint_name>robotarm_x_joint</joint_name>
             <topic>/robotarm/x_position_cmd</topic>
             <initial_target>-0.07</initial_target>
-            <p_gain>800</p_gain>
-            <i_gain>10</i_gain>
-            <d_gain>80</d_gain>
-            <i_max>20</i_max>
-            <i_min>-20</i_min>
+            <p_gain>600</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>150</d_gain>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
             <cmd_min>-500</cmd_min>
             <cmd_max>500</cmd_max>
         </plugin>
@@ -2013,37 +2449,37 @@
             <joint_name>robotarm_z_joint</joint_name>
             <topic>/robotarm/z_position_cmd</topic>
             <initial_target>0.13</initial_target>
-            <p_gain>500</p_gain>
+            <p_gain>120</p_gain>
             <i_gain>0</i_gain>
-            <d_gain>50</d_gain>
+            <d_gain>30</d_gain>
             <i_max>0</i_max>
             <i_min>0</i_min>
-            <cmd_min>-200</cmd_min>
-            <cmd_max>200</cmd_max>
+            <cmd_min>-50</cmd_min>
+            <cmd_max>50</cmd_max>
         </plugin>
         <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>left_gripper_finger_joint</joint_name>
             <topic>/sim/gripper/left_angle_cmd</topic>
             <initial_target>3.2</initial_target>
-            <p_gain>10000</p_gain>
+            <p_gain>2000</p_gain>
             <i_gain>0</i_gain>
-            <d_gain>500</d_gain>
+            <d_gain>200</d_gain>
             <i_max>0</i_max>
             <i_min>0</i_min>
-            <cmd_min>-100000</cmd_min>
-            <cmd_max>100000</cmd_max>
+            <cmd_min>-20000</cmd_min>
+            <cmd_max>20000</cmd_max>
         </plugin>
         <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>right_gripper_finger_joint</joint_name>
             <topic>/sim/gripper/right_angle_cmd</topic>
             <initial_target>6.9</initial_target>
-            <p_gain>10000</p_gain>
+            <p_gain>2000</p_gain>
             <i_gain>0</i_gain>
-            <d_gain>500</d_gain>
+            <d_gain>200</d_gain>
             <i_max>0</i_max>
             <i_min>0</i_min>
-            <cmd_min>-100000</cmd_min>
-            <cmd_max>100000</cmd_max>
+            <cmd_min>-20000</cmd_min>
+            <cmd_max>20000</cmd_max>
         </plugin>
         <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
             <topic>/joint_states</topic>

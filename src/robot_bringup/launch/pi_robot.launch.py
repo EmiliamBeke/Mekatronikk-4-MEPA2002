@@ -1,5 +1,5 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, SetEnvironmentVariable, TimerAction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -7,6 +7,22 @@ from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.actions import Node, SetParameter
 from ament_index_python.packages import get_package_share_directory
 import os
+
+
+def require_robotarm_safety_for_teddy_grab(context, *args, **kwargs):
+    use_teddy_grab = LaunchConfiguration('use_teddy_grab').perform(context).lower()
+    use_robotarm_safety = LaunchConfiguration('use_robotarm_safety').perform(context).lower()
+    if use_teddy_grab in ('1', 'true', 'yes', 'on') and use_robotarm_safety not in (
+        '1',
+        'true',
+        'yes',
+        'on',
+    ):
+        raise RuntimeError(
+            'use_teddy_grab:=true requires use_robotarm_safety:=true; '
+            'all arm/gripper commands must pass through robotarm_safety_node.'
+        )
+    return []
 
 
 def generate_launch_description():
@@ -208,6 +224,16 @@ def generate_launch_description():
         ],
     )
 
+    dist_sensor_marker_node = Node(
+        package='mekk4_bringup',
+        executable='dist_sensor_marker_node',
+        name='dist_sensor_marker',
+        output='screen',
+        parameters=[
+            {'use_sim_time': use_sim_time},
+        ],
+    )
+
     teddy_nav_goal_node = Node(
         package='mekk4_bringup',
         executable='teddy_nav_goal_node',
@@ -355,6 +381,7 @@ def generate_launch_description():
         DeclareLaunchArgument('rviz_config', default_value=default_rviz_config_path),
         DeclareLaunchArgument('use_respawn', default_value='false'),
         DeclareLaunchArgument('log_level', default_value='info'),
+        OpaqueFunction(function=require_robotarm_safety_for_teddy_grab),
         SetEnvironmentVariable('RCUTILS_LOGGING_BUFFERED_STREAM', '1'),
         SetParameter('use_sim_time', use_sim_time),
         joint_state_publisher,
@@ -369,6 +396,7 @@ def generate_launch_description():
         robotarm_safety_node,
         teddy_grab_node,
         teddy_lidar_markers_node,
+        dist_sensor_marker_node,
         teddy_nav_goal_node,
         rviz_node,
     ])

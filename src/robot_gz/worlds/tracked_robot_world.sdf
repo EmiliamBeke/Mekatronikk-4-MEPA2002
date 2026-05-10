@@ -36,7 +36,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -85,7 +87,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -131,7 +135,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -167,13 +173,30 @@
       <pose>1.1284448933912674 -0.056910550170631402 -0.0003408612621626614 1.5833008794618968 -0.0066090329093012211 1.663768487385846</pose>
       <link name="box">
         <collision name="collision">
-          <pose>0 0 0 0 0 0</pose>
+          <pose>0.0006631512265393301 0.10033082529253454 -0.0012546574840287311 1.7045691790591884 -1.4769075490086996 3.0017924711073887</pose>
           <geometry>
-            <mesh>
-              <uri>model://sim_teddy_bear/meshes/Teddy.glb</uri>
-              <scale>0.28499999999999998 0.28499999999999998 0.28499999999999998</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.06</radius>
+              <length>0.20</length>
+            </cylinder>
           </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>0x0003</collide_bitmask>
+              <ode>
+                <soft_cfm>0.005</soft_cfm>
+                <soft_erp>0.6</soft_erp>
+                <kp>5000</kp>
+                <kd>50</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>8.0</mu>
+                <mu2>8.0</mu2>
+              </ode>
+            </friction>
+          </surface>
         </collision>
         <visual name="teddy_mesh">
           <pose>0 0 0 0 0 0</pose>
@@ -216,7 +239,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -262,7 +287,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -304,7 +331,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -346,7 +375,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">
@@ -388,7 +419,9 @@
               <ode />
             </friction>
             <bounce />
-            <contact />
+            <contact>
+              <collide_bitmask>0x0005</collide_bitmask>
+            </contact>
           </surface>
         </collision>
         <visual name="visual">

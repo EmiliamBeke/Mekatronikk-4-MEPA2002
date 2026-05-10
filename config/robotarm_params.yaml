@@ -17,7 +17,7 @@ mega_driver:
     init_distance_sensor_on_connect: true
 
     # Servo pulse range used by the gripper command path.
-    # Servo: 0–270° maps to 500–2500 µs. ~1800 µs = teddy grip position.
+    # Servo: 0-270 degrees maps to 500-2500 us. ~1800 us = teddy grip position.
     gripper_min_us: 500
     gripper_max_us: 2500
 
@@ -39,6 +39,7 @@ robotarm_safety:
     x_state_topic: /robotarm/x_position_state
     z_state_topic: /robotarm/z_position_state
     joint_states_topic: /joint_states
+    x_joint_name: robotarm_x_joint
     z_joint_name: robotarm_z_joint
 
     publish_period_s: 0.05
@@ -58,8 +59,13 @@ robotarm_safety:
     lidar_x_threshold: 0.0
     lidar_z_clearance: 0.13
 
+    # Chassis keepout in internal joint coordinates. GUI z=0 maps to joint z=0.13,
+    # so if display Z is below 0, x must not retract behind 0.
+    chassis_x_min_when_low_z: 0.0
+    chassis_z_threshold: 0.13
+
     # Gripper pulse clamp in microseconds.
-    # Servo: 0–270° = 500–2500 µs; ~1800 µs = teddy grip.
+    # Servo: 0-270 degrees = 500-2500 us; ~1800 us = teddy grip.
     gripper_min: 500.0
     gripper_max: 2500.0
 

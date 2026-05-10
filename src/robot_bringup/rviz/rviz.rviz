@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
       Splitter Ratio: 0.5
-    Tree Height: 141
+    Tree Height: 642
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -113,11 +113,256 @@ Visualization Manager:
         Value: /robot_description
       Enabled: true
       Links:
+        ABX00102-Dist-sensor:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         All Links Enabled: true
+        BLLegs:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        BN0085:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        BRLegs:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Bottom-Rack-200.0mm-L30.00-m2.1651:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Chassis:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
+        FLLegs:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        FRLegs:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Finger-L-16L30.00-m2.1651:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Finger-R16L30.00-m2.1651Mirror:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Gear-9R24.00-m2.741-1-1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Gripper:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LBWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LBWheelColision:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LD06_LiDAR-1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LDriveWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LFWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LLeadscrew:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LTWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LTracks:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LeadNutL:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        LeadNutR:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Leadscrew-Rigg:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         Link Tree Style: Links in Alphabetic Order
+        M1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        M2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Mega-wsheeld-v5-1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        PI5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RBWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RBWheelColision:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RDriveWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RFWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RFWheelColision:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RFWheelColision-1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RLeadscrew:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RTWheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        RTracks:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Servo:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Servo-Gear-8L30.00-m2.1651:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Stepper-Gear-9R24.00-m2.741-1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        StøtteStag-1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Top-Rack-200.0mm-R30.00-m2.1651:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Unyaktig-batteri-mockup-v1-1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Xstepper:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ZStepper:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        dist_sensor_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        lidar_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rps-kamera-v2-2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -310,6 +555,19 @@ Visualization Manager:
         Reliability Policy: Best Effort
         Value: /overhead_camera
       Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Marker
+      Namespaces:
+        dist_sensor_beam: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /teddy_grab/dist_marker
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -403,18 +661,18 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1011
+  Height: 1917
   Hide Left Dock: false
   Hide Right Dock: false
   Overhead:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002c100000395fc0200000006fb0000000c00430061006d006500720061010000003f000000d70000001700fffffffb000000100044006900730070006c006100790073010000011c000000cd000000cc00fffffffb0000001200530065006c0065006300740069006f006e000000031f000001190000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000003a7000001530000005d00fffffffb0000000a0056006900650077007301000001ef000000a9000000a900fffffffb00000010004f0076006500720068006500610064010000029e000001360000001700ffffff000004770000039500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002c1000006ecfc0200000006fb0000000c00430061006d0065007200610100000065000002400000002400fffffffb000000100044006900730070006c00610079007301000002b0000002e90000016700fffffffb0000001200530065006c0065006300740069006f006e000000031f00000119000000a400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000003a700000153000000a400fffffffb0000000a0056006900650077007301000005a4000001260000011e00fffffffb00000010004f007600650072006800650061006401000006d50000007c0000002400ffffff00000931000006ec00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Tool Properties:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1854
-  X: 66
-  Y: 32
+  Width: 3069
+  X: 1
+  Y: 1

@@ -907,12 +907,14 @@
   <link name="imu_link" />
   <link name="camera_link" />
   <joint name="Chassis_to_lidar_link" type="fixed">
-    <origin xyz="0.23059999620590696 0.07739999999999982 0.08275000205719002" rpy="0 0 0" />
+    <!-- Centered on top of LD06 mesh, 5 mm below mesh top. -->
+    <origin xyz="0.21649999620590696 0.09150000000000003 0.11105000205719002" rpy="0 0 0" />
     <parent link="Chassis" />
     <child link="lidar_link" />
   </joint>
   <joint name="Chassis_to_imu_link" type="fixed">
-    <origin xyz="0.22470999620590695 0.08133999999999983 0.07275000205719001" rpy="0 0 0" />
+    <!-- Centered on BN0085 mesh; rotated so imu Y points forward (+X chassis) and X points right (-Y chassis). -->
+    <origin xyz="0.21582 0.09150 0.07357" rpy="0 0 -1.5707963267948966" />
     <parent link="Chassis" />
     <child link="imu_link" />
   </joint>
@@ -920,5 +922,13 @@
     <origin xyz="0.21499999620590693 0.10189999999999982 0.06275000205719003" rpy="0 0 0" />
     <parent link="Chassis" />
     <child link="camera_link" />
+  </joint>
+  <!-- VL53 distance sensor scan frame. Its +X axis follows robotarm_x_joint
+       (+Y in Gripper frame), matching the Gazebo single-ray distance sensor. -->
+  <link name="dist_sensor_link" />
+  <joint name="ABX00102_to_dist_sensor_link" type="fixed">
+    <origin xyz="0 -0.001606 0" rpy="0 0 -1.5707963267948966" />
+    <parent link="ABX00102-Dist-sensor" />
+    <child link="dist_sensor_link" />
   </joint>
 </robot>

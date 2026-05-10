@@ -17,8 +17,32 @@ def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
 
 
+ARM_COMMAND_TOPICS = {
+    "/robotarm/x_position_cmd",
+    "/robotarm/z_position_cmd",
+    "/gripper/left_position_cmd",
+    "/gripper/right_position_cmd",
+}
+
+
+def reject_command_topics(**topics: str) -> None:
+    for name, topic in topics.items():
+        if topic in ARM_COMMAND_TOPICS:
+            raise ValueError(
+                f"{name} must publish to a request topic, not low-level command topic {topic}. "
+                "Arm commands must pass through robotarm_safety_node."
+            )
+
+
 class RosKeyboardTeleop:
     def __init__(self, args: argparse.Namespace) -> None:
+        reject_command_topics(
+            arm_x_topic=args.arm_x_topic,
+            arm_z_topic=args.arm_z_topic,
+            gripper_topic=args.gripper_topic,
+            right_gripper_topic=args.right_gripper_topic,
+        )
+
         self.node = rclpy.create_node("ros_keyboard_teleop")
         self.pub = self.node.create_publisher(Twist, args.topic, 10)
         self.arm_x_pub = self.node.create_publisher(Float64, args.arm_x_topic, 10)

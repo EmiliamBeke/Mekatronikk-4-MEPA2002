@@ -69,7 +69,7 @@ def generate_launch_description():
     default_ekf_params = os.path.join(robot_bringup_share, 'config', 'ekf.yaml')
     default_apriltag_params = os.path.join(robot_bringup_share, 'config', 'apriltag_overhead.yaml')
     default_overhead_odom_params = os.path.join(robot_bringup_share, 'config', 'overhead_odom.yaml')
-    default_robotarm_params = os.path.join(robot_bringup_share, 'config', 'robotarm_sim_params.yaml')
+    default_robotarm_params = os.path.join(robot_bringup_share, 'config', 'robotarm_params.yaml')
     workspace_root = os.path.abspath(os.path.join(robot_bringup_share, '..', '..', '..', '..'))
     default_teddy_model = os.path.join(workspace_root, 'models', 'yolo26n_ncnn_model')
 
@@ -111,6 +111,7 @@ def generate_launch_description():
             '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model',
             '/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             '/lidar/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
+            '/sim/dist_sensor/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             '/imu/data@sensor_msgs/msg/Imu[gz.msgs.IMU',
             '/camera@sensor_msgs/msg/Image[gz.msgs.Image',
             '/overhead_camera@sensor_msgs/msg/Image[gz.msgs.Image',
@@ -186,6 +187,28 @@ def generate_launch_description():
         ],
     )
 
+    robotarm_state_adapter = Node(
+        package='robot_sim_control',
+        executable='robotarm_state_adapter',
+        output='screen',
+        parameters=[
+            {'use_sim_time': True},
+            {'x_joint_name': 'robotarm_x_joint'},
+            {'z_joint_name': 'robotarm_z_joint'},
+        ],
+    )
+
+    dist_sensor_bridge = Node(
+        package='robot_sim_control',
+        executable='dist_sensor_bridge',
+        output='screen',
+        parameters=[
+            {'use_sim_time': True},
+            {'input_topic': '/sim/dist_sensor/scan'},
+            {'output_topic': '/mega/distance_mm'},
+        ],
+    )
+
     shared_core_stack = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(robot_bringup_share, 'launch', 'pi_robot.launch.py')
@@ -195,15 +218,12 @@ def generate_launch_description():
             'use_lidar': 'false',
             'use_teddy': use_teddy,
             'use_teddy_approach': use_teddy_approach,
-            'use_teddy_grab': PythonExpression([
-                "'", use_teddy, "' == 'true' and '", use_teddy_grab, "' == 'true'",
-            ]),
+            'use_teddy_grab': use_teddy_grab,
             'use_imu': 'false',
             'use_mega_driver': 'false',
             'use_ekf': use_ekf,
             'use_joint_states': 'false',
-            # TEMP: safety node bypassed in sim for direct joint control debugging.
-            # Re-enable by setting back to 'true'.
+            # Keep all arm/gripper requests routed through robotarm_safety.
             'use_robotarm_safety': 'true',
             'use_sim_time': 'true',
             'rviz': rviz_enabled,
@@ -425,6 +445,8 @@ def generate_launch_description():
             annotated_camera_bridge,
             keyboard_teleop,
             gripper_sim_adapter,
+            robotarm_state_adapter,
+            dist_sensor_bridge,
         ]
     )
 

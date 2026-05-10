@@ -14,7 +14,7 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 
 STATUS_RE = re.compile(r"(?P<key>[A-Za-z_]+)=(?P<value>[^ ]+)")
-MARKER_Z = 0.03
+MARKER_Z = 0.0
 DEFAULT_RAY_DISTANCE_M = 0.50
 TARGET_COLOR = (0.0, 1.0, 0.0, 0.9)
 POINT_COLOR = (1.0, 0.65, 0.0, 0.95)
