@@ -428,7 +428,7 @@ void step_blocking(Axis &axis, long physical_dir) {
   delayMicroseconds(axis.period_us);
 }
 
-bool home_axis(Axis &axis, const char *name, long max_steps) {
+bool home_axis(Axis &axis, const char *name, long max_steps, bool print_ok = true) {
   set_arm_steppers_enabled(true);
   const long backoff = name[0] == 'X'
                          ? mm_to_steps(kHomeBackoffMm, kXStepsPerMm)
@@ -448,10 +448,12 @@ bool home_axis(Axis &axis, const char *name, long max_steps) {
       axis.position = axis.home_position;
       axis.target = axis.position;
       axis.moving = false;
-      Serial.print("OK HOME ");
-      Serial.print(name);
-      Serial.print(" ");
-      Serial.println(axis.position);
+      if (print_ok) {
+        Serial.print("OK HOME ");
+        Serial.print(name);
+        Serial.print(" ");
+        Serial.println(axis.position);
+      }
       return true;
     }
     step_blocking(axis, axis.home_dir);
@@ -494,6 +496,41 @@ bool startup_home_arm() {
   Serial.print(x_axis.position);
   Serial.print(" Z=");
   Serial.println(z_axis.position);
+  save_arm_state();
+  return true;
+}
+
+bool home_x_axis_only() {
+  stop_all();
+  open_gripper_for_homing();
+  x_axis.home_position = mm_to_steps(kStartupXHomeMm, kXStepsPerMm);
+  if (!home_axis(x_axis, "X", kXHomeMaxSteps, false)) {
+    return false;
+  }
+
+  move_axis_relative(x_axis, mm_to_steps(kStartupXFinalMm - kStartupXHomeMm, kXStepsPerMm));
+  while (x_axis.moving) {
+    update_axis(x_axis, "X");
+  }
+
+  arm_homed = true;
+  Serial.print("OK X HOME FINAL ");
+  Serial.println(x_axis.position);
+  save_arm_state();
+  return true;
+}
+
+bool calibrate_x_axis_extended() {
+  stop_all();
+  open_gripper_for_homing();
+  x_axis.home_position = mm_to_steps(kStartupXHomeMm, kXStepsPerMm);
+  if (!home_axis(x_axis, "X", kXHomeMaxSteps, false)) {
+    return false;
+  }
+
+  arm_homed = true;
+  Serial.print("OK X CAL EXTENDED ");
+  Serial.println(x_axis.position);
   save_arm_state();
   return true;
 }
@@ -662,9 +699,9 @@ void handle_command(const char *cmd) {
     stop_all();
     clear_arm_state();
   } else if (strcmp(cmd, "HOME X") == 0) {
-    stop_all();
-    open_gripper_for_homing();
-    home_axis(x_axis, "X", kXHomeMaxSteps);
+    home_x_axis_only();
+  } else if (strcmp(cmd, "CAL X") == 0) {
+    calibrate_x_axis_extended();
   } else if (strcmp(cmd, "HOME Z") == 0) {
     stop_all();
     open_gripper_for_homing();

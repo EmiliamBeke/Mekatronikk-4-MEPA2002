@@ -38,7 +38,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("odom_poll_period_s", 0.05)
         self.declare_parameter("arm_state_poll_period_s", 0.25)
         self.declare_parameter("arm_motion_timeout_s", 180.0)
-        self.declare_parameter("auto_home_arm_on_connect", True)
+        self.declare_parameter("auto_home_x_on_connect", True)
         self.declare_parameter("init_distance_sensor_on_connect", True)
         self.declare_parameter("cmd_vel_timeout_s", 0.5)
         self.declare_parameter("reply_timeout_s", 2.0)
@@ -95,8 +95,8 @@ class MegaDriverNode(Node):
         self._arm_motion_timeout_s = (
             self.get_parameter("arm_motion_timeout_s").get_parameter_value().double_value
         )
-        self._auto_home_arm_on_connect = (
-            self.get_parameter("auto_home_arm_on_connect").get_parameter_value().bool_value
+        self._auto_home_x_on_connect = (
+            self.get_parameter("auto_home_x_on_connect").get_parameter_value().bool_value
         )
         self._init_distance_sensor_on_connect = (
             self.get_parameter("init_distance_sensor_on_connect").get_parameter_value().bool_value
@@ -361,9 +361,11 @@ class MegaDriverNode(Node):
             self._last_arm_state_poll_at = 0.0
             self._serial_error_count = 0
             self._sync_arm_state_from_mega()
-            if self._auto_home_arm_on_connect:
-                self.get_logger().info("Running HOME ARM on Mega connect.")
-                self._home_arm_on_mega()
+            if self._auto_home_x_on_connect:
+                self.get_logger().info("Running CAL X on Mega connect.")
+                self._calibrate_x_extended_on_mega()
+                self._move_z_to_initial_home_on_mega()
+                self._move_x_to_initial_home_on_mega()
             if self._arm_homed:
                 self._desired_arm_x = self._actual_arm_x
                 self._last_arm_x_cmd_m = self._actual_arm_x
@@ -611,6 +613,88 @@ class MegaDriverNode(Node):
         self._active_arm_axis = None
         self._publish_arm_state()
 
+    def _home_x_on_mega(self) -> None:
+        self._send_expect("HOME X", "OK X HOME FINAL", self._startup_ready_timeout_s)
+        self._sync_arm_state_from_mega()
+        if not self._arm_homed:
+            raise RuntimeError("Mega reported arm not homed after HOME X.")
+        self._desired_arm_x = self._actual_arm_x
+        self._last_arm_x_cmd_m = self._actual_arm_x
+        self._pending_arm_x_delta_steps = 0
+        self._desired_arm_z = self._actual_arm_z
+        self._last_arm_z_cmd_m = self._actual_arm_z
+        self._pending_arm_z_delta_steps = 0
+        self._warned_arm_not_homed = False
+        self._active_arm_axis = None
+        self._publish_arm_state()
+
+    def _calibrate_x_extended_on_mega(self) -> None:
+        self._send_expect("CAL X", "OK X CAL EXTENDED", self._startup_ready_timeout_s)
+        self._sync_arm_state_from_mega()
+        if not self._arm_homed:
+            raise RuntimeError("Mega reported arm not homed after CAL X.")
+        self._desired_arm_x = self._actual_arm_x
+        self._last_arm_x_cmd_m = self._actual_arm_x
+        self._pending_arm_x_delta_steps = 0
+        self._desired_arm_z = self._actual_arm_z
+        self._last_arm_z_cmd_m = self._actual_arm_z
+        self._pending_arm_z_delta_steps = 0
+        self._warned_arm_not_homed = False
+        self._active_arm_axis = None
+        self._publish_arm_state()
+
+    def _move_z_to_initial_home_on_mega(self) -> None:
+        delta_steps = self._meters_to_z_steps(self._initial_arm_z_m - self._actual_arm_z)
+        if delta_steps == 0:
+            self._desired_arm_z = self._actual_arm_z
+            self._last_arm_z_cmd_m = self._actual_arm_z
+            self._pending_arm_z_delta_steps = 0
+            return
+
+        self.get_logger().info(
+            "Moving Z to home %.3f m after X calibration; current z=%.3f m"
+            % (self._initial_arm_z_m, self._actual_arm_z)
+        )
+        self._send_expect(f"ARM Z {delta_steps}", "OK ARM Z", self._arm_motion_timeout_s)
+        self._last_arm_state_poll_at = 0.0
+        self._sync_arm_state_from_mega()
+        if abs(self._actual_arm_z - self._initial_arm_z_m) > self._z_step_tolerance_m():
+            raise RuntimeError(
+                "Mega Z did not reach home after X calibration: target=%.3f actual=%.3f"
+                % (self._initial_arm_z_m, self._actual_arm_z)
+            )
+        self._desired_arm_z = self._actual_arm_z
+        self._last_arm_z_cmd_m = self._actual_arm_z
+        self._pending_arm_z_delta_steps = 0
+        self._active_arm_axis = None
+        self._publish_arm_state()
+
+    def _move_x_to_initial_home_on_mega(self) -> None:
+        delta_steps = self._meters_to_x_steps(self._initial_arm_x_m - self._actual_arm_x)
+        if delta_steps == 0:
+            self._desired_arm_x = self._actual_arm_x
+            self._last_arm_x_cmd_m = self._actual_arm_x
+            self._pending_arm_x_delta_steps = 0
+            return
+
+        self.get_logger().info(
+            "Moving X to home %.3f m after Z home; current x=%.3f m"
+            % (self._initial_arm_x_m, self._actual_arm_x)
+        )
+        self._send_expect(f"ARM X {delta_steps}", "OK ARM X", self._arm_motion_timeout_s)
+        self._last_arm_state_poll_at = 0.0
+        self._sync_arm_state_from_mega()
+        if abs(self._actual_arm_x - self._initial_arm_x_m) > self._x_step_tolerance_m():
+            raise RuntimeError(
+                "Mega X did not reach home after Z home: target=%.3f actual=%.3f"
+                % (self._initial_arm_x_m, self._actual_arm_x)
+            )
+        self._desired_arm_x = self._actual_arm_x
+        self._last_arm_x_cmd_m = self._actual_arm_x
+        self._pending_arm_x_delta_steps = 0
+        self._active_arm_axis = None
+        self._publish_arm_state()
+
     def _publish_arm_state(self) -> None:
         x_msg = Float64()
         x_msg.data = float(self._actual_arm_x)
@@ -664,12 +748,16 @@ class MegaDriverNode(Node):
         self._publish_arm_state()
 
     def _arm_x_at_target(self) -> bool:
-        tolerance_m = 1.5 / self._arm_x_steps_per_mm / 1000.0
-        return abs(self._actual_arm_x - self._desired_arm_x) <= tolerance_m
+        return abs(self._actual_arm_x - self._desired_arm_x) <= self._x_step_tolerance_m()
+
+    def _x_step_tolerance_m(self) -> float:
+        return 1.5 / self._arm_x_steps_per_mm / 1000.0
 
     def _arm_z_at_target(self) -> bool:
-        tolerance_m = 1.5 / self._arm_z_steps_per_mm / 1000.0
-        return abs(self._actual_arm_z - self._desired_arm_z) <= tolerance_m
+        return abs(self._actual_arm_z - self._desired_arm_z) <= self._z_step_tolerance_m()
+
+    def _z_step_tolerance_m(self) -> float:
+        return 1.5 / self._arm_z_steps_per_mm / 1000.0
 
     def _refresh_active_arm_axis(self, state: dict[str, str]) -> None:
         if self._active_arm_axis == "x" and (

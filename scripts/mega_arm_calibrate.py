@@ -82,7 +82,7 @@ def main() -> int:
     args = parser.parse_args()
 
     command = "HOME ARM" if args.mode == "all" else "HOME X"
-    expected = ("OK ARM STARTUP HOME",) if args.mode == "all" else ("OK HOME X",)
+    expected = ("OK ARM STARTUP HOME",) if args.mode == "all" else ("OK X HOME FINAL",)
 
     try:
         with serial.Serial(args.port, args.baudrate, timeout=0.1, write_timeout=1.0) as ser:
