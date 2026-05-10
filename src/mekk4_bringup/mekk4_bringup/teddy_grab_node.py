@@ -145,10 +145,10 @@ class TeddyGrabNode(Node):
             self.step("grab_servo", "Phase 6", "gripper", safe_x, self.grab_z, g_closed, self.p("grab_hold_s")),
             # Phase 7: verify teddy is still held.
             self.step("verify_grab", "Phase 7", "verify_grab", safe_x, self.grab_z, g_closed, self.p("verify_hold_s")),
-            # Phase 8: retract X to home.
-            self.step("retract_x", "Phase 8", "x", home_x, self.grab_z, g_closed, move_s),
-            # Phase 8: lift Z after X is retracted.
-            self.step("lift_z", "Phase 8", "z", home_x, self.p("lift_z"), g_closed, move_s),
+            # Phase 8: lift Z before X retracts behind the chassis front edge.
+            self.step("lift_z", "Phase 8", "z", safe_x, self.p("lift_z"), g_closed, move_s),
+            # Phase 8: retract X to home after Z is clear.
+            self.step("retract_x", "Phase 8", "x", home_x, self.p("lift_z"), g_closed, move_s),
             # Phase 9: final distance check.
             self.step("verify_final", "Phase 9", "verify_final", home_x, self.p("lift_z"), g_closed, self.p("verify_hold_s")),
         ]
@@ -171,10 +171,10 @@ class TeddyGrabNode(Node):
             self.step("grab_servo", "Phase 6", "gripper", safe_x, self.grab_z, g_closed, self.p("grab_hold_s")),
             # Phase 7: verify second attempt.
             self.step("verify_grab", "Phase 7", "verify_grab", safe_x, self.grab_z, g_closed, self.p("verify_hold_s")),
-            # Phase 8: retract X to home.
-            self.step("retract_x", "Phase 8", "x", home_x, self.grab_z, g_closed, move_s),
-            # Phase 8: lift Z.
-            self.step("lift_z", "Phase 8", "z", home_x, self.p("lift_z"), g_closed, move_s),
+            # Phase 8: lift Z before X retracts behind the chassis front edge.
+            self.step("lift_z", "Phase 8", "z", safe_x, self.p("lift_z"), g_closed, move_s),
+            # Phase 8: retract X to home after Z is clear.
+            self.step("retract_x", "Phase 8", "x", home_x, self.p("lift_z"), g_closed, move_s),
             # Phase 9: final distance check.
             self.step("verify_final", "Phase 9", "verify_final", home_x, self.p("lift_z"), g_closed, self.p("verify_hold_s")),
         ]
@@ -355,7 +355,7 @@ class TeddyGrabNode(Node):
     # Keep later status targets consistent with final reach X.
     def patch_reach_x(self):
         for step in self.sequence[self.step_i + 1 :]:
-            if step["name"] in ("grab_servo", "verify_grab"):
+            if step["name"] in ("grab_servo", "verify_grab", "lift_z"):
                 step["x"] = self.reach_x
 
     # Verify requested axis reached target using Mega feedback.
