@@ -33,7 +33,7 @@ class TeddyGrabNode(Node):
 
         self.grab_z = float(self.p("lower_z"))
         self.grab_z_calc = "not computed"
-        self.reach_x = float(self.p("final_x"))
+        self.reach_x = float(self.p("safe_x"))
         self.retry_count = 0
         self.contact_t = None
         self.sequence = []
@@ -73,7 +73,7 @@ class TeddyGrabNode(Node):
         if not self.enabled or self.state != "idle" or msg.data != self.trigger_mode:
             return
         self.grab_z = self.compute_grab_z()
-        self.reach_x = float(self.p("final_x"))
+        self.reach_x = float(self.p("safe_x"))
         self.retry_count = 0
         self.contact_t = None
         self.last_gripper_us = None
@@ -127,7 +127,7 @@ class TeddyGrabNode(Node):
 
     # Normal grab sequence. X and Z are separate actions.
     def make_sequence(self):
-        f_x = float(self.p("final_x"))
+        f_x = float(self.p("safe_x"))
         g_open = float(self.p("gripper_open"))
         g_closed = float(self.p("gripper_closed"))
         move_s = float(self.p("move_hold_s"))
@@ -154,7 +154,7 @@ class TeddyGrabNode(Node):
 
     # Retry once after failed grab verification.
     def make_retry_sequence(self):
-        f_x = float(self.p("final_x"))
+        f_x = float(self.p("safe_x"))
         g_open = float(self.p("gripper_open"))
         g_closed = float(self.p("gripper_closed"))
         move_s = float(self.p("move_hold_s"))
@@ -179,7 +179,7 @@ class TeddyGrabNode(Node):
 
     # Reset arm before handing control back to teddy_approach.
     def make_restart_sequence(self):
-        f_x = float(self.p("final_x"))
+        f_x = float(self.p("safe_x"))
         z0 = float(self.p("lower_z"))
         g_open = float(self.p("gripper_open"))
         move_s = float(self.p("move_hold_s"))
@@ -360,7 +360,7 @@ class TeddyGrabNode(Node):
         value = self.x if axis == "x" else self.z
         if value is None:
             return not bool(self.p("require_state_feedback"))
-        if axis == "x" and target == float(self.p("final_x")):
+        if axis == "x" and target == float(self.p("safe_x")):
             return value >= target
         return abs(value - target) <= float(self.p("position_tolerance_m"))
 
