@@ -64,17 +64,21 @@ SOURCE_TEDDY_GRAB_PARAMS="${REPO_ROOT}/config/teddy_grab.yaml"
 INSTALLED_TEDDY_GRAB_PARAMS="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/config/teddy_grab.yaml"
 SOURCE_ROBOTARM_PARAMS="${REPO_ROOT}/config/robotarm_params.yaml"
 INSTALLED_ROBOTARM_PARAMS="${REPO_ROOT}/install/robot_bringup/share/robot_bringup/config/robotarm_params.yaml"
+SOURCE_ROBOT_URDF="${REPO_ROOT}/src/robot_description/urdf/tracked_robot.urdf"
+INSTALLED_ROBOT_URDF="${REPO_ROOT}/install/robot_description/share/robot_description/urdf/tracked_robot.urdf"
 SOURCE_PKG_XML="${REPO_ROOT}/src/robot_bringup/package.xml"
 SOURCE_CMAKE="${REPO_ROOT}/src/robot_bringup/CMakeLists.txt"
 MEKK4_SETUP="${REPO_ROOT}/src/mekk4_bringup/setup.py"
 MEKK4_PKG_XML="${REPO_ROOT}/src/mekk4_bringup/package.xml"
 MEKK4_MEGA_DRIVER="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/mega_driver_node.py"
 MEKK4_CMD_VEL_MUX="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/cmd_vel_mux_node.py"
+MEKK4_ZERO_JOINT_STATE_PUBLISHER="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/zero_joint_state_publisher.py"
 MEKK4_TEDDY_APPROACH="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/teddy_approach_node.py"
 MEKK4_TEDDY_GRAB="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/teddy_grab_node.py"
 MEKK4_ROBOTARM_SAFETY="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/robotarm_safety_node.py"
 INSTALLED_MEGA_DRIVER="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/mega_driver_node"
 INSTALLED_CMD_VEL_MUX="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/cmd_vel_mux_node"
+INSTALLED_ZERO_JOINT_STATE_PUBLISHER="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/zero_joint_state_publisher"
 INSTALLED_TEDDY_APPROACH="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/teddy_approach_node"
 INSTALLED_TEDDY_GRAB="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/teddy_grab_node"
 INSTALLED_ROBOTARM_SAFETY="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/robotarm_safety_node"
@@ -112,9 +116,13 @@ elif [[ ! -f "${INSTALLED_TEDDY_GRAB_PARAMS}" ]]; then
   needs_ws_build=1
 elif [[ ! -f "${INSTALLED_ROBOTARM_PARAMS}" ]]; then
   needs_ws_build=1
+elif [[ ! -f "${INSTALLED_ROBOT_URDF}" ]]; then
+  needs_ws_build=1
 elif [[ ! -f "${INSTALLED_CMD_VEL_MUX}" ]]; then
   needs_ws_build=1
 elif [[ ! -f "${INSTALLED_MEGA_DRIVER}" ]]; then
+  needs_ws_build=1
+elif [[ ! -f "${INSTALLED_ZERO_JOINT_STATE_PUBLISHER}" ]]; then
   needs_ws_build=1
 elif [[ ! -f "${INSTALLED_TEDDY_APPROACH}" ]]; then
   needs_ws_build=1
@@ -130,6 +138,8 @@ elif [[ "${SOURCE_TEDDY_GRAB_PARAMS}" -nt "${INSTALLED_TEDDY_GRAB_PARAMS}" ]]; t
   needs_ws_build=1
 elif [[ "${SOURCE_ROBOTARM_PARAMS}" -nt "${INSTALLED_ROBOTARM_PARAMS}" ]]; then
   needs_ws_build=1
+elif [[ "${SOURCE_ROBOT_URDF}" -nt "${INSTALLED_ROBOT_URDF}" ]]; then
+  needs_ws_build=1
 elif [[ "${SOURCE_PKG_XML}" -nt "${INSTALLED_LAUNCH}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_CMAKE}" -nt "${INSTALLED_LAUNCH}" ]]; then
@@ -141,6 +151,8 @@ elif [[ "${MEKK4_PKG_XML}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
 elif [[ "${MEKK4_MEGA_DRIVER}" -nt "${INSTALLED_MEGA_DRIVER}" ]]; then
   needs_ws_build=1
 elif [[ "${MEKK4_CMD_VEL_MUX}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
+  needs_ws_build=1
+elif [[ "${MEKK4_ZERO_JOINT_STATE_PUBLISHER}" -nt "${INSTALLED_ZERO_JOINT_STATE_PUBLISHER}" ]]; then
   needs_ws_build=1
 elif [[ "${MEKK4_TEDDY_APPROACH}" -nt "${INSTALLED_TEDDY_APPROACH}" ]]; then
   needs_ws_build=1
