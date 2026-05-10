@@ -30,7 +30,7 @@ teddy_grab:
     approach_x_max: 0.082
     approach_x_step_m: 0.002
     lift_z: 0.21
-    final_x: 0.0
+    final_x: -0.07
 
     # Extend X outward from final_x until distance contact is stable or the
     # configured mechanical reach limit is reached.
@@ -60,14 +60,14 @@ teddy_grab:
 
     # Servo pulse widths in microseconds.
     gripper_open: 500.0
-    gripper_closed: 2000.0
+    gripper_closed: 1800.0
 
     # Per-step hold times.
-    move_hold_s: 0.2
+    move_hold_s: 1.0
     grab_hold_s: 2.0
-    verify_hold_s: 0.2
-    final_hold_s: 0.5
+    verify_hold_s: 1.0
+    final_hold_s: 1.0
 
     # Wait this long after teddy_approach reports stop before moving the arm.
     # Lets the chassis fully decelerate.
-    settle_after_trigger_s: 1.0
+    settle_after_trigger_s: 2.0

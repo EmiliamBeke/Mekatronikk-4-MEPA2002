@@ -313,6 +313,10 @@ class TeddyGrabNode(Node):
         if self.distance_under_threshold_for(step["hold_s"]):
             self.next_step()
             return
+        if self.distance_under_threshold():
+            return
+        if bool(self.p("require_distance_feedback")) and not self.distance_fresh():
+            return
         if self.elapsed_s() < step["hold_s"]:
             return
         self.retry_count += 1
@@ -331,6 +335,10 @@ class TeddyGrabNode(Node):
         if self.distance_under_threshold_for(step["hold_s"]):
             self.state = "done"
             self.get_logger().info("teddy grab successful")
+            return
+        if self.distance_under_threshold():
+            return
+        if bool(self.p("require_distance_feedback")) and not self.distance_fresh():
             return
         if self.elapsed_s() >= step["hold_s"]:
             self.get_logger().warning("final contact check failed; restarting approach")
