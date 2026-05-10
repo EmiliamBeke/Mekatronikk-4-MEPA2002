@@ -78,6 +78,8 @@ robotarm_safety:
     initial_left_gripper: 500.0
     initial_right_gripper: 500.0
 
-    startup_lock_s: 0.0
+    # On launch, move/hold Z at home before retracting X to home (-0.07).
+    startup_lock_s: 1.5
+    startup_z_first_x: 0.0
     spawn_x: -0.07
     spawn_z: 0.13

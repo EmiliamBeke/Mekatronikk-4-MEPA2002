@@ -40,6 +40,7 @@ PARAM_DEFAULTS = {
     "initial_left_gripper": 500.0,
     "initial_right_gripper": 500.0,
     "startup_lock_s": 1.5,
+    "startup_z_first_x": 0.0,
     "spawn_x": 0.0,
     "spawn_z": 0.0,
 }
@@ -102,6 +103,7 @@ class RobotarmSafetyNode(Node):
         self.commanded_x = self.requested_x
         self.commanded_z = self.requested_z
         self.startup_lock_s = float(self.param("startup_lock_s"))
+        self.startup_z_first_x = clamp(float(self.param("startup_z_first_x")), self.x_min, self.x_max)
         self._startup_t0 = None
         self.spawn_x = float(self.param("spawn_x"))
         self.spawn_z = float(self.param("spawn_z"))
@@ -204,10 +206,11 @@ class RobotarmSafetyNode(Node):
             self._startup_t0 = self.get_clock().now()
         elapsed = (self.get_clock().now() - self._startup_t0).nanoseconds * 1e-9
         if elapsed < self.startup_lock_s:
-            # Hold spawn pose so z PID can settle before x retracts.
-            self.publish(self.x_pub, self.spawn_x)
+            # Move Z to home before retracting X behind the chassis front edge.
+            startup_x = self.current_x if self.current_x is not None else self.startup_z_first_x
+            self.publish(self.x_pub, startup_x)
             self.publish(self.z_pub, self.spawn_z)
-            self.commanded_x = self.spawn_x
+            self.commanded_x = startup_x
             self.commanded_z = self.spawn_z
             self.publish(self.left_gripper_pub, self.requested_left_gripper)
             self.publish(self.right_gripper_pub, self.requested_right_gripper)
