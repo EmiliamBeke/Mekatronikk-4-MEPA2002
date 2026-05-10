@@ -127,34 +127,36 @@ class TeddyGrabNode(Node):
 
     # Normal grab sequence. X and Z are separate actions.
     def make_sequence(self):
-        f_x = float(self.p("safe_x"))
+        safe_x = float(self.p("safe_x"))
+        home_x = float(self.p("home_x"))
         g_open = float(self.p("gripper_open"))
         g_closed = float(self.p("gripper_closed"))
         move_s = float(self.p("move_hold_s"))
         return [
             # Phase 1: wait after approach handoff.
-            self.step("settle", "Phase 1", "wait", f_x, self.hold_z(), g_open, self.p("settle_after_trigger_s")),
+            self.step("settle", "Phase 1", "wait", safe_x, self.hold_z(), g_open, self.p("settle_after_trigger_s")),
             # Phase 3: move X to 0.
-            self.step("move_x_zero", "Phase 3", "x", f_x, self.hold_z(), g_open, move_s),
+            self.step("move_x_zero", "Phase 3", "x", safe_x, self.hold_z(), g_open, move_s),
             # Phase 4: move Z to computed teddy center height.
-            self.step("move_z_grab", "Phase 4", "z", f_x, self.grab_z, g_open, move_s),
+            self.step("move_z_grab", "Phase 4", "z", safe_x, self.grab_z, g_open, move_s),
             # Phase 5: extend X until distance contact is stable.
-            self.step("reach_until_contact", "Phase 5", "reach", f_x, self.grab_z, g_open, 0.0),
+            self.step("reach_until_contact", "Phase 5", "reach", safe_x, self.grab_z, g_open, 0.0),
             # Phase 6: close gripper.
-            self.step("grab_servo", "Phase 6", "gripper", f_x, self.grab_z, g_closed, self.p("grab_hold_s")),
+            self.step("grab_servo", "Phase 6", "gripper", safe_x, self.grab_z, g_closed, self.p("grab_hold_s")),
             # Phase 7: verify teddy is still held.
-            self.step("verify_grab", "Phase 7", "verify_grab", f_x, self.grab_z, g_closed, self.p("verify_hold_s")),
-            # Phase 8: retract X to 0.
-            self.step("retract_x", "Phase 8", "x", f_x, self.grab_z, g_closed, move_s),
+            self.step("verify_grab", "Phase 7", "verify_grab", safe_x, self.grab_z, g_closed, self.p("verify_hold_s")),
+            # Phase 8: retract X to home.
+            self.step("retract_x", "Phase 8", "x", home_x, self.grab_z, g_closed, move_s),
             # Phase 8: lift Z after X is retracted.
-            self.step("lift_z", "Phase 8", "z", f_x, self.p("lift_z"), g_closed, move_s),
+            self.step("lift_z", "Phase 8", "z", home_x, self.p("lift_z"), g_closed, move_s),
             # Phase 9: final distance check.
-            self.step("verify_final", "Phase 9", "verify_final", f_x, self.p("lift_z"), g_closed, self.p("verify_hold_s")),
+            self.step("verify_final", "Phase 9", "verify_final", home_x, self.p("lift_z"), g_closed, self.p("verify_hold_s")),
         ]
 
     # Retry once after failed grab verification.
     def make_retry_sequence(self):
-        f_x = float(self.p("safe_x"))
+        safe_x = float(self.p("safe_x"))
+        home_x = float(self.p("home_x"))
         g_open = float(self.p("gripper_open"))
         g_closed = float(self.p("gripper_closed"))
         move_s = float(self.p("move_hold_s"))
@@ -162,36 +164,37 @@ class TeddyGrabNode(Node):
             # Phase 7.1: open gripper.
             self.step("retry_open", "Phase 7.1", "gripper", self.reach_x, self.grab_z, g_open, move_s),
             # Phase 7.1: retract X to 0.
-            self.step("retry_x_zero", "Phase 7.1", "x", f_x, self.grab_z, g_open, move_s),
+            self.step("retry_x_zero", "Phase 7.1", "x", safe_x, self.grab_z, g_open, move_s),
             # Phase 5: reach again.
-            self.step("reach_until_contact", "Phase 5", "reach", f_x, self.grab_z, g_open, 0.0),
+            self.step("reach_until_contact", "Phase 5", "reach", safe_x, self.grab_z, g_open, 0.0),
             # Phase 6: close gripper again.
-            self.step("grab_servo", "Phase 6", "gripper", f_x, self.grab_z, g_closed, self.p("grab_hold_s")),
+            self.step("grab_servo", "Phase 6", "gripper", safe_x, self.grab_z, g_closed, self.p("grab_hold_s")),
             # Phase 7: verify second attempt.
-            self.step("verify_grab", "Phase 7", "verify_grab", f_x, self.grab_z, g_closed, self.p("verify_hold_s")),
-            # Phase 8: retract X to 0.
-            self.step("retract_x", "Phase 8", "x", f_x, self.grab_z, g_closed, move_s),
+            self.step("verify_grab", "Phase 7", "verify_grab", safe_x, self.grab_z, g_closed, self.p("verify_hold_s")),
+            # Phase 8: retract X to home.
+            self.step("retract_x", "Phase 8", "x", home_x, self.grab_z, g_closed, move_s),
             # Phase 8: lift Z.
-            self.step("lift_z", "Phase 8", "z", f_x, self.p("lift_z"), g_closed, move_s),
+            self.step("lift_z", "Phase 8", "z", home_x, self.p("lift_z"), g_closed, move_s),
             # Phase 9: final distance check.
-            self.step("verify_final", "Phase 9", "verify_final", f_x, self.p("lift_z"), g_closed, self.p("verify_hold_s")),
+            self.step("verify_final", "Phase 9", "verify_final", home_x, self.p("lift_z"), g_closed, self.p("verify_hold_s")),
         ]
 
     # Reset arm before handing control back to teddy_approach.
     def make_restart_sequence(self):
-        f_x = float(self.p("safe_x"))
+        safe_x = float(self.p("safe_x"))
+        home_x = float(self.p("home_x"))
         z0 = float(self.p("lower_z"))
         g_open = float(self.p("gripper_open"))
         move_s = float(self.p("move_hold_s"))
         return [
             # Phase 7.2: open gripper.
-            self.step("restart_open", "Phase 7.2", "gripper", self.x_or(f_x), self.hold_z(), g_open, move_s),
-            # Phase 7.2: retract X to 0.
-            self.step("restart_x_zero", "Phase 7.2", "x", f_x, self.hold_z(), g_open, move_s),
+            self.step("restart_open", "Phase 7.2", "gripper", self.x_or(safe_x), self.hold_z(), g_open, move_s),
+            # Phase 7.2: retract X to home.
+            self.step("restart_x_home", "Phase 7.2", "x", home_x, self.hold_z(), g_open, move_s),
             # Phase 7.2: lower Z to 0.
-            self.step("restart_z_zero", "Phase 7.2", "z", f_x, z0, g_open, move_s),
+            self.step("restart_z_zero", "Phase 7.2", "z", home_x, z0, g_open, move_s),
             # Phase 7.2: reset teddy_approach.
-            self.step("restart_approach", "Phase 7.2", "reset", f_x, z0, g_open, self.p("final_hold_s")),
+            self.step("restart_approach", "Phase 7.2", "reset", home_x, z0, g_open, self.p("final_hold_s")),
         ]
 
     # Create one sequence dictionary.
@@ -286,15 +289,17 @@ class TeddyGrabNode(Node):
         self.command_gripper(step["gripper"])
         self.command_x(self.reach_x)
         self.target_x = self.reach_x
-        if self.contact_is_stable():
-            step["x"] = self.reach_x
-            self.target_x = self.reach_x
-            self.patch_reach_x()
-            self.next_step()
-            return
         if bool(self.p("require_distance_feedback")) and not self.distance_fresh():
             return
         if not self.axis_reached("x", self.reach_x, 0.0):
+            self.contact_t = None
+            return
+        if self.distance_under_threshold():
+            if self.contact_is_stable():
+                step["x"] = self.reach_x
+                self.target_x = self.reach_x
+                self.patch_reach_x()
+                self.next_step()
             return
         max_x = float(self.p("approach_x_max"))
         if self.reach_x >= max_x - 1e-9:
