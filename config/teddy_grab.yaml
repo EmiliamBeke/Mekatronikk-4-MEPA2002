@@ -37,7 +37,7 @@ teddy_grab:
     # Extend X outward from safe_x until distance contact is stable or the
     # configured mechanical reach limit is reached.
     require_distance_feedback: true
-    contact_distance_mm: 35
+    contact_distance_mm: 40
     contact_hold_s: 2.0
 
     # Optional rough image-to-height correction from teddy_detector dy only.

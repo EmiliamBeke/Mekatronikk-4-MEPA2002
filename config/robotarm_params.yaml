@@ -17,6 +17,7 @@ mega_driver:
     # disturb smooth arm stepping on the Arduino.
     arm_state_poll_period_s: 0.25
     arm_motion_timeout_s: 180.0
+    auto_home_arm_on_connect: true
     init_distance_sensor_on_connect: true
 
     # Servo pulse range used by the gripper command path.

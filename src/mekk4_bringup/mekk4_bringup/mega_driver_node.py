@@ -38,6 +38,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("odom_poll_period_s", 0.05)
         self.declare_parameter("arm_state_poll_period_s", 0.25)
         self.declare_parameter("arm_motion_timeout_s", 180.0)
+        self.declare_parameter("auto_home_arm_on_connect", True)
         self.declare_parameter("init_distance_sensor_on_connect", True)
         self.declare_parameter("cmd_vel_timeout_s", 0.5)
         self.declare_parameter("reply_timeout_s", 2.0)
@@ -93,6 +94,9 @@ class MegaDriverNode(Node):
         )
         self._arm_motion_timeout_s = (
             self.get_parameter("arm_motion_timeout_s").get_parameter_value().double_value
+        )
+        self._auto_home_arm_on_connect = (
+            self.get_parameter("auto_home_arm_on_connect").get_parameter_value().bool_value
         )
         self._init_distance_sensor_on_connect = (
             self.get_parameter("init_distance_sensor_on_connect").get_parameter_value().bool_value
@@ -357,6 +361,9 @@ class MegaDriverNode(Node):
             self._last_arm_state_poll_at = 0.0
             self._serial_error_count = 0
             self._sync_arm_state_from_mega()
+            if self._auto_home_arm_on_connect:
+                self.get_logger().info("Running HOME ARM on Mega connect.")
+                self._home_arm_on_mega()
             if self._arm_homed:
                 self._desired_arm_x = self._actual_arm_x
                 self._last_arm_x_cmd_m = self._actual_arm_x
@@ -578,19 +585,7 @@ class MegaDriverNode(Node):
             return response
 
         try:
-            self._send_expect("HOME ARM", "OK ARM STARTUP HOME", self._startup_ready_timeout_s)
-            self._sync_arm_state_from_mega()
-            if not self._arm_homed:
-                raise RuntimeError("Mega reported arm still not homed after HOME ARM.")
-            self._desired_arm_x = self._actual_arm_x
-            self._last_arm_x_cmd_m = self._actual_arm_x
-            self._pending_arm_x_delta_steps = 0
-            self._desired_arm_z = self._actual_arm_z
-            self._last_arm_z_cmd_m = self._actual_arm_z
-            self._pending_arm_z_delta_steps = 0
-            self._warned_arm_not_homed = False
-            self._active_arm_axis = None
-            self._publish_arm_state()
+            self._home_arm_on_mega()
         except Exception as exc:
             response.success = False
             response.message = f"HOME ARM failed: {exc}"
@@ -600,6 +595,21 @@ class MegaDriverNode(Node):
         response.success = True
         response.message = "Mega arm homed."
         return response
+
+    def _home_arm_on_mega(self) -> None:
+        self._send_expect("HOME ARM", "OK ARM STARTUP HOME", self._startup_ready_timeout_s)
+        self._sync_arm_state_from_mega()
+        if not self._arm_homed:
+            raise RuntimeError("Mega reported arm still not homed after HOME ARM.")
+        self._desired_arm_x = self._actual_arm_x
+        self._last_arm_x_cmd_m = self._actual_arm_x
+        self._pending_arm_x_delta_steps = 0
+        self._desired_arm_z = self._actual_arm_z
+        self._last_arm_z_cmd_m = self._actual_arm_z
+        self._pending_arm_z_delta_steps = 0
+        self._warned_arm_not_homed = False
+        self._active_arm_axis = None
+        self._publish_arm_state()
 
     def _publish_arm_state(self) -> None:
         x_msg = Float64()
