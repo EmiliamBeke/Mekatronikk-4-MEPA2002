@@ -14,6 +14,7 @@ WITH_TEDDY_APPROACH="${WITH_TEDDY_APPROACH:-1}"
 WITH_TEDDY_GRAB="${WITH_TEDDY_GRAB:-${WITH_TEDDY}}"
 WITH_IMU="${WITH_IMU:-1}"
 WITH_MEGA_DRIVER="${WITH_MEGA_DRIVER:-1}"
+WITH_ROBOTARM_SAFETY="${WITH_ROBOTARM_SAFETY:-1}"
 WITH_EKF="${WITH_EKF:-1}"
 PC_HOST="${PC_HOST:-}"
 PORT_NAME="${PORT_NAME:-/dev/ttyAMA0}"
@@ -71,10 +72,12 @@ MEKK4_MEGA_DRIVER="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/mega_driver_node
 MEKK4_CMD_VEL_MUX="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/cmd_vel_mux_node.py"
 MEKK4_TEDDY_APPROACH="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/teddy_approach_node.py"
 MEKK4_TEDDY_GRAB="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/teddy_grab_node.py"
+MEKK4_ROBOTARM_SAFETY="${REPO_ROOT}/src/mekk4_bringup/mekk4_bringup/robotarm_safety_node.py"
 INSTALLED_MEGA_DRIVER="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/mega_driver_node"
 INSTALLED_CMD_VEL_MUX="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/cmd_vel_mux_node"
 INSTALLED_TEDDY_APPROACH="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/teddy_approach_node"
 INSTALLED_TEDDY_GRAB="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/teddy_grab_node"
+INSTALLED_ROBOTARM_SAFETY="${REPO_ROOT}/install/mekk4_bringup/lib/mekk4_bringup/robotarm_safety_node"
 
 if [[ -z "${DOCKER_LIDAR_GID}" && -e "${PORT_NAME}" ]]; then
   DOCKER_LIDAR_GID="$(stat -c '%g' "${PORT_NAME}")"
@@ -115,6 +118,8 @@ elif [[ ! -f "${INSTALLED_MEGA_DRIVER}" ]]; then
   needs_ws_build=1
 elif [[ ! -f "${INSTALLED_TEDDY_APPROACH}" ]]; then
   needs_ws_build=1
+elif [[ ! -f "${INSTALLED_ROBOTARM_SAFETY}" ]]; then
+  needs_ws_build=1
 elif [[ "${SOURCE_LAUNCH}" -nt "${INSTALLED_LAUNCH}" ]]; then
   needs_ws_build=1
 elif [[ "${SOURCE_NAV2_STACK_LAUNCH}" -nt "${INSTALLED_NAV2_STACK_LAUNCH}" ]]; then
@@ -140,6 +145,8 @@ elif [[ "${MEKK4_CMD_VEL_MUX}" -nt "${INSTALLED_CMD_VEL_MUX}" ]]; then
 elif [[ "${MEKK4_TEDDY_APPROACH}" -nt "${INSTALLED_TEDDY_APPROACH}" ]]; then
   needs_ws_build=1
 elif [[ "${MEKK4_TEDDY_GRAB}" -nt "${INSTALLED_TEDDY_GRAB}" ]]; then
+  needs_ws_build=1
+elif [[ "${MEKK4_ROBOTARM_SAFETY}" -nt "${INSTALLED_ROBOTARM_SAFETY}" ]]; then
   needs_ws_build=1
 fi
 
@@ -214,4 +221,4 @@ docker "${docker_run_args[@]}" \
   -e MEKK4_DEBUG_STREAM_FPS="${MEKK4_DEBUG_STREAM_FPS}" \
   -e MEKK4_DEBUG_STREAM_BITRATE="${MEKK4_DEBUG_STREAM_BITRATE}" \
   -e YOLO_CONFIG_DIR="/tmp" \
-  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} use_teddy_approach:=${WITH_TEDDY_APPROACH} use_teddy_grab:=${WITH_TEDDY_GRAB} use_imu:=${WITH_IMU} use_mega_driver:=${WITH_MEGA_DRIVER} use_ekf:=${WITH_EKF} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} imu_frame:=${IMU_FRAME} mega_port:=${MEGA_PORT} mega_baudrate:=${MEGA_BAUDRATE} mega_odom_topic:=${MEGA_ODOM_TOPIC} mega_publish_tf:=${MEGA_PUBLISH_TF} swap_sides:=${SWAP_SIDES} left_cmd_sign:=${LEFT_CMD_SIGN} right_cmd_sign:=${RIGHT_CMD_SIGN} angular_cmd_sign:=${ANGULAR_CMD_SIGN} min_nonzero_pwm:=${MIN_NONZERO_PWM} min_forward_pwm:=${MIN_FORWARD_PWM} min_reverse_pwm:=${MIN_REVERSE_PWM} min_turn_pwm:=${MIN_TURN_PWM} pure_rotation_linear_deadband_mps:=${PURE_ROTATION_LINEAR_DEADBAND_MPS} left_cmd_scale:=${LEFT_CMD_SCALE} right_cmd_scale:=${RIGHT_CMD_SCALE} left_tick_sign:=${LEFT_TICK_SIGN} right_tick_sign:=${RIGHT_TICK_SIGN} left_m_per_tick:=${LEFT_M_PER_TICK} right_m_per_tick:=${RIGHT_M_PER_TICK} track_width_eff_m:=${TRACK_WIDTH_EFF_M} ekf_params_file:=${EKF_PARAMS_FILE} params_file:=${PARAMS_FILE} teddy_approach_params_file:=${TEDDY_APPROACH_PARAMS_FILE} teddy_grab_params_file:=${TEDDY_GRAB_PARAMS_FILE} robotarm_params_file:=${ROBOTARM_PARAMS_FILE}"
+  ros bash -lc "source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash && ros2 launch robot_bringup pi_robot.launch.py use_nav2:=${WITH_NAV2} use_teddy:=${WITH_TEDDY} use_teddy_approach:=${WITH_TEDDY_APPROACH} use_teddy_grab:=${WITH_TEDDY_GRAB} use_imu:=${WITH_IMU} use_mega_driver:=${WITH_MEGA_DRIVER} use_robotarm_safety:=${WITH_ROBOTARM_SAFETY} use_ekf:=${WITH_EKF} product_name:=${PRODUCT_NAME} port_name:=${PORT_NAME} port_baudrate:=${PORT_BAUDRATE} frame_id:=${LIDAR_FRAME} base_frame:=${BASE_FRAME} imu_frame:=${IMU_FRAME} mega_port:=${MEGA_PORT} mega_baudrate:=${MEGA_BAUDRATE} mega_odom_topic:=${MEGA_ODOM_TOPIC} mega_publish_tf:=${MEGA_PUBLISH_TF} swap_sides:=${SWAP_SIDES} left_cmd_sign:=${LEFT_CMD_SIGN} right_cmd_sign:=${RIGHT_CMD_SIGN} angular_cmd_sign:=${ANGULAR_CMD_SIGN} min_nonzero_pwm:=${MIN_NONZERO_PWM} min_forward_pwm:=${MIN_FORWARD_PWM} min_reverse_pwm:=${MIN_REVERSE_PWM} min_turn_pwm:=${MIN_TURN_PWM} pure_rotation_linear_deadband_mps:=${PURE_ROTATION_LINEAR_DEADBAND_MPS} left_cmd_scale:=${LEFT_CMD_SCALE} right_cmd_scale:=${RIGHT_CMD_SCALE} left_tick_sign:=${LEFT_TICK_SIGN} right_tick_sign:=${RIGHT_TICK_SIGN} left_m_per_tick:=${LEFT_M_PER_TICK} right_m_per_tick:=${RIGHT_M_PER_TICK} track_width_eff_m:=${TRACK_WIDTH_EFF_M} ekf_params_file:=${EKF_PARAMS_FILE} params_file:=${PARAMS_FILE} teddy_approach_params_file:=${TEDDY_APPROACH_PARAMS_FILE} teddy_grab_params_file:=${TEDDY_GRAB_PARAMS_FILE} robotarm_params_file:=${ROBOTARM_PARAMS_FILE}"

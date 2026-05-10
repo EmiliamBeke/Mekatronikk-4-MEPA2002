@@ -106,11 +106,12 @@ Detaljert testprosedyre ligger i [Arduino Mega-wikien](docs/wiki/arduino-mega.md
 | `make sim` | Start full sim: Gazebo + bridge + EKF + Nav2 + RViz + keyboard teleop |
 | `make sim-headless` | Start Gazebo uten GUI |
 | `make sim-nav2` | Start bare Nav2 mot en sim som allerede kjører uten Nav2 |
-| `make pi-bringup` | Start fysisk robotstack på Pi |
+| `make pi-bringup` | Start fysisk robotstack på Pi, inkludert `robotarm_safety` som homer Z før X |
 | `make pc-teddy-rviz` | Start PC RViz med annotert YOLO-stream |
 | `make pc-ros-keyboard` | Manuell ROS teleop via `/cmd_vel_manual` |
 | `make mega-upload` | Last opp Arduino sketch |
 | `make mega-motor-test` | Kjør direkte motor-/encoder-test på Mega |
+| `make x-cal` | Kjør bare X-homing/kalibrering på robotarmen via Mega |
 | `make mega-calibrate ARGS="snapshot"` | Test Mega/encoder-kontakt |
 
 ## Prosjektstatus Kort
