@@ -43,6 +43,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("init_distance_sensor_on_connect", True)
         self.declare_parameter("cmd_vel_timeout_s", 0.5)
         self.declare_parameter("reply_timeout_s", 2.0)
+        self.declare_parameter("max_driver_errors_before_reconnect", 10)
         self.declare_parameter("base_frame_id", "base_link")
         self.declare_parameter("odom_frame_id", "odom")
         self.declare_parameter("publish_tf", True)
@@ -109,6 +110,11 @@ class MegaDriverNode(Node):
             self.get_parameter("cmd_vel_timeout_s").get_parameter_value().double_value
         )
         self._reply_timeout_s = self.get_parameter("reply_timeout_s").get_parameter_value().double_value
+        self._max_driver_errors_before_reconnect = (
+            self.get_parameter("max_driver_errors_before_reconnect")
+            .get_parameter_value()
+            .integer_value
+        )
         self._base_frame_id = self.get_parameter("base_frame_id").get_parameter_value().string_value
         self._odom_frame_id = self.get_parameter("odom_frame_id").get_parameter_value().string_value
         self._publish_tf = self.get_parameter("publish_tf").get_parameter_value().bool_value
@@ -212,6 +218,8 @@ class MegaDriverNode(Node):
             raise ValueError("Timer periods must be greater than zero.")
         if self._arm_motion_timeout_s <= 0.0:
             raise ValueError("arm_motion_timeout_s must be greater than zero.")
+        if self._max_driver_errors_before_reconnect < 1:
+            raise ValueError("max_driver_errors_before_reconnect must be at least 1.")
         if self._arm_x_steps_per_mm <= 0.0:
             raise ValueError("arm_x_steps_per_mm must be greater than zero.")
         if self._arm_z_steps_per_mm <= 0.0:
@@ -959,13 +967,17 @@ class MegaDriverNode(Node):
             self.get_logger().warning(f"Mega driver loop failed: {exc}")
             self._serial_error_count += 1
             try:
+                self._send_motion("STOP")
                 self._serial.reset_input_buffer()
                 self._serial.reset_output_buffer()
             except Exception:
                 self._close_serial()
                 return
-            if self._serial_error_count >= 3:
-                self.get_logger().warning("Closing Mega serial after 3 consecutive driver failures.")
+            if self._serial_error_count >= self._max_driver_errors_before_reconnect:
+                self.get_logger().warning(
+                    "Closing Mega serial after %d consecutive driver failures."
+                    % self._serial_error_count
+                )
                 self._close_serial()
 
     def destroy_node(self) -> bool:

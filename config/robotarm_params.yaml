@@ -20,6 +20,7 @@ mega_driver:
     auto_home_x_on_connect: true
     require_arm_home_before_motion: true
     init_distance_sensor_on_connect: true
+    max_driver_errors_before_reconnect: 10
 
     # Servo pulse range used by the gripper command path.
     # Servo: 0-270 degrees maps to 500-2500 us. ~1800 us = teddy grip position.
