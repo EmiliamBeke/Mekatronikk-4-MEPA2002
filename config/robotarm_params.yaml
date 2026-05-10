@@ -1,5 +1,47 @@
 mega_driver:
   ros__parameters:
+    # Serial connection and command loop timing.
+    port: /dev/ttyACM0
+    baudrate: 115200
+    post_open_wait_s: 2.5
+    startup_ready_timeout_s: 120.0
+    reconnect_delay_s: 1.0
+    send_period_s: 0.2
+    reply_timeout_s: 2.0
+    cmd_vel_timeout_s: 0.5
+    max_driver_errors_before_reconnect: 10
+
+    # Base frames and odometry. Pi launch may override publish_tf/odom remapping
+    # when EKF owns odom -> base_link.
+    base_frame_id: base_link
+    odom_frame_id: odom
+    publish_tf: true
+    odom_poll_period_s: 0.05
+    odom_tf_hold_timeout_s: 0.75
+    reset_odom_after_arm_motion: true
+    left_m_per_tick: 0.0
+    right_m_per_tick: 0.0
+    track_width_eff_m: 0.35
+    left_tick_sign: 1
+    right_tick_sign: 1
+    reset_encoders_on_connect: true
+
+    # Track motor command conversion. Pi launch can override these during
+    # hardware calibration without editing code.
+    swap_sides: false
+    max_track_speed_mps: 0.45
+    max_pwm: 255
+    min_nonzero_pwm: 55
+    min_forward_pwm: 0
+    min_reverse_pwm: 0
+    min_turn_pwm: 0
+    pure_rotation_linear_deadband_mps: 0.03
+    left_cmd_sign: 1
+    right_cmd_sign: 1
+    angular_cmd_sign: 1
+    left_cmd_scale: 1.0
+    right_cmd_scale: 1.0
+
     # Mega-side conversion from requested arm position in meters to firmware steps.
     # Must match the mechanical setup and the constants in the Mega runtime firmware.
     arm_x_steps_per_mm: 18.65
@@ -15,14 +57,11 @@ mega_driver:
 
     # Polling for Mega STATE feedback. Lower values increase serial load and can
     # disturb smooth arm stepping on the Arduino.
-    odom_tf_hold_timeout_s: 0.75
-    reset_odom_after_arm_motion: true
     arm_state_poll_period_s: 0.25
     arm_motion_timeout_s: 180.0
     auto_home_x_on_connect: true
     require_arm_home_before_motion: true
     init_distance_sensor_on_connect: true
-    max_driver_errors_before_reconnect: 10
 
     # Servo pulse range used by the gripper command path.
     # Servo: 0-270 degrees maps to 500-2500 us. ~1800 us = teddy grip position.

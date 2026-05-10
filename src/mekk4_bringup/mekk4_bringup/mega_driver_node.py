@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import time
+from typing import Any
 
 import rclpy
 from geometry_msgs.msg import TransformStamped, Twist
@@ -27,173 +28,56 @@ def normalize_angle(angle: float) -> float:
 
 class MegaDriverNode(Node):
     def __init__(self) -> None:
-        super().__init__("mega_driver")
+        super().__init__("mega_driver", automatically_declare_parameters_from_overrides=True)
 
-        self.declare_parameter("port", "/dev/ttyACM0")
-        self.declare_parameter("baudrate", 115200)
-        self.declare_parameter("post_open_wait_s", 2.5)
-        self.declare_parameter("startup_ready_timeout_s", 120.0)
-        self.declare_parameter("reconnect_delay_s", 1.0)
-        self.declare_parameter("send_period_s", 0.2)
-        self.declare_parameter("odom_poll_period_s", 0.05)
-        self.declare_parameter("odom_tf_hold_timeout_s", 0.75)
-        self.declare_parameter("reset_odom_after_arm_motion", True)
-        self.declare_parameter("arm_state_poll_period_s", 0.25)
-        self.declare_parameter("arm_motion_timeout_s", 180.0)
-        self.declare_parameter("auto_home_x_on_connect", True)
-        self.declare_parameter("require_arm_home_before_motion", True)
-        self.declare_parameter("init_distance_sensor_on_connect", True)
-        self.declare_parameter("cmd_vel_timeout_s", 0.5)
-        self.declare_parameter("reply_timeout_s", 2.0)
-        self.declare_parameter("max_driver_errors_before_reconnect", 10)
-        self.declare_parameter("base_frame_id", "base_link")
-        self.declare_parameter("odom_frame_id", "odom")
-        self.declare_parameter("publish_tf", True)
-        self.declare_parameter("swap_sides", False)
-        self.declare_parameter("max_track_speed_mps", 0.45)
-        self.declare_parameter("max_pwm", 255)
-        self.declare_parameter("min_nonzero_pwm", 55)
-        self.declare_parameter("min_forward_pwm", 0)
-        self.declare_parameter("min_reverse_pwm", 0)
-        self.declare_parameter("min_turn_pwm", 0)
-        self.declare_parameter("pure_rotation_linear_deadband_mps", 0.03)
-        self.declare_parameter("left_cmd_sign", 1)
-        self.declare_parameter("right_cmd_sign", 1)
-        self.declare_parameter("angular_cmd_sign", 1)
-        self.declare_parameter("left_cmd_scale", 1.0)
-        self.declare_parameter("right_cmd_scale", 1.0)
-        self.declare_parameter("left_tick_sign", 1)
-        self.declare_parameter("right_tick_sign", 1)
-        self.declare_parameter("left_m_per_tick", 0.0)
-        self.declare_parameter("right_m_per_tick", 0.0)
-        self.declare_parameter("track_width_eff_m", 0.35)
-        self.declare_parameter("reset_encoders_on_connect", True)
-        self.declare_parameter("initial_arm_x_m", 0.0)
-        self.declare_parameter("initial_arm_z_m", 0.12)
-        self.declare_parameter("arm_x_steps_per_mm", 18.65)
-        self.declare_parameter("arm_z_steps_per_mm", 2929.0)
-        self.declare_parameter("joint_states_topic", "/joint_states")
-        self.declare_parameter("x_joint_name", "robotarm_x_joint")
-        self.declare_parameter("z_joint_name", "robotarm_z_joint")
-        self.declare_parameter("gripper_min_us", 500)
-        self.declare_parameter("gripper_max_us", 1800)
-
-        self._port = self.get_parameter("port").get_parameter_value().string_value
-        self._baudrate = self.get_parameter("baudrate").get_parameter_value().integer_value
-        self._post_open_wait_s = (
-            self.get_parameter("post_open_wait_s").get_parameter_value().double_value
-        )
-        self._startup_ready_timeout_s = (
-            self.get_parameter("startup_ready_timeout_s").get_parameter_value().double_value
-        )
-        self._reconnect_delay_s = (
-            self.get_parameter("reconnect_delay_s").get_parameter_value().double_value
-        )
-        self._send_period_s = self.get_parameter("send_period_s").get_parameter_value().double_value
-        self._odom_poll_period_s = (
-            self.get_parameter("odom_poll_period_s").get_parameter_value().double_value
-        )
-        self._odom_tf_hold_timeout_s = (
-            self.get_parameter("odom_tf_hold_timeout_s").get_parameter_value().double_value
-        )
-        self._reset_odom_after_arm_motion = (
-            self.get_parameter("reset_odom_after_arm_motion").get_parameter_value().bool_value
-        )
-        self._arm_state_poll_period_s = (
-            self.get_parameter("arm_state_poll_period_s").get_parameter_value().double_value
-        )
-        self._arm_motion_timeout_s = (
-            self.get_parameter("arm_motion_timeout_s").get_parameter_value().double_value
-        )
-        self._auto_home_x_on_connect = (
-            self.get_parameter("auto_home_x_on_connect").get_parameter_value().bool_value
-        )
-        self._require_arm_home_before_motion = (
-            self.get_parameter("require_arm_home_before_motion").get_parameter_value().bool_value
-        )
-        self._init_distance_sensor_on_connect = (
-            self.get_parameter("init_distance_sensor_on_connect").get_parameter_value().bool_value
-        )
-        self._cmd_vel_timeout_s = (
-            self.get_parameter("cmd_vel_timeout_s").get_parameter_value().double_value
-        )
-        self._reply_timeout_s = self.get_parameter("reply_timeout_s").get_parameter_value().double_value
-        self._max_driver_errors_before_reconnect = (
-            self.get_parameter("max_driver_errors_before_reconnect")
-            .get_parameter_value()
-            .integer_value
-        )
-        self._base_frame_id = self.get_parameter("base_frame_id").get_parameter_value().string_value
-        self._odom_frame_id = self.get_parameter("odom_frame_id").get_parameter_value().string_value
-        self._publish_tf = self.get_parameter("publish_tf").get_parameter_value().bool_value
-        self._swap_sides = self.get_parameter("swap_sides").get_parameter_value().bool_value
-        self._max_track_speed_mps = (
-            self.get_parameter("max_track_speed_mps").get_parameter_value().double_value
-        )
-        self._max_pwm = self.get_parameter("max_pwm").get_parameter_value().integer_value
-        self._min_nonzero_pwm = (
-            self.get_parameter("min_nonzero_pwm").get_parameter_value().integer_value
-        )
-        self._min_forward_pwm = (
-            self.get_parameter("min_forward_pwm").get_parameter_value().integer_value
-        )
-        self._min_reverse_pwm = (
-            self.get_parameter("min_reverse_pwm").get_parameter_value().integer_value
-        )
-        self._min_turn_pwm = self.get_parameter("min_turn_pwm").get_parameter_value().integer_value
-        self._pure_rotation_linear_deadband_mps = (
-            self.get_parameter("pure_rotation_linear_deadband_mps")
-            .get_parameter_value()
-            .double_value
-        )
-        self._left_cmd_sign = self.get_parameter("left_cmd_sign").get_parameter_value().integer_value
-        self._right_cmd_sign = self.get_parameter("right_cmd_sign").get_parameter_value().integer_value
-        self._angular_cmd_sign = (
-            self.get_parameter("angular_cmd_sign").get_parameter_value().integer_value
-        )
-        self._left_cmd_scale = (
-            self.get_parameter("left_cmd_scale").get_parameter_value().double_value
-        )
-        self._right_cmd_scale = (
-            self.get_parameter("right_cmd_scale").get_parameter_value().double_value
-        )
-        self._left_tick_sign = self.get_parameter("left_tick_sign").get_parameter_value().integer_value
-        self._right_tick_sign = self.get_parameter("right_tick_sign").get_parameter_value().integer_value
-        self._left_m_per_tick = (
-            self.get_parameter("left_m_per_tick").get_parameter_value().double_value
-        )
-        self._right_m_per_tick = (
-            self.get_parameter("right_m_per_tick").get_parameter_value().double_value
-        )
-        self._track_width_eff_m = (
-            self.get_parameter("track_width_eff_m").get_parameter_value().double_value
-        )
-        self._reset_encoders_on_connect = (
-            self.get_parameter("reset_encoders_on_connect").get_parameter_value().bool_value
-        )
-        self._initial_arm_x_m = (
-            self.get_parameter("initial_arm_x_m").get_parameter_value().double_value
-        )
-        self._initial_arm_z_m = (
-            self.get_parameter("initial_arm_z_m").get_parameter_value().double_value
-        )
-        self._arm_x_steps_per_mm = (
-            self.get_parameter("arm_x_steps_per_mm").get_parameter_value().double_value
-        )
-        self._arm_z_steps_per_mm = (
-            self.get_parameter("arm_z_steps_per_mm").get_parameter_value().double_value
-        )
-        self._joint_states_topic = (
-            self.get_parameter("joint_states_topic").get_parameter_value().string_value
-        )
-        self._x_joint_name = self.get_parameter("x_joint_name").get_parameter_value().string_value
-        self._z_joint_name = self.get_parameter("z_joint_name").get_parameter_value().string_value
-        self._gripper_min_us = (
-            self.get_parameter("gripper_min_us").get_parameter_value().integer_value
-        )
-        self._gripper_max_us = (
-            self.get_parameter("gripper_max_us").get_parameter_value().integer_value
-        )
+        self._port = self._param_str("port")
+        self._baudrate = self._param_int("baudrate")
+        self._post_open_wait_s = self._param_float("post_open_wait_s")
+        self._startup_ready_timeout_s = self._param_float("startup_ready_timeout_s")
+        self._reconnect_delay_s = self._param_float("reconnect_delay_s")
+        self._send_period_s = self._param_float("send_period_s")
+        self._odom_poll_period_s = self._param_float("odom_poll_period_s")
+        self._odom_tf_hold_timeout_s = self._param_float("odom_tf_hold_timeout_s")
+        self._reset_odom_after_arm_motion = self._param_bool("reset_odom_after_arm_motion")
+        self._arm_state_poll_period_s = self._param_float("arm_state_poll_period_s")
+        self._arm_motion_timeout_s = self._param_float("arm_motion_timeout_s")
+        self._auto_home_x_on_connect = self._param_bool("auto_home_x_on_connect")
+        self._require_arm_home_before_motion = self._param_bool("require_arm_home_before_motion")
+        self._init_distance_sensor_on_connect = self._param_bool("init_distance_sensor_on_connect")
+        self._cmd_vel_timeout_s = self._param_float("cmd_vel_timeout_s")
+        self._reply_timeout_s = self._param_float("reply_timeout_s")
+        self._max_driver_errors_before_reconnect = self._param_int("max_driver_errors_before_reconnect")
+        self._base_frame_id = self._param_str("base_frame_id")
+        self._odom_frame_id = self._param_str("odom_frame_id")
+        self._publish_tf = self._param_bool("publish_tf")
+        self._swap_sides = self._param_bool("swap_sides")
+        self._max_track_speed_mps = self._param_float("max_track_speed_mps")
+        self._max_pwm = self._param_int("max_pwm")
+        self._min_nonzero_pwm = self._param_int("min_nonzero_pwm")
+        self._min_forward_pwm = self._param_int("min_forward_pwm")
+        self._min_reverse_pwm = self._param_int("min_reverse_pwm")
+        self._min_turn_pwm = self._param_int("min_turn_pwm")
+        self._pure_rotation_linear_deadband_mps = self._param_float("pure_rotation_linear_deadband_mps")
+        self._left_cmd_sign = self._param_int("left_cmd_sign")
+        self._right_cmd_sign = self._param_int("right_cmd_sign")
+        self._angular_cmd_sign = self._param_int("angular_cmd_sign")
+        self._left_cmd_scale = self._param_float("left_cmd_scale")
+        self._right_cmd_scale = self._param_float("right_cmd_scale")
+        self._left_tick_sign = self._param_int("left_tick_sign")
+        self._right_tick_sign = self._param_int("right_tick_sign")
+        self._left_m_per_tick = self._param_float("left_m_per_tick")
+        self._right_m_per_tick = self._param_float("right_m_per_tick")
+        self._track_width_eff_m = self._param_float("track_width_eff_m")
+        self._reset_encoders_on_connect = self._param_bool("reset_encoders_on_connect")
+        self._initial_arm_x_m = self._param_float("initial_arm_x_m")
+        self._initial_arm_z_m = self._param_float("initial_arm_z_m")
+        self._arm_x_steps_per_mm = self._param_float("arm_x_steps_per_mm")
+        self._arm_z_steps_per_mm = self._param_float("arm_z_steps_per_mm")
+        self._joint_states_topic = self._param_str("joint_states_topic")
+        self._x_joint_name = self._param_str("x_joint_name")
+        self._z_joint_name = self._param_str("z_joint_name")
+        self._gripper_min_us = self._param_int("gripper_min_us")
+        self._gripper_max_us = self._param_int("gripper_max_us")
 
         if self._max_track_speed_mps <= 0.0:
             raise ValueError("max_track_speed_mps must be greater than zero.")
@@ -236,8 +120,8 @@ class MegaDriverNode(Node):
         if self._gripper_min_us <= 0 or self._gripper_min_us >= self._gripper_max_us:
             raise ValueError("gripper_min_us must be greater than zero and below gripper_max_us.")
 
-        self._serial = None
-        self._serial_module = None
+        self._serial: Any = None
+        self._serial_module: Any = None
         self._serial_error_count = 0
         self._next_connect_attempt = 0.0
         self._last_motion_command = "STOP"
@@ -308,6 +192,29 @@ class MegaDriverNode(Node):
         self._home_arm_srv = self.create_service(Trigger, "/mega/home_arm", self._on_home_arm)
         self._tf_broadcaster = TransformBroadcaster(self) if self._publish_tf else None
         self._timer = self.create_timer(0.02, self._on_timer)
+
+    def _param(self, name: str) -> Any:
+        if not self.has_parameter(name):
+            raise ValueError(f"missing required parameter: {name}")
+        value = self.get_parameter(name).value
+        if value is None:
+            raise ValueError(f"missing required parameter: {name}")
+        return value
+
+    def _param_str(self, name: str) -> str:
+        return str(self._param(name))
+
+    def _param_int(self, name: str) -> int:
+        return int(self._param(name))
+
+    def _param_float(self, name: str) -> float:
+        return float(self._param(name))
+
+    def _param_bool(self, name: str) -> bool:
+        value = self._param(name)
+        if isinstance(value, str):
+            return value.strip().lower() in ("1", "true", "yes", "on")
+        return bool(value)
 
     def _load_serial(self) -> None:
         try:
@@ -1032,9 +939,9 @@ class MegaDriverNode(Node):
                 )
                 self._close_serial()
 
-    def destroy_node(self) -> bool:
+    def destroy_node(self) -> None:
         self._close_serial()
-        return super().destroy_node()
+        super().destroy_node()
 
 
 def main() -> None:

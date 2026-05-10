@@ -43,6 +43,7 @@ class TeddyGrabNode(Node):
         self.last_gripper_us = None
         self.last_log_t = -math.inf
         self.waiting_for_new_approach = False
+        self.approach_ran_after_reset = False
 
         self.cmd_pub = self.create_publisher(Twist, self.p("cmd_vel_topic"), 10)
         self.reset_pub = self.create_publisher(Empty, self.p("approach_reset_topic"), 10)
@@ -72,9 +73,14 @@ class TeddyGrabNode(Node):
     # Start grab when teddy_approach reports settled.
     def on_mode(self, msg):
         if self.waiting_for_new_approach:
-            if msg.data == self.trigger_mode:
+            if msg.data != self.trigger_mode:
+                if self.approach_is_active(msg.data):
+                    self.approach_ran_after_reset = True
+                return
+            if not self.approach_ran_after_reset:
                 return
             self.waiting_for_new_approach = False
+            self.approach_ran_after_reset = False
         if not self.enabled or self.state != "idle" or msg.data != self.trigger_mode:
             return
         self.grab_z = self.compute_grab_z()
@@ -269,6 +275,7 @@ class TeddyGrabNode(Node):
             self.state = "idle"
             self.step_i = -1
             self.waiting_for_new_approach = True
+            self.approach_ran_after_reset = False
             self.reset_pub.publish(Empty())
             self.get_logger().info("state=idle waiting for next teddy_approach_settled")
         else:
@@ -357,6 +364,10 @@ class TeddyGrabNode(Node):
         self.sequence = self.make_restart_sequence()
         self.step_i = 0
         self.enter_step()
+
+    # True when teddy_approach has left stale handoff and is actively evaluating again.
+    def approach_is_active(self, mode):
+        return mode in ("centering", "approaching", "waiting_center_settle")
 
     # Keep later status targets consistent with final reach X.
     def patch_reach_x(self):
