@@ -6,8 +6,9 @@ mega_driver:
     arm_z_steps_per_mm: 2929.0
 
     # Assumed arm state before Mega reports a homed state.
-    initial_arm_x_m: 0.0
-    initial_arm_z_m: 0.12
+    # Must match HOME ARM in mega_total_code_nonblocking.
+    initial_arm_x_m: -0.07
+    initial_arm_z_m: 0.13
 
     # Polling for Mega STATE feedback. Lower values increase serial load and can
     # disturb smooth arm stepping on the Arduino.
@@ -42,11 +43,11 @@ robotarm_safety:
 
     publish_period_s: 0.05
 
-    # Allowed commanded workspace in meters.
-    x_min: -0.2
-    x_max: 0.2
+    # Allowed commanded workspace in meters. Matches minimal_all.launch.py.
+    x_min: -0.07
+    x_max: 0.082
     z_min: 0.0
-    z_max: 0.3
+    z_max: 0.25
 
     # Max target jump per publish. Physical speed is set by the Mega firmware;
     # these are large to avoid chopping one smooth arm move into many serial commands.
@@ -54,8 +55,8 @@ robotarm_safety:
     max_z_step_per_publish: 0.30
 
     # Keepout to avoid moving low over the LiDAR/front structure.
-    lidar_x_threshold: 0.08
-    lidar_z_clearance: 0.12
+    lidar_x_threshold: 0.0
+    lidar_z_clearance: 0.13
 
     # Gripper pulse clamp in microseconds.
     # Servo: 0–270° = 500–2500 µs; ~1800 µs = teddy grip.
@@ -63,7 +64,11 @@ robotarm_safety:
     gripper_max: 2500.0
 
     # Startup command state before feedback arrives.
-    initial_x: 0.0
-    initial_z: 0.12
+    initial_x: -0.07
+    initial_z: 0.13
     initial_left_gripper: 500.0
     initial_right_gripper: 500.0
+
+    startup_lock_s: 0.0
+    spawn_x: -0.07
+    spawn_z: 0.13

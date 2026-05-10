@@ -53,8 +53,9 @@ constexpr int kDistanceContactMm = 20;
 constexpr float kXStepsPerMm = 18.65f;
 constexpr float kZStepsPerMm = 2929.0f;
 constexpr float kHomeBackoffMm = 5.0f;
-constexpr float kStartupXMaxMm = 150.0f;
-constexpr float kStartupZClearanceMm = 120.0f;
+constexpr float kStartupXHomeMm = 82.0f;
+constexpr float kStartupXFinalMm = -70.0f;
+constexpr float kStartupZClearanceMm = 130.0f;
 
 constexpr unsigned int kPulseUs = 10;
 constexpr unsigned int kXStepPeriodUs = 1000;
@@ -467,7 +468,7 @@ bool startup_home_arm() {
   open_gripper_for_homing();
   arm_homed = false;
   stop_all();
-  x_axis.home_position = mm_to_steps(kStartupXMaxMm, kXStepsPerMm);
+  x_axis.home_position = mm_to_steps(kStartupXHomeMm, kXStepsPerMm);
   z_axis.home_position = 0;
   if (!home_axis(x_axis, "X", kXHomeMaxSteps)) {
     Serial.println("ERR ARM STARTUP HOME X");
@@ -483,7 +484,7 @@ bool startup_home_arm() {
     update_axis(z_axis, "Z");
   }
 
-  move_axis_relative(x_axis, -mm_to_steps(kStartupXMaxMm, kXStepsPerMm));
+  move_axis_relative(x_axis, mm_to_steps(kStartupXFinalMm - kStartupXHomeMm, kXStepsPerMm));
   while (x_axis.moving) {
     update_axis(x_axis, "X");
   }

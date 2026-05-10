@@ -30,16 +30,16 @@ teddy_grab:
     require_state_feedback: true
 
     # Sequence positions in meters.
-    safe_x: 0.085
+    safe_x: 0.015
     safe_z: 0.12
     lower_z: 0.03
-    grab_x: 0.15
-    approach_x_max: 0.18
+    grab_x: 0.08
+    approach_x_max: 0.082
     approach_x_step_m: 0.002
     lift_z: 0.21
-    final_x: 0.0
+    final_x: -0.07
 
-    # Continue moving X forward until the VL53 distance sensor reports <= 20 mm
+    # Continue moving X forward until the VL53 distance sensor reports contact
     # for long enough.
     use_distance_contact: true
     require_distance_feedback: true

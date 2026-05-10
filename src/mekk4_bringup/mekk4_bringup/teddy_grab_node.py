@@ -31,14 +31,14 @@ PARAM_DEFAULTS = {
     "distance_timeout_s": 0.5,
     "detector_status_timeout_s": 1.0,
     "scan_timeout_s": 0.5,
-    "safe_x": 0.095,
+    "safe_x": 0.015,
     "safe_z": 0.12,
-    "lower_z": 0.04,
-    "grab_x": 0.15,
-    "approach_x_max": 0.18,
+    "lower_z": 0.03,
+    "grab_x": 0.08,
+    "approach_x_max": 0.082,
     "approach_x_step_m": 0.002,
     "lift_z": 0.21,
-    "final_x": 0.0,
+    "final_x": -0.07,
     "gripper_open": 500.0,
     "gripper_closed": 1800.0,
     "move_hold_s": 0.2,
@@ -47,11 +47,11 @@ PARAM_DEFAULTS = {
     "require_state_feedback": True,
     "use_distance_contact": True,
     "require_distance_feedback": True,
-    "contact_distance_mm": 20,
-    "contact_hold_s": 0.25,
+    "contact_distance_mm": 35,
+    "contact_hold_s": 0.10,
     "use_detector_dy_for_grab_z": False,
     "dy_to_z_gain_m": 0.04,
-    "use_lidar_geometry_for_grab_z": False,
+    "use_lidar_geometry_for_grab_z": True,
     "scan_front_angle_rad": 0.20,
     "scan_min_points": 3,
     "camera_vertical_fov_rad": 0.80,
@@ -215,7 +215,7 @@ class TeddyGrabNode(Node):
                 "hold_s": move_hold_s,
             },
             {
-                "name": "lower_z_10mm",
+                "name": "lower_z_grab",
                 "x": safe_x,
                 "z": lower_z,
                 "gripper": open_gripper,
@@ -236,7 +236,7 @@ class TeddyGrabNode(Node):
         else:
             sequence.append(
                 {
-                    "name": "reach_x_150mm",
+                    "name": "reach_x_grab",
                     "x": grab_x,
                     "z": lower_z,
                     "gripper": open_gripper,
@@ -261,14 +261,14 @@ class TeddyGrabNode(Node):
                     "hold_s": move_hold_s,
                 },
                 {
-                    "name": "lift_z_210mm",
+                    "name": "lift_z",
                     "x": safe_x,
                     "z": lift_z,
                     "gripper": closed_gripper,
                     "hold_s": move_hold_s,
                 },
                 {
-                    "name": "home_x_0mm",
+                    "name": "home_x_final",
                     "x": final_x,
                     "z": lift_z,
                     "gripper": closed_gripper,
@@ -394,14 +394,14 @@ class TeddyGrabNode(Node):
 
     def finish_contact_step(self) -> None:
         for step in self.sequence:
-            if step["name"] in ("grab_servo", "retract_x_safe", "lift_z_210mm", "home_x_0mm"):
+            if step["name"] in ("grab_servo", "retract_x_safe", "lift_z", "home_x_final"):
                 if step["name"] == "grab_servo":
                     step["x"] = self.reach_x_target
                 elif step["name"] == "retract_x_safe":
                     step["z"] = self.grab_z_target
-                elif step["name"] == "lift_z_210mm":
+                elif step["name"] == "lift_z":
                     step["x"] = float(self.param("safe_x"))
-                elif step["name"] == "home_x_0mm":
+                elif step["name"] == "home_x_final":
                     step["z"] = float(self.param("lift_z"))
         self.step_index += 1
         self.set_state(self.sequence[self.step_index]["name"])

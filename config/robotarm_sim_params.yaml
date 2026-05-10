@@ -6,8 +6,9 @@ mega_driver:
     arm_z_steps_per_mm: 2929.0
 
     # Assumed arm state before Mega reports a homed state.
-    initial_arm_x_m: 0.0
-    initial_arm_z_m: 0.12
+    # Kept equal to HOME ARM in mega_total_code_nonblocking.
+    initial_arm_x_m: -0.07
+    initial_arm_z_m: 0.13
 
     # Polling for Mega STATE feedback. Lower values increase serial load.
     arm_state_poll_period_s: 0.05
