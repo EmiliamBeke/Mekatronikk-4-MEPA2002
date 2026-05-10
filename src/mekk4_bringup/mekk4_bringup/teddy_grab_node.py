@@ -42,6 +42,7 @@ class TeddyGrabNode(Node):
         self.target_gripper = None
         self.last_gripper_us = None
         self.last_log_t = -math.inf
+        self.waiting_for_new_approach = False
 
         self.cmd_pub = self.create_publisher(Twist, self.p("cmd_vel_topic"), 10)
         self.reset_pub = self.create_publisher(Empty, self.p("approach_reset_topic"), 10)
@@ -70,6 +71,10 @@ class TeddyGrabNode(Node):
 
     # Start grab when teddy_approach reports settled.
     def on_mode(self, msg):
+        if self.waiting_for_new_approach:
+            if msg.data == self.trigger_mode:
+                return
+            self.waiting_for_new_approach = False
         if not self.enabled or self.state != "idle" or msg.data != self.trigger_mode:
             return
         self.grab_z = self.compute_grab_z()
@@ -183,18 +188,18 @@ class TeddyGrabNode(Node):
     def make_restart_sequence(self):
         safe_x = float(self.p("safe_x"))
         home_x = float(self.p("home_x"))
-        z0 = float(self.p("lower_z"))
+        lift_z = float(self.p("lift_z"))
         g_open = float(self.p("gripper_open"))
         move_s = float(self.p("move_hold_s"))
         return [
             # Phase 7.2: open gripper.
             self.step("restart_open", "Phase 7.2", "gripper", self.x_or(safe_x), self.hold_z(), g_open, move_s),
-            # Phase 7.2: retract X to home.
-            self.step("restart_x_home", "Phase 7.2", "x", home_x, self.hold_z(), g_open, move_s),
-            # Phase 7.2: lower Z to 0.
-            self.step("restart_z_zero", "Phase 7.2", "z", home_x, z0, g_open, move_s),
+            # Phase 7.2: lift Z before X retracts behind the chassis front edge.
+            self.step("restart_lift_z", "Phase 7.2", "z", self.x_or(safe_x), lift_z, g_open, move_s),
+            # Phase 7.2: retract X to home after Z is clear.
+            self.step("restart_x_home", "Phase 7.2", "x", home_x, lift_z, g_open, move_s),
             # Phase 7.2: reset teddy_approach.
-            self.step("restart_approach", "Phase 7.2", "reset", home_x, z0, g_open, self.p("final_hold_s")),
+            self.step("restart_approach", "Phase 7.2", "reset", home_x, lift_z, g_open, self.p("final_hold_s")),
         ]
 
     # Create one sequence dictionary.
@@ -263,6 +268,7 @@ class TeddyGrabNode(Node):
         if reset:
             self.state = "idle"
             self.step_i = -1
+            self.waiting_for_new_approach = True
             self.reset_pub.publish(Empty())
             self.get_logger().info("state=idle waiting for next teddy_approach_settled")
         else:
