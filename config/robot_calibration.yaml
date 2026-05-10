@@ -6,7 +6,7 @@ mega_driver:
   min_nonzero_pwm: 50
   min_forward_pwm: 50
   min_reverse_pwm: 60
-  min_turn_pwm: 105
+  min_turn_pwm: 90
   pure_rotation_linear_deadband_mps: 0.0
   left_cmd_scale: 0.96
   right_cmd_scale: 1.0
