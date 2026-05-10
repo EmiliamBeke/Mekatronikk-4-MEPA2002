@@ -39,6 +39,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("arm_state_poll_period_s", 0.25)
         self.declare_parameter("arm_motion_timeout_s", 180.0)
         self.declare_parameter("auto_home_x_on_connect", True)
+        self.declare_parameter("require_arm_home_before_motion", True)
         self.declare_parameter("init_distance_sensor_on_connect", True)
         self.declare_parameter("cmd_vel_timeout_s", 0.5)
         self.declare_parameter("reply_timeout_s", 2.0)
@@ -97,6 +98,9 @@ class MegaDriverNode(Node):
         )
         self._auto_home_x_on_connect = (
             self.get_parameter("auto_home_x_on_connect").get_parameter_value().bool_value
+        )
+        self._require_arm_home_before_motion = (
+            self.get_parameter("require_arm_home_before_motion").get_parameter_value().bool_value
         )
         self._init_distance_sensor_on_connect = (
             self.get_parameter("init_distance_sensor_on_connect").get_parameter_value().bool_value
@@ -238,6 +242,7 @@ class MegaDriverNode(Node):
         self._actual_arm_x = self._initial_arm_x_m
         self._actual_arm_z = self._initial_arm_z_m
         self._arm_homed = False
+        self._arm_startup_ready = False
         self._warned_arm_not_homed = False
         self._active_arm_axis: str | None = None
         self._desired_left_gripper = float(self._gripper_min_us)
@@ -317,6 +322,7 @@ class MegaDriverNode(Node):
         self._last_right_ticks = None
         self._last_encoder_stamp = None
         self._active_arm_axis = None
+        self._arm_startup_ready = False
         self._serial_error_count = 0
         self._next_connect_attempt = time.monotonic() + self._reconnect_delay_s
 
@@ -366,6 +372,8 @@ class MegaDriverNode(Node):
                 self._calibrate_x_extended_on_mega()
                 self._move_z_to_initial_home_on_mega()
                 self._move_x_to_initial_home_on_mega()
+                self._try_init_distance_sensor()
+            self._arm_startup_ready = self._arm_homed and self._arm_at_launch_home()
             if self._arm_homed:
                 self._desired_arm_x = self._actual_arm_x
                 self._last_arm_x_cmd_m = self._actual_arm_x
@@ -756,6 +764,12 @@ class MegaDriverNode(Node):
     def _arm_z_at_target(self) -> bool:
         return abs(self._actual_arm_z - self._desired_arm_z) <= self._z_step_tolerance_m()
 
+    def _arm_at_launch_home(self) -> bool:
+        return (
+            abs(self._actual_arm_x - self._initial_arm_x_m) <= self._x_step_tolerance_m()
+            and abs(self._actual_arm_z - self._initial_arm_z_m) <= self._z_step_tolerance_m()
+        )
+
     def _z_step_tolerance_m(self) -> float:
         return 1.5 / self._arm_z_steps_per_mm / 1000.0
 
@@ -777,6 +791,10 @@ class MegaDriverNode(Node):
         self._sync_arm_state_from_mega()
 
     def _desired_motion_command(self) -> str:
+        if self._require_arm_home_before_motion and not self._arm_startup_ready:
+            self._publish_pwm(0, 0)
+            return "STOP"
+
         now = time.monotonic()
         if self._last_cmd_vel_at < 0.0 or (now - self._last_cmd_vel_at) > self._cmd_vel_timeout_s:
             self._publish_pwm(0, 0)

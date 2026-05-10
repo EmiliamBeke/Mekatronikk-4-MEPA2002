@@ -18,6 +18,7 @@ mega_driver:
     arm_state_poll_period_s: 0.25
     arm_motion_timeout_s: 180.0
     auto_home_x_on_connect: true
+    require_arm_home_before_motion: true
     init_distance_sensor_on_connect: true
 
     # Servo pulse range used by the gripper command path.
