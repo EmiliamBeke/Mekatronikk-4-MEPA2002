@@ -6,7 +6,7 @@ import re
 import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
-from sensor_msgs.msg import JointState, LaserScan
+from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Empty, Float64, Int32, String
 
 
@@ -53,7 +53,6 @@ class TeddyGrabNode(Node):
         self.create_subscription(String, self.p("mode_topic"), self.on_mode, 10)
         self.create_subscription(Float64, self.p("x_state_topic"), self.on_x_state, 10)
         self.create_subscription(Float64, self.p("z_state_topic"), self.on_z_state, 10)
-        self.create_subscription(JointState, self.p("joint_states_topic"), self.on_joint_states, 10)
         self.create_subscription(Int32, self.p("distance_topic"), self.on_distance, 10)
         self.create_subscription(String, self.p("teddy_status_topic"), self.on_teddy_status, 10)
         self.create_subscription(LaserScan, self.p("scan_topic"), self.on_scan, 10)
@@ -90,16 +89,6 @@ class TeddyGrabNode(Node):
     # Store Z feedback from Mega.
     def on_z_state(self, msg):
         self.z = float(msg.data)
-
-    # Store X/Z feedback from joint_states if available.
-    def on_joint_states(self, msg):
-        x_name = str(self.p("x_joint_name"))
-        z_name = str(self.p("z_joint_name"))
-        for name, pos in zip(msg.name, msg.position):
-            if name == x_name:
-                self.x = float(pos)
-            elif name == z_name:
-                self.z = float(pos)
 
     # Store gripper distance sensor.
     def on_distance(self, msg):

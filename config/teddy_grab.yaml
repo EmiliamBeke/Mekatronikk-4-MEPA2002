@@ -13,9 +13,6 @@ teddy_grab:
     # Feedback from Mega driver.
     x_state_topic: /robotarm/x_position_state
     z_state_topic: /robotarm/z_position_state
-    joint_states_topic: /joint_states
-    x_joint_name: robotarm_x_joint
-    z_joint_name: robotarm_z_joint
     distance_topic: /mega/distance_mm
     teddy_status_topic: /teddy_detector/status
     scan_topic: /lidar

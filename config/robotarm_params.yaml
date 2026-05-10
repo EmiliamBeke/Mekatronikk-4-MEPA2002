@@ -4,6 +4,9 @@ mega_driver:
     # Must match the mechanical setup and the constants in the Mega runtime firmware.
     arm_x_steps_per_mm: 18.65
     arm_z_steps_per_mm: 2929.0
+    joint_states_topic: /joint_states
+    x_joint_name: robotarm_x_joint
+    z_joint_name: robotarm_z_joint
 
     # Assumed arm state before Mega reports a homed state.
     # Must match HOME ARM in mega_total_code_nonblocking.

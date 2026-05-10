@@ -8,6 +8,7 @@ import rclpy
 from geometry_msgs.msg import TransformStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
+from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64, Int32
 from std_srvs.srv import Trigger
 from tf2_ros import TransformBroadcaster
@@ -66,6 +67,9 @@ class MegaDriverNode(Node):
         self.declare_parameter("initial_arm_z_m", 0.12)
         self.declare_parameter("arm_x_steps_per_mm", 18.65)
         self.declare_parameter("arm_z_steps_per_mm", 2929.0)
+        self.declare_parameter("joint_states_topic", "/joint_states")
+        self.declare_parameter("x_joint_name", "robotarm_x_joint")
+        self.declare_parameter("z_joint_name", "robotarm_z_joint")
         self.declare_parameter("gripper_min_us", 500)
         self.declare_parameter("gripper_max_us", 1800)
 
@@ -157,6 +161,11 @@ class MegaDriverNode(Node):
         self._arm_z_steps_per_mm = (
             self.get_parameter("arm_z_steps_per_mm").get_parameter_value().double_value
         )
+        self._joint_states_topic = (
+            self.get_parameter("joint_states_topic").get_parameter_value().string_value
+        )
+        self._x_joint_name = self.get_parameter("x_joint_name").get_parameter_value().string_value
+        self._z_joint_name = self.get_parameter("z_joint_name").get_parameter_value().string_value
         self._gripper_min_us = (
             self.get_parameter("gripper_min_us").get_parameter_value().integer_value
         )
@@ -266,6 +275,7 @@ class MegaDriverNode(Node):
         self._right_pwm_pub = self.create_publisher(Int32, "mega_driver/right_pwm", 10)
         self._arm_x_state_pub = self.create_publisher(Float64, "/robotarm/x_position_state", 10)
         self._arm_z_state_pub = self.create_publisher(Float64, "/robotarm/z_position_state", 10)
+        self._joint_state_pub = self.create_publisher(JointState, self._joint_states_topic, 10)
         self._distance_pub = self.create_publisher(Int32, "/mega/distance_mm", 10)
         self._home_arm_srv = self.create_service(Trigger, "/mega/home_arm", self._on_home_arm)
         self._tf_broadcaster = TransformBroadcaster(self) if self._publish_tf else None
@@ -598,6 +608,12 @@ class MegaDriverNode(Node):
         z_msg.data = float(self._actual_arm_z)
         self._arm_x_state_pub.publish(x_msg)
         self._arm_z_state_pub.publish(z_msg)
+
+        joint_msg = JointState()
+        joint_msg.header.stamp = self.get_clock().now().to_msg()
+        joint_msg.name = [self._x_joint_name, self._z_joint_name]
+        joint_msg.position = [float(self._actual_arm_x), float(self._actual_arm_z)]
+        self._joint_state_pub.publish(joint_msg)
 
     def _publish_distance_state(self, distance_mm: int) -> None:
         msg = Int32()
