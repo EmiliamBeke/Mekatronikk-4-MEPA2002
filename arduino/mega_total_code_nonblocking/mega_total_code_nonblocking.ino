@@ -59,7 +59,7 @@ constexpr float kStartupZClearanceMm = 130.0f;
 
 constexpr unsigned int kPulseUs = 10;
 constexpr unsigned int kXStepPeriodUs = 1000;
-constexpr unsigned int kZStepPeriodUs = 100;
+constexpr unsigned int kZStepPeriodUs = 70;
 constexpr long kXHomeMaxSteps = 10000;
 constexpr long kZHomeMaxSteps = 800000;
 constexpr uint32_t kPersistMagic = 0x4D454741UL;
