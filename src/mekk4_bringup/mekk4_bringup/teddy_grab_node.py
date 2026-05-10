@@ -286,7 +286,12 @@ class TeddyGrabNode(Node):
         self.command_gripper(step["gripper"])
         self.command_x(self.reach_x)
         self.target_x = self.reach_x
-        if self.stable_contact_for(float(self.p("contact_hold_s"))) and self.axis_reached("x", self.reach_x, 0.0):
+        if self.contact_is_stable():
+            if self.x is not None:
+                self.reach_x = self.x
+                step["x"] = self.reach_x
+                self.target_x = self.reach_x
+                self.command_x(self.reach_x)
             self.patch_reach_x()
             self.next_step()
             return
@@ -305,7 +310,7 @@ class TeddyGrabNode(Node):
     # Verify contact after closing gripper.
     def verify_grab(self, step):
         self.command_gripper(step["gripper"])
-        if self.stable_contact_for(step["hold_s"]):
+        if self.distance_under_threshold_for(step["hold_s"]):
             self.next_step()
             return
         if self.elapsed_s() < step["hold_s"]:
@@ -323,7 +328,7 @@ class TeddyGrabNode(Node):
     # Verify contact after retract/lift.
     def verify_final(self, step):
         self.command_gripper(step["gripper"])
-        if self.stable_contact_for(step["hold_s"]):
+        if self.distance_under_threshold_for(step["hold_s"]):
             self.state = "done"
             self.get_logger().info("teddy grab successful")
             return
@@ -404,14 +409,22 @@ class TeddyGrabNode(Node):
     def x_or(self, fallback):
         return self.x if self.x is not None else fallback
 
-    # Check current distance contact.
-    def has_contact(self):
-        return self.distance_fresh() and self.distance_mm is not None and 0 <= self.distance_mm <= int(self.p("contact_distance_mm"))
+    # True only while Mega distance is fresh and under the configured threshold.
+    def distance_under_threshold(self):
+        return (
+            self.distance_fresh()
+            and self.distance_mm is not None
+            and self.distance_mm <= int(self.p("contact_distance_mm"))
+        )
 
-    # Require continuous contact for seconds.
-    def stable_contact_for(self, seconds):
+    # Grip when distance has stayed under threshold for contact_hold_s.
+    def contact_is_stable(self):
+        return self.distance_under_threshold_for(float(self.p("contact_hold_s")))
+
+    # True after distance has stayed under threshold for the given seconds.
+    def distance_under_threshold_for(self, seconds):
         now = self.now_s()
-        if not self.has_contact():
+        if not self.distance_under_threshold():
             self.contact_t = None
             return False
         if self.contact_t is None:

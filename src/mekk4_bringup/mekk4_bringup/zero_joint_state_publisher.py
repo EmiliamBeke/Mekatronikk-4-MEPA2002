@@ -14,17 +14,15 @@ class ZeroJointStatePublisher(Node):
         self.declare_parameter(
             "joint_names",
             [
-                "left_wheel_joint",
-                "right_wheel_joint",
-                "Midsection_Revolute-55",
-                "SLOTRBI_Revolute-58",
-                "SLOTRFI_Revolute-59",
-                "Midsection_Revolute-61",
-                "SLOTLFI_Revolute-64",
-                "SLOTLBI_Revolute-65",
+                "Chassis_Revolute-1",
+                "Chassis_Revolute-2",
+                "Chassis_Revolute-7",
+                "Chassis_Revolute-8",
+                "right_gripper_finger_joint",
+                "left_gripper_finger_joint",
             ],
         )
-        self.declare_parameter("joint_positions", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        self.declare_parameter("joint_positions", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
         publish_rate_hz = self.get_parameter("publish_rate_hz").get_parameter_value().double_value
         self._joint_names = [str(name) for name in self.get_parameter("joint_names").value]
