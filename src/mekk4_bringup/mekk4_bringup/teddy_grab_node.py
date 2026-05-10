@@ -88,7 +88,7 @@ class TeddyGrabNode(Node):
 
     # Store Z feedback from Mega.
     def on_z_state(self, msg):
-        self.z = float(msg.data)
+        self.z = float(msg.data) - self.z_offset()
 
     # Store gripper distance sensor.
     def on_distance(self, msg):
@@ -271,7 +271,11 @@ class TeddyGrabNode(Node):
 
     # Command only Z.
     def command_z(self, z):
-        self.publish(self.z_pub, z)
+        self.publish(self.z_pub, z + self.z_offset())
+
+    # Convert Mega's physical Z to teddy_grab's zero-centered work Z.
+    def z_offset(self):
+        return float(self.p("z_offset_m"))
 
     # Command gripper servos.
     def command_gripper(self, us):
@@ -439,12 +443,13 @@ class TeddyGrabNode(Node):
             return
         self.last_log_t = now
         self.get_logger().info(
-            "%s: %s | target x=%s z=%s gripper=%s | current x=%s z=%s | dist=%s | grab_z_calc=%s"
+            "%s: %s | target x=%s z=%s cmd_z=%s gripper=%s | current x=%s z=%s | dist=%s | grab_z_calc=%s"
             % (
                 self.phase(),
                 self.state,
                 self.fmt(self.target_x, "m"),
                 self.fmt(self.target_z, "m"),
+                self.fmt(None if self.target_z is None else self.target_z + self.z_offset(), "m"),
                 self.fmt(self.target_gripper, "us"),
                 self.fmt(self.x, "m"),
                 self.fmt(self.z, "m"),
