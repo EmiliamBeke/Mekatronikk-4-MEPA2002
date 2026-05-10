@@ -30,7 +30,7 @@ teddy_grab:
     approach_x_max: 0.082
     approach_x_step_m: 0.002
     lift_z: 0.21
-    final_x: -0.07
+    final_x: 0.0
 
     # Extend X outward from final_x until distance contact is stable or the
     # configured mechanical reach limit is reached.
