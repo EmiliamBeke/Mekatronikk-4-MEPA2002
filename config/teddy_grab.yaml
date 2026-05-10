@@ -25,14 +25,11 @@ teddy_grab:
     status_log_period_s: 0.5
     require_state_feedback: true
 
-    # Sequence positions in meters.
-    # Teddy grab uses work-Z where 0.00 is the gripper/chassis reference plane.
-    # Mega and robot_state_publisher use physical joint Z, so commands add this offset.
-    z_offset_m: 0.13
-    lower_z: 0.00
+    # Sequence positions in meters. Same physical coordinates as Mega STATE X/Z.
+    lower_z: 0.13
     approach_x_max: 0.082
     approach_x_step_m: 0.002
-    lift_z: 0.08
+    lift_z: 0.21
     final_x: 0.0
 
     # Extend X outward from final_x until distance contact is stable or the
