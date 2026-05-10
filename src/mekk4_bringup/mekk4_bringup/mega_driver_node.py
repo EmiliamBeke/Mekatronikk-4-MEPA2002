@@ -37,6 +37,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("send_period_s", 0.2)
         self.declare_parameter("odom_poll_period_s", 0.05)
         self.declare_parameter("odom_tf_hold_timeout_s", 0.75)
+        self.declare_parameter("reset_odom_after_arm_motion", True)
         self.declare_parameter("arm_state_poll_period_s", 0.25)
         self.declare_parameter("arm_motion_timeout_s", 180.0)
         self.declare_parameter("auto_home_x_on_connect", True)
@@ -94,6 +95,9 @@ class MegaDriverNode(Node):
         )
         self._odom_tf_hold_timeout_s = (
             self.get_parameter("odom_tf_hold_timeout_s").get_parameter_value().double_value
+        )
+        self._reset_odom_after_arm_motion = (
+            self.get_parameter("reset_odom_after_arm_motion").get_parameter_value().bool_value
         )
         self._arm_state_poll_period_s = (
             self.get_parameter("arm_state_poll_period_s").get_parameter_value().double_value
@@ -499,6 +503,22 @@ class MegaDriverNode(Node):
             return second, first
         return first, second
 
+    def _reset_odom_encoder_baseline_after_arm_motion(self) -> None:
+        if not self._odom_enabled or not self._reset_odom_after_arm_motion:
+            return
+        try:
+            left_ticks_raw, right_ticks_raw = self._read_encoder_pair()
+        except Exception as exc:
+            self.get_logger().warning(f"Failed to reset odom baseline after arm motion: {exc}")
+            return
+        now = time.monotonic()
+        self._last_left_ticks = left_ticks_raw * self._left_tick_sign
+        self._last_right_ticks = right_ticks_raw * self._right_tick_sign
+        self._last_encoder_stamp = now
+        self._last_odom_data_at = now
+        self._last_poll_at = now
+        self._publish_odometry(0.0, 0.0)
+
     @staticmethod
     def _parse_encoder(reply: str, label: str) -> int:
         parts = reply.split()
@@ -577,6 +597,7 @@ class MegaDriverNode(Node):
         self._active_arm_axis = None
         self._last_arm_state_poll_at = 0.0
         self._sync_arm_state_from_mega()
+        self._reset_odom_encoder_baseline_after_arm_motion()
 
     def _maybe_send_arm_z(self) -> None:
         if self._pending_arm_z_delta_steps == 0:
@@ -596,6 +617,7 @@ class MegaDriverNode(Node):
         self._active_arm_axis = None
         self._last_arm_state_poll_at = 0.0
         self._sync_arm_state_from_mega()
+        self._reset_odom_encoder_baseline_after_arm_motion()
 
     def _maybe_send_gripper(self) -> None:
         gripper_us = self._gripper_us_from_command(self._desired_left_gripper)
@@ -684,6 +706,7 @@ class MegaDriverNode(Node):
         self._send_expect(f"ARM Z {delta_steps}", "OK ARM Z", self._arm_motion_timeout_s)
         self._last_arm_state_poll_at = 0.0
         self._sync_arm_state_from_mega()
+        self._reset_odom_encoder_baseline_after_arm_motion()
         if abs(self._actual_arm_z - self._initial_arm_z_m) > self._z_step_tolerance_m():
             raise RuntimeError(
                 "Mega Z did not reach home after X calibration: target=%.3f actual=%.3f"
@@ -710,6 +733,7 @@ class MegaDriverNode(Node):
         self._send_expect(f"ARM X {delta_steps}", "OK ARM X", self._arm_motion_timeout_s)
         self._last_arm_state_poll_at = 0.0
         self._sync_arm_state_from_mega()
+        self._reset_odom_encoder_baseline_after_arm_motion()
         if abs(self._actual_arm_x - self._initial_arm_x_m) > self._x_step_tolerance_m():
             raise RuntimeError(
                 "Mega X did not reach home after Z home: target=%.3f actual=%.3f"

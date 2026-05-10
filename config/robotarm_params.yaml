@@ -16,6 +16,7 @@ mega_driver:
     # Polling for Mega STATE feedback. Lower values increase serial load and can
     # disturb smooth arm stepping on the Arduino.
     odom_tf_hold_timeout_s: 0.75
+    reset_odom_after_arm_motion: true
     arm_state_poll_period_s: 0.25
     arm_motion_timeout_s: 180.0
     auto_home_x_on_connect: true
