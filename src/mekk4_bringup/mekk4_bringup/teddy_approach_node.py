@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import re
+from typing import Any
 
 import rclpy
 from geometry_msgs.msg import Twist
@@ -12,30 +13,6 @@ from std_msgs.msg import Empty, String
 
 
 STATUS_RE = re.compile(r"(?P<key>[A-Za-z_]+)=(?P<value>[^ ]+)")
-
-PARAM_DEFAULTS = {
-    "enabled": False,
-    "status_topic": "/teddy_detector/status",
-    "cmd_vel_topic": "/cmd_vel_teddy",
-    "publish_period_s": 0.05,
-    "lost_timeout_s": 0.5,
-    "linear_speed": 0.08,
-    "drive_when_not_centered": False,
-    "center_tolerance": 0.10,
-    "center_settle_s": 2.0,
-    "angular_kp": 1.2,
-    "angular_kd": 0.0,
-    "min_angular_speed": 0.0,
-    "max_angular_speed": 0.8,
-    "scan_topic": "/lidar",
-    "stop_lidar_distance_m": 0.0,
-    "stop_lidar_front_angle_rad": 0.20,
-    "stop_lidar_min_points": 3,
-    "stop_lidar_timeout_s": 0.5,
-    "mode_topic": "/teddy_approach/mode",
-    "reset_topic": "/teddy_approach/reset",
-}
-
 
 def clamp(value, low, high):
     return max(low, min(high, value))
@@ -103,40 +80,40 @@ class BasicPd:
 
 class TeddyApproachNode(Node):
     def __init__(self):
-        super().__init__("teddy_approach")
+        super().__init__("teddy_approach", automatically_declare_parameters_from_overrides=True)
 
-        for name, default in PARAM_DEFAULTS.items():
-            self.declare_parameter(name, default)
-
-        self.enabled = self.param("enabled")
-        self.lost_timeout_s = self.param("lost_timeout_s")
-        self.linear_speed = self.param("linear_speed")
-        self.drive_when_not_centered = self.param("drive_when_not_centered")
-        self.center_tolerance = self.param("center_tolerance")
-        self.center_settle_s = self.param("center_settle_s")
-        self.stop_lidar_distance_m = self.param("stop_lidar_distance_m")
-        self.stop_lidar_front_angle_rad = self.param("stop_lidar_front_angle_rad")
-        self.stop_lidar_min_points = self.param("stop_lidar_min_points")
-        self.stop_lidar_timeout_s = self.param("stop_lidar_timeout_s")
+        self.enabled = bool(self.param("enabled"))
+        self.lost_timeout_s = float(self.param("lost_timeout_s"))
+        self.linear_speed = float(self.param("linear_speed"))
+        self.drive_when_not_centered = bool(self.param("drive_when_not_centered"))
+        self.center_tolerance = float(self.param("center_tolerance"))
+        self.center_settle_s = float(self.param("center_settle_s"))
+        self.stop_lidar_distance_m = float(self.param("stop_lidar_distance_m"))
+        self.stop_lidar_front_angle_rad = float(self.param("stop_lidar_front_angle_rad"))
+        self.stop_lidar_min_points = int(self.param("stop_lidar_min_points"))
+        self.stop_lidar_timeout_s = float(self.param("stop_lidar_timeout_s"))
 
         self.validate_params()
 
         self.turn_pid = BasicPd()
-        self.turn_pid.setGains(self.param("angular_kp"), self.param("angular_kd"))
-        self.turn_pid.setLimits(self.param("min_angular_speed"), self.param("max_angular_speed"))
+        self.turn_pid.setGains(float(self.param("angular_kp")), float(self.param("angular_kd")))
+        self.turn_pid.setLimits(
+            float(self.param("min_angular_speed")),
+            float(self.param("max_angular_speed")),
+        )
 
-        status_topic = self.param("status_topic")
-        cmd_vel_topic = self.param("cmd_vel_topic")
-        scan_topic = self.param("scan_topic")
-        mode_topic = self.param("mode_topic")
-        reset_topic = self.param("reset_topic")
+        status_topic = str(self.param("status_topic"))
+        cmd_vel_topic = str(self.param("cmd_vel_topic"))
+        scan_topic = str(self.param("scan_topic"))
+        mode_topic = str(self.param("mode_topic"))
+        reset_topic = str(self.param("reset_topic"))
 
         self.cmd_pub = self.create_publisher(Twist, cmd_vel_topic, 10)
         self.mode_pub = self.create_publisher(String, mode_topic, 10)
         self.create_subscription(String, status_topic, self.on_status, 10)
         self.create_subscription(LaserScan, scan_topic, self.on_scan, 10)
         self.create_subscription(Empty, reset_topic, self.on_reset, 10)
-        self.create_timer(self.param("publish_period_s"), self.on_timer)
+        self.create_timer(float(self.param("publish_period_s")), self.on_timer)
 
         self.last_seen_at = -1.0
         self.last_dx = 0.0
@@ -154,21 +131,24 @@ class TeddyApproachNode(Node):
             % (self.enabled, status_topic, cmd_vel_topic, scan_topic)
         )
 
-    def param(self, name):
-        return self.get_parameter(name).value
+    def param(self, name: str) -> Any:
+        value = self.get_parameter(name).value
+        if value is None:
+            raise ValueError(f"missing required parameter: {name}")
+        return value
 
     def now_s(self):
         return self.get_clock().now().nanoseconds * 1e-9
 
     def validate_params(self):
-        min_speed = self.param("min_angular_speed")
-        max_speed = self.param("max_angular_speed")
+        min_speed = float(self.param("min_angular_speed"))
+        max_speed = float(self.param("max_angular_speed"))
 
         if min_speed < 0.0:
             raise ValueError("min_angular_speed must be zero or greater")
         if max_speed < min_speed:
             raise ValueError("max_angular_speed must be greater than or equal to min_angular_speed")
-        if self.param("angular_kd") < 0.0:
+        if float(self.param("angular_kd")) < 0.0:
             raise ValueError("angular_kd must be zero or greater")
         if self.stop_lidar_distance_m < 0.0:
             raise ValueError("stop_lidar_distance_m must be zero or greater")
