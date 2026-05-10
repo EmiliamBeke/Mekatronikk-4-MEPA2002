@@ -5,10 +5,10 @@ The real robot has one servo whose PWM (500–2500 µs) drives both fingers via 
 gear/rack. In sim, each finger is a separate revolute joint with its own range:
 
   left_gripper_finger_joint:  [-3.228859, -0.523599] rad
-  right_gripper_finger_joint: [ 0.523599,  2.96706 ] rad
+  right_gripper_finger_joint: [ 0.523599,  3.228859 ] rad
 
-The convention here: PWM=500 µs ⇒ fully open (closest to ±0.523599),
-PWM=2500 µs ⇒ fully closed (extreme value). We subscribe to the existing
+The convention here: PWM=500 µs ⇒ fully open (extreme angles: ±3.228859),
+PWM=2500 µs ⇒ fully closed (near-centre: ±0.523599). We subscribe to the existing
 real-robot command topic (`/gripper/left_position_cmd` is what teleop and
 robotarm_safety publish), interpret it as µs, and republish per-finger angles.
 """
@@ -34,8 +34,8 @@ class GripperSimAdapter(Node):
         self.declare_parameter("pwm_max_us", 2500.0)
         self.declare_parameter("left_open_rad", -3.228859)
         self.declare_parameter("left_closed_rad", -0.523599)
-        self.declare_parameter("right_open_rad", 0.523599)
-        self.declare_parameter("right_closed_rad", 2.96706)
+        self.declare_parameter("right_open_rad", 3.228859)
+        self.declare_parameter("right_closed_rad", 0.523599)
         self.declare_parameter("publish_period_s", 0.05)
         self.declare_parameter("initial_pwm_us", 500.0)
 

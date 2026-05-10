@@ -129,6 +129,7 @@
             </collision>
         </link>
         <link name="ABX00102-Dist-sensor">
+            <gravity>0</gravity>
             <pose>-0.019999999999976006 0.2417999869809261 0.06356024279029658 -1.5707963267948968 -2.2204460492504156e-16 4.1633363423465674e-17</pose>
             <inertial>
                 <mass>0.0016856916739247086</mass>
@@ -258,6 +259,7 @@
             </collision>
         </link>
         <link name="Xstepper">
+            <gravity>0</gravity>
             <pose>-0.04100000095367515 0.02179998692132104 0.19479679940672623 -3.1415926535897922 -1.5707963267948961 0</pose>
             <inertial>
                 <mass>0.4621945983755269</mass>
@@ -392,6 +394,7 @@
             </collision>
         </link>
         <link name="Servo">
+            <gravity>0</gravity>
             <pose>-0.010249999999975595 0.19737498698092587 0.04998711794280987 -3.8064789415720075e-16 -2.220446049250383e-16 2.2862306060965623e-29</pose>
             <inertial>
                 <mass>0.08417757927421474</mass>
@@ -583,6 +586,7 @@
             </collision>
         </link>
         <link name="Gripper">
+            <gravity>0</gravity>
             <pose>0.000500000000024391 0.22387498698092592 0.0499871179428099 -3.806478941572021e-16 -2.2204460492503796e-16 8.661448798436061e-16</pose>
             <inertial>
                 <mass>0.5425163222161179</mass>
@@ -619,6 +623,7 @@
         </collision>
         </link>
         <link name="Leadscrew-Rigg">
+            <gravity>0</gravity>
             <pose>0.000500000000024884 0.056799986921325284 0.1637967994067263 -3.8064789415719695e-16 3.637378840725568e-16 1.5707963267948974</pose>
             <inertial>
                 <mass>0.2552161680137732</mass>
@@ -691,6 +696,7 @@
         </collision>
         </link>
         <link name="LeadNutR">
+            <gravity>0</gravity>
             <pose>0.028500000000024884 0.06779998692132531 0.17129679940672624 -3.2513674292593853e-16 3.637378840725569e-16 1.5707963267948974</pose>
             <inertial>
                 <mass>0.03449007966719112</mass>
@@ -902,6 +908,7 @@
             </collision>
         </link>
         <link name="Finger-R16L30.00-m2.1651Mirror">
+            <gravity>0</gravity>
             <pose>0.05050000000002444 0.25194970115787824 0.0181496172275414 3.141592653589793 -3.06075404564795e-16 -2.9670597283903595</pose>
             <inertial>
                 <mass>0.047559344696753665</mass>
@@ -923,21 +930,9 @@
                     </mesh>
                 </geometry>
             </visual>
-            <collision name="Finger-R16L30.00-m2.1651Mirror_collision">
-                <geometry>
-                    <mesh>
-                        <uri>meshes/Finger-R16L30.00-m2.1651Mirror.stl</uri>
-                        <scale>0.001 0.001 0.001</scale>
-                    </mesh>
-                </geometry>
-                        <surface>
-              <contact>
-                <collide_bitmask>0x0000</collide_bitmask>
-              </contact>
-            </surface>
-        </collision>
         </link>
         <link name="Top-Rack-200.0mm-R30.00-m2.1651">
+            <gravity>0</gravity>
             <pose>0.044194982654498796 0.22387611908150276 0.06028711794280997 -3.1415926535897927 3.4450928483977336e-16 -3.1415926535897922</pose>
             <inertial>
                 <mass>0.02617962275433629</mass>
@@ -974,6 +969,7 @@
         </collision>
         </link>
         <link name="Bottom-Rack-200.0mm-L30.00-m2.1651">
+            <gravity>0</gravity>
             <pose>-0.043162717914134736 0.22387623158947115 0.0397871179428098 3.806478941572016e-16 3.4450928483977336e-16 -3.1415926535897922</pose>
             <inertial>
                 <mass>0.02619004416035449</mass>
@@ -1010,6 +1006,7 @@
         </collision>
         </link>
         <link name="Servo-Gear-8L30.00-m2.1651">
+            <gravity>0</gravity>
             <pose>0.0005000000000243921 0.22335698698092593 0.04998711794280984 1.5707963267948966 1.5707963267948961 0</pose>
             <inertial>
                 <mass>0.002870206785412932</mass>
@@ -1046,6 +1043,7 @@
         </collision>
         </link>
         <link name="Finger-L-16L30.00-m2.1651">
+            <gravity>0</gravity>
             <pose>-0.04949999999997567 0.25194970115787807 0.03202461770437842 3.027691622235631e-16 -2.321255814241267e-16 -2.6179938779914935</pose>
             <inertial>
                 <mass>0.04765014920834861</mass>
@@ -1067,19 +1065,6 @@
                     </mesh>
                 </geometry>
             </visual>
-            <collision name="Finger-L-16L30.00-m2.1651_collision">
-                <geometry>
-                    <mesh>
-                        <uri>meshes/Finger-L-16L30.00-m2.1651.stl</uri>
-                        <scale>0.001 0.001 0.001</scale>
-                    </mesh>
-                </geometry>
-                        <surface>
-              <contact>
-                <collide_bitmask>0x0000</collide_bitmask>
-              </contact>
-            </surface>
-        </collision>
         </link>
         <link name="LTWheel">
             <pose>-0.07619999885559083 0.15835678379409296 0.06997811794280995 1.5707963267948961 3.806478941571971e-16 1.5707963267948974</pose>
@@ -1786,6 +1771,7 @@
             <pose>0.011000013078674568 -0.027999999999975277 0.36000020059327364 0.0 0.0 0.0</pose>
             <parent>RLeadscrew</parent>
             <child>Leadscrew-Rigg</child>
+            <initial_position>0.13</initial_position>
             <axis>
                 <xyz expressed_in="__model__">-0.0 0.0 1.0</xyz>
                 <limit>
@@ -1795,8 +1781,8 @@
                     <velocity>1.0</velocity>
                 </limit>
                 <dynamics>
-                    <damping>1.0</damping>
-                    <friction>0.1</friction>
+                    <damping>0.1</damping>
+                    <friction>0.0</friction>
                 </dynamics>
             </axis>
         </joint>
@@ -1829,11 +1815,12 @@
             <pose>-2.4501307459178207e-14 -0.1670749869809259 0.15480988205718993 0.0 0.0 0.0</pose>
             <parent>Leadscrew-Rigg</parent>
             <child>Gripper</child>
+            <initial_position>-0.07</initial_position>
             <axis>
                 <xyz expressed_in="__model__">-0.0 1.0 -0.0</xyz>
                 <limit>
-                    <lower>0.0</lower>
-                    <upper>0.09</upper>
+                    <lower>-0.07</lower>
+                    <upper>0.082</upper>
                     <effort>1000</effort>
                     <velocity>1.0</velocity>
                 </limit>
@@ -1872,13 +1859,14 @@
             <pose>-5.18933657783551e-08 2.9430204269261924e-07 -0.03193738277245858 0.0 0.0 0.0</pose>
             <parent>Gripper</parent>
             <child>Finger-R16L30.00-m2.1651Mirror</child>
+            <initial_position>6.9</initial_position>
             <axis>
                 <xyz expressed_in="__model__">0.0 -0.0 -1.0</xyz>
                 <limit>
-                    <lower>0.523599</lower>
-                    <upper>2.96706</upper>
-                    <effort>10</effort>
-                    <velocity>3.0</velocity>
+                    <lower>0.0</lower>
+                    <upper>8.0</upper>
+                    <effort>1000</effort>
+                    <velocity>10.0</velocity>
                 </limit>
                 <dynamics>
                     <damping>0.5</damping>
@@ -1890,13 +1878,14 @@
             <pose>-1.4942103989005114e-07 -2.588048814805392e-07 0.018062382295621567 0.0 0.0 0.0</pose>
             <parent>Gripper</parent>
             <child>Finger-L-16L30.00-m2.1651</child>
+            <initial_position>3.2</initial_position>
             <axis>
                 <xyz expressed_in="__model__">0.0 -0.0 -1.0</xyz>
                 <limit>
-                    <lower>-3.228859</lower>
-                    <upper>-0.523599</upper>
-                    <effort>10</effort>
-                    <velocity>3.0</velocity>
+                    <lower>0.0</lower>
+                    <upper>8.0</upper>
+                    <effort>1000</effort>
+                    <velocity>10.0</velocity>
                 </limit>
                 <dynamics>
                     <damping>0.5</damping>
@@ -2011,46 +2000,50 @@
         <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>robotarm_x_joint</joint_name>
             <topic>/robotarm/x_position_cmd</topic>
-            <p_gain>200</p_gain>
+            <initial_target>-0.07</initial_target>
+            <p_gain>800</p_gain>
             <i_gain>10</i_gain>
-            <d_gain>30</d_gain>
+            <d_gain>80</d_gain>
             <i_max>20</i_max>
             <i_min>-20</i_min>
-            <cmd_min>-100</cmd_min>
-            <cmd_max>100</cmd_max>
-        </plugin>
-        <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
-            <joint_name>robotarm_z_joint</joint_name>
-            <topic>/robotarm/z_position_cmd</topic>
-            <p_gain>2000</p_gain>
-            <i_gain>100</i_gain>
-            <d_gain>200</d_gain>
-            <i_max>200</i_max>
-            <i_min>-200</i_min>
             <cmd_min>-500</cmd_min>
             <cmd_max>500</cmd_max>
         </plugin>
         <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+            <joint_name>robotarm_z_joint</joint_name>
+            <topic>/robotarm/z_position_cmd</topic>
+            <initial_target>0.13</initial_target>
+            <p_gain>500</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>50</d_gain>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
+            <cmd_min>-200</cmd_min>
+            <cmd_max>200</cmd_max>
+        </plugin>
+        <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>left_gripper_finger_joint</joint_name>
             <topic>/sim/gripper/left_angle_cmd</topic>
-            <p_gain>10</p_gain>
-            <i_gain>0.5</i_gain>
-            <d_gain>1.5</d_gain>
-            <i_max>2</i_max>
-            <i_min>-2</i_min>
-            <cmd_min>-10</cmd_min>
-            <cmd_max>10</cmd_max>
+            <initial_target>3.2</initial_target>
+            <p_gain>10000</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>500</d_gain>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
+            <cmd_min>-100000</cmd_min>
+            <cmd_max>100000</cmd_max>
         </plugin>
         <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
             <joint_name>right_gripper_finger_joint</joint_name>
             <topic>/sim/gripper/right_angle_cmd</topic>
-            <p_gain>10</p_gain>
-            <i_gain>0.5</i_gain>
-            <d_gain>1.5</d_gain>
-            <i_max>2</i_max>
-            <i_min>-2</i_min>
-            <cmd_min>-10</cmd_min>
-            <cmd_max>10</cmd_max>
+            <initial_target>6.9</initial_target>
+            <p_gain>10000</p_gain>
+            <i_gain>0</i_gain>
+            <d_gain>500</d_gain>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
+            <cmd_min>-100000</cmd_min>
+            <cmd_max>100000</cmd_max>
         </plugin>
         <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
             <topic>/joint_states</topic>

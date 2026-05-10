@@ -47,6 +47,7 @@ class RosKeyboardTeleop:
         self.arm_x_max = args.arm_x_max
         self.arm_z_min = args.arm_z_min
         self.arm_z_max = args.arm_z_max
+        self.arm_z_offset = args.arm_z_offset
         self.arm_x_speed = max(0.0, args.arm_x_speed)
         self.arm_z_speed = max(0.0, args.arm_z_speed)
         self.arm_x_speed_step = max(0.001, args.arm_x_speed_step)
@@ -302,7 +303,7 @@ class RosKeyboardTeleop:
         if self._suppress_slider_cb:
             return
         self.arm_z = clamp(value, self.arm_z_min, self.arm_z_max)
-        self._publish_arm(self.arm_z_pub, self.arm_z)
+        self._publish_arm(self.arm_z_pub, self.arm_z + self.arm_z_offset)
 
     def _on_gripper_slider(self, value: float) -> None:
         if self._suppress_slider_cb:
@@ -319,7 +320,7 @@ class RosKeyboardTeleop:
     def _on_arm_z_state(self, msg: Float64) -> None:
         if "y" in self.pressed_keys or "h" in self.pressed_keys:
             return
-        self.arm_z = clamp(float(msg.data), self.arm_z_min, self.arm_z_max)
+        self.arm_z = clamp(float(msg.data) - self.arm_z_offset, self.arm_z_min, self.arm_z_max)
         self._set_var_silent(self.arm_z_var, self.arm_z)
 
     def _update_arm_targets(self, dt: float) -> None:
@@ -350,7 +351,7 @@ class RosKeyboardTeleop:
                 self.arm_z_min,
                 self.arm_z_max,
             )
-            self._publish_arm(self.arm_z_pub, self.arm_z)
+            self._publish_arm(self.arm_z_pub, self.arm_z + self.arm_z_offset)
             self._set_var_silent(self.arm_z_var, self.arm_z)
 
     def _tick(self) -> None:
@@ -428,6 +429,7 @@ def main() -> int:
     parser.add_argument("--arm-x-max", type=float, default=0.2, help="Maximum arm x target in meters")
     parser.add_argument("--arm-z-min", type=float, default=0.112, help="Minimum arm z target in meters")
     parser.add_argument("--arm-z-max", type=float, default=0.3, help="Maximum arm z target in meters")
+    parser.add_argument("--arm-z-offset", type=float, default=0.0, help="Offset added to arm z before publishing (control zero-point shift)")
     parser.add_argument("--arm-x-speed", type=float, default=0.010, help="Default arm x jog speed in m/s")
     parser.add_argument("--arm-z-speed", type=float, default=0.002, help="Default arm z jog speed in m/s")
     parser.add_argument("--arm-x-speed-step", type=float, default=0.002, help="Arm x jog speed increment for M/N")

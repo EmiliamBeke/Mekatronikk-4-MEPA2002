@@ -36,6 +36,9 @@ PARAM_DEFAULTS = {
     "initial_z": 0.12,
     "initial_left_gripper": 500.0,
     "initial_right_gripper": 500.0,
+    "startup_lock_s": 1.5,
+    "spawn_x": 0.0,
+    "spawn_z": 0.0,
 }
 
 
@@ -92,6 +95,10 @@ class RobotarmSafetyNode(Node):
         self.current_z: float | None = None
         self.commanded_x = self.requested_x
         self.commanded_z = self.requested_z
+        self.startup_lock_s = float(self.param("startup_lock_s"))
+        self._startup_t0 = None
+        self.spawn_x = float(self.param("spawn_x"))
+        self.spawn_z = float(self.param("spawn_z"))
 
         self.x_pub = self.create_publisher(Float64, self.param("x_command_topic"), 10)
         self.z_pub = self.create_publisher(Float64, self.param("z_command_topic"), 10)
@@ -173,8 +180,6 @@ class RobotarmSafetyNode(Node):
         self.current_z = clamp(float(msg.data), self.z_min, self.z_max)
 
     def on_joint_states(self, msg: JointState) -> None:
-        if self.current_z is not None:
-            return
         try:
             index = msg.name.index(self.z_joint_name)
         except ValueError:
@@ -183,6 +188,18 @@ class RobotarmSafetyNode(Node):
             self.current_z = float(msg.position[index])
 
     def on_timer(self) -> None:
+        if self._startup_t0 is None:
+            self._startup_t0 = self.get_clock().now()
+        elapsed = (self.get_clock().now() - self._startup_t0).nanoseconds * 1e-9
+        if elapsed < self.startup_lock_s:
+            # Hold spawn pose so z PID can settle before x retracts.
+            self.publish(self.x_pub, self.spawn_x)
+            self.publish(self.z_pub, self.spawn_z)
+            self.commanded_x = self.spawn_x
+            self.commanded_z = self.spawn_z
+            self.publish(self.left_gripper_pub, self.requested_left_gripper)
+            self.publish(self.right_gripper_pub, self.requested_right_gripper)
+            return
         x_position, z_position = self.commanded_xz()
         self.commanded_x = x_position
         self.commanded_z = z_position
@@ -196,7 +213,17 @@ class RobotarmSafetyNode(Node):
         x_position = self.current_x if self.current_x is not None else self.commanded_x
         z_position = self.current_z if self.current_z is not None else self.commanded_z
 
-        if self.in_lidar_keepout(x_position, z_position):
+        # Tolerance avoids deadlock when z hovers within a few mm of clearance
+        # because of PID jitter or sensor noise.
+        z_tol = 0.005
+
+        in_keepout = (
+            x_position < self.lidar_x_threshold
+            and z_position < self.lidar_z_clearance - z_tol
+        )
+
+        if in_keepout:
+            # Only enforce z-up when current z is meaningfully below clearance.
             z_position = step_towards(
                 z_position,
                 self.lidar_z_clearance,
@@ -204,25 +231,17 @@ class RobotarmSafetyNode(Node):
             )
             return x_position, z_position
 
-        if target_z < self.lidar_z_clearance and x_position < self.lidar_x_threshold:
-            x_position = step_towards(
-                x_position,
-                self.lidar_x_threshold,
-                self.max_x_step_per_publish,
-            )
-            return x_position, z_position
+        # Block lowering z below clearance while x stays inside the keepout band.
+        if (
+            target_z < self.lidar_z_clearance - z_tol
+            and x_position < self.lidar_x_threshold
+        ):
+            target_z = self.lidar_z_clearance
 
-        if target_x < self.lidar_x_threshold and z_position < self.lidar_z_clearance:
-            z_position = step_towards(
-                z_position,
-                self.lidar_z_clearance,
-                self.max_z_step_per_publish,
-            )
-            return x_position, z_position
-
+        # Move z and x simultaneously; do not gate one behind the other once
+        # we are out of the hard keepout zone.
         if abs(z_position - target_z) > 1e-9:
             z_position = step_towards(z_position, target_z, self.max_z_step_per_publish)
-            return x_position, z_position
 
         if abs(x_position - target_x) > 1e-9:
             x_position = step_towards(x_position, target_x, self.max_x_step_per_publish)

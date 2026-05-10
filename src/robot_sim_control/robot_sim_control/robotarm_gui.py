@@ -27,6 +27,7 @@ class RobotarmGui:
         self.x_max = args.x_max
         self.z_min = args.z_min
         self.z_max = args.z_max
+        self.z_offset = args.z_offset
         self.gripper_min = args.gripper_min
         self.gripper_max = args.gripper_max
         self.x_initial = clamp(args.x_initial, self.x_min, self.x_max)
@@ -135,7 +136,7 @@ class RobotarmGui:
         self.x_pub.publish(x_msg)
 
         z_msg = Float64()
-        z_msg.data = clamp(float(self.z_var.get()), self.z_min, self.z_max)
+        z_msg.data = clamp(float(self.z_var.get()), self.z_min, self.z_max) + self.z_offset
         self.z_pub.publish(z_msg)
 
         gripper_position = clamp(
@@ -178,6 +179,7 @@ def main() -> int:
     parser.add_argument("--x-max", type=float, default=0.09)
     parser.add_argument("--z-min", type=float, default=0.0)
     parser.add_argument("--z-max", type=float, default=0.25)
+    parser.add_argument("--z-offset", type=float, default=0.0)
     parser.add_argument("--gripper-min", type=float, default=500.0)
     parser.add_argument("--gripper-max", type=float, default=2500.0)
     parser.add_argument("--x-initial", type=float, default=0.01)

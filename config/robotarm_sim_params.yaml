@@ -42,19 +42,19 @@ robotarm_safety:
 
     # Allowed commanded workspace in meters. Matches the SDF joint limits set
     # in Fusion (robotarm_x_joint, robotarm_z_joint).
-    x_min: 0.01
-    x_max: 0.09
+    x_min: -0.07
+    x_max: 0.082
     z_min: 0.0
     z_max: 0.25
 
     # Slew-rate limits per publish period. With publish_period_s=0.05, 0.005 m
     # gives about 0.10 m/s on X and 0.001 m gives about 0.02 m/s on Z.
     max_x_step_per_publish: 0.005
-    max_z_step_per_publish: 0.001
+    max_z_step_per_publish: 0.05
 
-    # Keepout to avoid moving low over the LiDAR/front structure.
-    lidar_x_threshold: 0.09
-    lidar_z_clearance: 0.12
+    # Keepout: if x < 0 (arm retracted past centre) and z is low, block move.
+    lidar_x_threshold: 0.0
+    lidar_z_clearance: 0.13
 
     # Sim gripper commands are servo PWM (µs), same units as the real Mega.
     # gripper_sim_adapter maps PWM to per-finger joint angles.
@@ -62,7 +62,11 @@ robotarm_safety:
     gripper_max: 2500.0
 
     # Startup command state (same home as the real arm calibration).
-    initial_x: 0.0
-    initial_z: 0.12
+    initial_x: -0.07
+    initial_z: 0.13
     initial_left_gripper: 500.0
     initial_right_gripper: 500.0
+
+    startup_lock_s: 0.0
+    spawn_x: -0.07
+    spawn_z: 0.13
