@@ -36,6 +36,7 @@ class MegaDriverNode(Node):
         self.declare_parameter("reconnect_delay_s", 1.0)
         self.declare_parameter("send_period_s", 0.2)
         self.declare_parameter("odom_poll_period_s", 0.05)
+        self.declare_parameter("odom_tf_hold_timeout_s", 0.75)
         self.declare_parameter("arm_state_poll_period_s", 0.25)
         self.declare_parameter("arm_motion_timeout_s", 180.0)
         self.declare_parameter("auto_home_x_on_connect", True)
@@ -90,6 +91,9 @@ class MegaDriverNode(Node):
         self._send_period_s = self.get_parameter("send_period_s").get_parameter_value().double_value
         self._odom_poll_period_s = (
             self.get_parameter("odom_poll_period_s").get_parameter_value().double_value
+        )
+        self._odom_tf_hold_timeout_s = (
+            self.get_parameter("odom_tf_hold_timeout_s").get_parameter_value().double_value
         )
         self._arm_state_poll_period_s = (
             self.get_parameter("arm_state_poll_period_s").get_parameter_value().double_value
@@ -213,9 +217,10 @@ class MegaDriverNode(Node):
         if (
             self._send_period_s <= 0.0
             or self._odom_poll_period_s <= 0.0
+            or self._odom_tf_hold_timeout_s < 0.0
             or self._arm_state_poll_period_s <= 0.0
         ):
-            raise ValueError("Timer periods must be greater than zero.")
+            raise ValueError("Timer periods must be positive, and odom_tf_hold_timeout_s must be zero or greater.")
         if self._arm_motion_timeout_s <= 0.0:
             raise ValueError("arm_motion_timeout_s must be greater than zero.")
         if self._max_driver_errors_before_reconnect < 1:
@@ -260,6 +265,8 @@ class MegaDriverNode(Node):
         self._last_left_ticks = None
         self._last_right_ticks = None
         self._last_encoder_stamp = None
+        self._last_odom_data_at = None
+        self._last_odom_publish_at = 0.0
 
         self._x = 0.0
         self._y = 0.0
@@ -329,6 +336,8 @@ class MegaDriverNode(Node):
         self._last_left_ticks = None
         self._last_right_ticks = None
         self._last_encoder_stamp = None
+        self._last_odom_data_at = None
+        self._last_odom_publish_at = 0.0
         self._active_arm_axis = None
         self._arm_startup_ready = False
         self._serial_error_count = 0
@@ -368,6 +377,7 @@ class MegaDriverNode(Node):
             self._last_left_ticks = left_ticks_raw * self._left_tick_sign
             self._last_right_ticks = right_ticks_raw * self._right_tick_sign
             self._last_encoder_stamp = time.monotonic()
+            self._last_odom_data_at = self._last_encoder_stamp
             self._last_motion_command = "STOP"
             self._last_stop_sent = True
             self._last_motion_sent_at = time.monotonic()
@@ -878,6 +888,7 @@ class MegaDriverNode(Node):
 
         now = time.monotonic()
         if self._last_poll_at and (now - self._last_poll_at) < self._odom_poll_period_s:
+            self._publish_held_odometry(now)
             return
 
         left_ticks_raw, right_ticks_raw = self._read_encoder_pair()
@@ -889,7 +900,9 @@ class MegaDriverNode(Node):
             self._last_left_ticks = left_ticks
             self._last_right_ticks = right_ticks
             self._last_encoder_stamp = stamp_now
+            self._last_odom_data_at = stamp_now
             self._last_poll_at = now
+            self._publish_odometry(0.0, 0.0)
             return
 
         dt = max(1e-6, stamp_now - self._last_encoder_stamp)
@@ -898,6 +911,7 @@ class MegaDriverNode(Node):
         self._last_left_ticks = left_ticks
         self._last_right_ticks = right_ticks
         self._last_encoder_stamp = stamp_now
+        self._last_odom_data_at = stamp_now
         self._last_poll_at = now
 
         d_left = delta_left_ticks * self._left_m_per_tick
@@ -914,7 +928,20 @@ class MegaDriverNode(Node):
         angular_velocity = d_theta / dt
         self._publish_odometry(linear_velocity, angular_velocity)
 
+    def _publish_held_odometry(self, now: float | None = None) -> None:
+        if not self._odom_enabled or self._last_odom_data_at is None:
+            return
+        now = time.monotonic() if now is None else now
+        if self._odom_tf_hold_timeout_s <= 0.0:
+            return
+        if now - self._last_odom_data_at > self._odom_tf_hold_timeout_s:
+            return
+        if now - self._last_odom_publish_at < self._odom_poll_period_s:
+            return
+        self._publish_odometry(0.0, 0.0)
+
     def _publish_odometry(self, linear_velocity: float, angular_velocity: float) -> None:
+        self._last_odom_publish_at = time.monotonic()
         stamp = self.get_clock().now().to_msg()
         qz = math.sin(self._yaw / 2.0)
         qw = math.cos(self._yaw / 2.0)
@@ -966,6 +993,7 @@ class MegaDriverNode(Node):
         except Exception as exc:
             self.get_logger().warning(f"Mega driver loop failed: {exc}")
             self._serial_error_count += 1
+            self._publish_held_odometry()
             try:
                 self._send_motion("STOP")
                 self._serial.reset_input_buffer()
