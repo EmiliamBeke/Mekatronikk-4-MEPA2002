@@ -11,11 +11,12 @@ mega_driver:
     cmd_vel_timeout_s: 0.5
     max_driver_errors_before_reconnect: 10
 
-    # Base frames and odometry. Pi launch may override publish_tf/odom remapping
-    # when EKF owns odom -> base_link.
+    # Base frames and odometry. Pi launch overrides publish_tf via mega_publish_tf
+    # arg. Default false because EKF owns odom->base_link in normal bringup; sim
+    # launch sets it true explicitly when needed.
     base_frame_id: base_link
     odom_frame_id: odom
-    publish_tf: true
+    publish_tf: false
     odom_poll_period_s: 0.05
     odom_tf_hold_timeout_s: 1.75
     reset_odom_after_arm_motion: true
