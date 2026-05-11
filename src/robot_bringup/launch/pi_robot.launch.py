@@ -9,6 +9,10 @@ from ament_index_python.packages import get_package_share_directory
 import os
 
 
+def _str_to_bool(value):
+    return str(value).strip().lower() in ('1', 'true', 'yes', 'on')
+
+
 def require_robotarm_safety_for_teddy_grab(context, *args, **kwargs):
     use_teddy_grab = LaunchConfiguration('use_teddy_grab').perform(context).lower()
     use_robotarm_safety = LaunchConfiguration('use_robotarm_safety').perform(context).lower()
@@ -259,42 +263,47 @@ def generate_launch_description():
         ],
     )
 
-    mega_driver_node = Node(
-        package='mekk4_bringup',
-        executable='mega_driver_node',
-        name='mega_driver',
-        output='screen',
-        condition=IfCondition(use_mega_driver),
-        parameters=[
-            {'use_sim_time': use_sim_time},
-            robotarm_params_file,
-            {
-                'port': ParameterValue(mega_port, value_type=str),
-                'baudrate': ParameterValue(mega_baudrate, value_type=int),
-                'base_frame_id': ParameterValue(base_frame, value_type=str),
-                'publish_tf': PythonExpression(["'", mega_publish_tf, "'.lower() in ('1','true','yes','on')"]),
-                'swap_sides': ParameterValue(swap_sides, value_type=bool),
-                'left_cmd_sign': ParameterValue(left_cmd_sign, value_type=int),
-                'right_cmd_sign': ParameterValue(right_cmd_sign, value_type=int),
-                'angular_cmd_sign': ParameterValue(angular_cmd_sign, value_type=int),
-                'min_nonzero_pwm': ParameterValue(min_nonzero_pwm, value_type=int),
-                'min_forward_pwm': ParameterValue(min_forward_pwm, value_type=int),
-                'min_reverse_pwm': ParameterValue(min_reverse_pwm, value_type=int),
-                'min_turn_pwm': ParameterValue(min_turn_pwm, value_type=int),
-                'pure_rotation_linear_deadband_mps': ParameterValue(
-                    pure_rotation_linear_deadband_mps, value_type=float
-                ),
-                'left_cmd_scale': ParameterValue(left_cmd_scale, value_type=float),
-                'right_cmd_scale': ParameterValue(right_cmd_scale, value_type=float),
-                'left_tick_sign': ParameterValue(left_tick_sign, value_type=int),
-                'right_tick_sign': ParameterValue(right_tick_sign, value_type=int),
-                'left_m_per_tick': ParameterValue(left_m_per_tick, value_type=float),
-                'right_m_per_tick': ParameterValue(right_m_per_tick, value_type=float),
-                'track_width_eff_m': ParameterValue(track_width_eff_m, value_type=float),
-            }
-        ],
-        remappings=[('odom', mega_odom_topic)],
-    )
+    def _build_mega_driver_node(context, *args, **kwargs):
+        if not _str_to_bool(LaunchConfiguration('use_mega_driver').perform(context)):
+            return []
+        publish_tf_bool = _str_to_bool(LaunchConfiguration('mega_publish_tf').perform(context))
+        return [Node(
+            package='mekk4_bringup',
+            executable='mega_driver_node',
+            name='mega_driver',
+            output='screen',
+            parameters=[
+                {'use_sim_time': use_sim_time},
+                robotarm_params_file,
+                {
+                    'port': ParameterValue(mega_port, value_type=str),
+                    'baudrate': ParameterValue(mega_baudrate, value_type=int),
+                    'base_frame_id': ParameterValue(base_frame, value_type=str),
+                    'publish_tf': publish_tf_bool,
+                    'swap_sides': ParameterValue(swap_sides, value_type=bool),
+                    'left_cmd_sign': ParameterValue(left_cmd_sign, value_type=int),
+                    'right_cmd_sign': ParameterValue(right_cmd_sign, value_type=int),
+                    'angular_cmd_sign': ParameterValue(angular_cmd_sign, value_type=int),
+                    'min_nonzero_pwm': ParameterValue(min_nonzero_pwm, value_type=int),
+                    'min_forward_pwm': ParameterValue(min_forward_pwm, value_type=int),
+                    'min_reverse_pwm': ParameterValue(min_reverse_pwm, value_type=int),
+                    'min_turn_pwm': ParameterValue(min_turn_pwm, value_type=int),
+                    'pure_rotation_linear_deadband_mps': ParameterValue(
+                        pure_rotation_linear_deadband_mps, value_type=float
+                    ),
+                    'left_cmd_scale': ParameterValue(left_cmd_scale, value_type=float),
+                    'right_cmd_scale': ParameterValue(right_cmd_scale, value_type=float),
+                    'left_tick_sign': ParameterValue(left_tick_sign, value_type=int),
+                    'right_tick_sign': ParameterValue(right_tick_sign, value_type=int),
+                    'left_m_per_tick': ParameterValue(left_m_per_tick, value_type=float),
+                    'right_m_per_tick': ParameterValue(right_m_per_tick, value_type=float),
+                    'track_width_eff_m': ParameterValue(track_width_eff_m, value_type=float),
+                }
+            ],
+            remappings=[('odom', mega_odom_topic)],
+        )]
+
+    mega_driver_node = OpaqueFunction(function=_build_mega_driver_node)
 
     ekf_node = Node(
         package='robot_localization',
