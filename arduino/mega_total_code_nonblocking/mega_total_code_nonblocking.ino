@@ -591,7 +591,7 @@ void update_distance() {
       distance_ok = false;
       distance_mm = kDistanceNoReadingMm;
       last_distance_fail_ms = millis();
-      Serial.println("ERR DIST I2C TIMEOUT");
+      Serial.println("EVENT DIST I2C TIMEOUT");
     }
     return;
   }
@@ -603,7 +603,7 @@ void update_distance() {
     distance_ok = false;
     distance_mm = kDistanceNoReadingMm;
     last_distance_fail_ms = millis();
-    Serial.println("ERR DIST I2C TIMEOUT");
+    Serial.println("EVENT DIST I2C TIMEOUT");
     return;
   }
 
@@ -613,7 +613,7 @@ void update_distance() {
       distance_ok = false;
       distance_mm = kDistanceNoReadingMm;
       last_distance_fail_ms = millis();
-      Serial.println("ERR DIST I2C TIMEOUT");
+      Serial.println("EVENT DIST I2C TIMEOUT");
       return;
     }
     distance_mm = kDistanceNoReadingMm;

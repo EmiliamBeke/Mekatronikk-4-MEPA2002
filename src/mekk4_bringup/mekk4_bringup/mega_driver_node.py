@@ -10,7 +10,7 @@ from geometry_msgs.msg import TransformStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-from std_msgs.msg import Float64, Int32
+from std_msgs.msg import Bool, Float64, Int32
 from std_srvs.srv import Trigger
 from tf2_ros import TransformBroadcaster
 
@@ -190,6 +190,7 @@ class MegaDriverNode(Node):
         self._joint_state_pub = self.create_publisher(JointState, self._joint_states_topic, 10)
         self._distance_pub = self.create_publisher(Int32, "/mega/distance_mm", 10)
         self._home_arm_srv = self.create_service(Trigger, "/mega/home_arm", self._on_home_arm)
+        self.create_subscription(Bool, "/mega/freeze_odom", self._on_freeze_odom, 10)
         self._tf_broadcaster = TransformBroadcaster(self) if self._publish_tf else None
         self._timer = self.create_timer(0.02, self._on_timer)
 
