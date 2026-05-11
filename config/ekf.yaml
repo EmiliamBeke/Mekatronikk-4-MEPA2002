@@ -1,6 +1,6 @@
 ekf_filter_node:
   ros__parameters:
-    frequency: 10.0
+    frequency: 30.0
     sensor_timeout: 0.1
     two_d_mode: true
     publish_tf: true
@@ -8,7 +8,7 @@ ekf_filter_node:
     transform_time_offset: 0.0
     transform_timeout: 0.0
     print_diagnostics: true
-    predict_to_current_time: false
+    predict_to_current_time: true
     reset_on_time_jump: true
 
     map_frame: map
