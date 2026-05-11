@@ -2,7 +2,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, SetEnvironmentVariable, TimerAction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.actions import Node, SetParameter
 from ament_index_python.packages import get_package_share_directory
@@ -272,7 +272,7 @@ def generate_launch_description():
                 'port': ParameterValue(mega_port, value_type=str),
                 'baudrate': ParameterValue(mega_baudrate, value_type=int),
                 'base_frame_id': ParameterValue(base_frame, value_type=str),
-                'publish_tf': ParameterValue(mega_publish_tf, value_type=bool),
+                'publish_tf': PythonExpression(["'", mega_publish_tf, "'.lower() in ('1','true','yes','on')"]),
                 'swap_sides': ParameterValue(swap_sides, value_type=bool),
                 'left_cmd_sign': ParameterValue(left_cmd_sign, value_type=int),
                 'right_cmd_sign': ParameterValue(right_cmd_sign, value_type=int),
