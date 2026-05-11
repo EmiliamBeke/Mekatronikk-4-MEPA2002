@@ -357,8 +357,9 @@ class MegaDriverNode(Node):
                 continue
         raise RuntimeError("timeout waiting for Mega startup ready")
 
-    def _read_reply(self) -> str:
-        while True:
+    def _read_reply(self, timeout_s: float) -> str:
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline:
             raw = self._serial.readline()
             if not raw:
                 continue
@@ -372,12 +373,12 @@ class MegaDriverNode(Node):
                     self.get_logger().debug(f"Mega event: {text}")
                 continue
             return text
+        raise RuntimeError("timeout waiting for Mega reply")
 
     def _send_expect(self, command: str, expected_prefix: str, timeout_s: float | None = None) -> str:
-        del timeout_s
         self._serial.write((command + "\n").encode("utf-8"))
         self._serial.flush()
-        reply = self._read_reply()
+        reply = self._read_reply(self._reply_timeout_s if timeout_s is None else timeout_s)
         if not reply.startswith(expected_prefix):
             raise RuntimeError(
                 f"unexpected reply to {command!r}: expected prefix {expected_prefix!r}, got {reply!r}"
