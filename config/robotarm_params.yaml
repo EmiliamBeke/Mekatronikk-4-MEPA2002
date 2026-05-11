@@ -17,11 +17,11 @@ mega_driver:
     odom_frame_id: odom
     publish_tf: true
     odom_poll_period_s: 0.05
-    odom_tf_hold_timeout_s: 0.75
+    odom_tf_hold_timeout_s: 1.75
     reset_odom_after_arm_motion: true
-    left_m_per_tick: 0.0
-    right_m_per_tick: 0.0
-    track_width_eff_m: 0.35
+    left_m_per_tick: 	0.000054145
+    right_m_per_tick: 0.000053178
+    track_width_eff_m: 0.289845896
     left_tick_sign: 1
     right_tick_sign: 1
     reset_encoders_on_connect: true
@@ -39,7 +39,7 @@ mega_driver:
     left_cmd_sign: 1
     right_cmd_sign: 1
     angular_cmd_sign: -1
-    left_cmd_scale: 1.0
+    left_cmd_scale: 0.96
     right_cmd_scale: 1.0
 
     # Mega-side conversion from requested arm position in meters to firmware steps.
