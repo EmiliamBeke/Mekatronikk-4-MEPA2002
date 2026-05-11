@@ -7,7 +7,7 @@ import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Empty, Float64, Int32, String
+from std_msgs.msg import Bool, Empty, Float64, Int32, String
 
 
 class TeddyGrabNode(Node):
@@ -47,6 +47,7 @@ class TeddyGrabNode(Node):
 
         self.cmd_pub = self.create_publisher(Twist, self.p("cmd_vel_topic"), 10)
         self.reset_pub = self.create_publisher(Empty, self.p("approach_reset_topic"), 10)
+        self.freeze_odom_pub = self.create_publisher(Bool, "/mega/freeze_odom", 10)
         self.x_pub = self.create_publisher(Float64, "/robotarm/request/x_position", 10)
         self.z_pub = self.create_publisher(Float64, "/robotarm/request/z_position", 10)
         self.left_pub = self.create_publisher(Float64, "/gripper/request/left_position", 10)
@@ -91,6 +92,7 @@ class TeddyGrabNode(Node):
         self.sequence = self.make_sequence()
         self.step_i = 0
         self.get_logger().info("Phase 2: grab_z=%.3f m (%s)" % (self.grab_z, self.grab_z_calc))
+        self.freeze_odom_pub.publish(Bool(data=True))
         self.enter_step()
 
     # Store X feedback from Mega.
@@ -263,6 +265,7 @@ class TeddyGrabNode(Node):
         self.step_i += 1
         if self.step_i >= len(self.sequence):
             self.state = "done"
+            self.freeze_odom_pub.publish(Bool(data=False))
             self.get_logger().info("done")
             return
         self.enter_step()
@@ -276,6 +279,7 @@ class TeddyGrabNode(Node):
             self.step_i = -1
             self.waiting_for_new_approach = True
             self.approach_ran_after_reset = False
+            self.freeze_odom_pub.publish(Bool(data=False))
             self.reset_pub.publish(Empty())
             self.get_logger().info("state=idle waiting for next teddy_approach_settled")
         else:
@@ -349,6 +353,7 @@ class TeddyGrabNode(Node):
         self.command_gripper(step["gripper"])
         if self.distance_under_threshold_for(step["hold_s"]):
             self.state = "done"
+            self.freeze_odom_pub.publish(Bool(data=False))
             self.get_logger().info("teddy grab successful")
             return
         if self.distance_under_threshold():

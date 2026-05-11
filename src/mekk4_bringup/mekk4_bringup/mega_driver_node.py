@@ -155,6 +155,7 @@ class MegaDriverNode(Node):
         self._last_encoder_stamp = None
         self._last_odom_data_at = None
         self._last_odom_publish_at = 0.0
+        self._odom_frozen = False
 
         self._x = 0.0
         self._y = 0.0
@@ -814,8 +815,22 @@ class MegaDriverNode(Node):
         if command != self._last_motion_command or (now - self._last_motion_sent_at) >= self._send_period_s:
             self._send_motion(command)
 
+    def _on_freeze_odom(self, msg: Bool) -> None:
+        if msg.data and not self._odom_frozen:
+            self.get_logger().info("Odom frozen by grab sequence")
+        elif not msg.data and self._odom_frozen:
+            self.get_logger().info("Odom unfrozen — resetting encoder baseline")
+            self._last_left_ticks = None
+            self._last_right_ticks = None
+            self._last_encoder_stamp = None
+        self._odom_frozen = msg.data
+
     def _poll_odometry(self) -> None:
         if not self._odom_enabled:
+            return
+
+        if self._odom_frozen:
+            self._publish_held_odometry()
             return
 
         now = time.monotonic()
