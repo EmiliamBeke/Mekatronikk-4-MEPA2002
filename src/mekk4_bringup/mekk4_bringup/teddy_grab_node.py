@@ -194,18 +194,18 @@ class TeddyGrabNode(Node):
     def make_restart_sequence(self):
         safe_x = float(self.p("safe_x"))
         home_x = float(self.p("home_x"))
-        lift_z = float(self.p("lift_z"))
+        home_z = float(self.p("home_z"))
         g_open = float(self.p("gripper_open"))
         move_s = float(self.p("move_hold_s"))
         return [
             # Phase 7.2: open gripper.
             self.step("restart_open", "Phase 7.2", "gripper", self.x_or(safe_x), self.hold_z(), g_open, move_s),
-            # Phase 7.2: lift Z before X retracts behind the chassis front edge.
-            self.step("restart_lift_z", "Phase 7.2", "z", self.x_or(safe_x), lift_z, g_open, move_s),
+            # Phase 7.2: move Z to home before X retracts.
+            self.step("restart_lift_z", "Phase 7.2", "z", self.x_or(safe_x), home_z, g_open, move_s),
             # Phase 7.2: retract X to home after Z is clear.
-            self.step("restart_x_home", "Phase 7.2", "x", home_x, lift_z, g_open, move_s),
+            self.step("restart_x_home", "Phase 7.2", "x", home_x, home_z, g_open, move_s),
             # Phase 7.2: reset teddy_approach.
-            self.step("restart_approach", "Phase 7.2", "reset", home_x, lift_z, g_open, self.p("final_hold_s")),
+            self.step("restart_approach", "Phase 7.2", "reset", home_x, home_z, g_open, self.p("final_hold_s")),
         ]
 
     # Create one sequence dictionary.

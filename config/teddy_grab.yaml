@@ -33,6 +33,7 @@ teddy_grab:
     approach_x_max: 0.082
     approach_x_step_m: 0.002
     lift_z: 0.21
+    home_z: 0.13
 
     # Extend X outward from safe_x until distance contact is stable or the
     # configured mechanical reach limit is reached.
