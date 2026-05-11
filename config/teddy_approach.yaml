@@ -29,8 +29,8 @@ teddy_approach:
     stop_lidar_timeout_s: 1.5
 
     # Drive forward only after the teddy is centered unless this is true.
-    linear_speed: 0.1
-    drive_when_not_centered: false
+    linear_speed: 0.05
+    drive_when_not_centered: true
 
 teddy_lidar_markers:
   ros__parameters:
