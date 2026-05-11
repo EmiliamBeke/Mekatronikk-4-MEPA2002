@@ -16,27 +16,26 @@ echo "[pi-sparse-checkout] Directory: ${REPO_DIR}" >&2
 git clone --no-checkout "${REPO_URL}" "${REPO_DIR}"
 cd "${REPO_DIR}"
 
-# Initialize sparse checkout (non-cone: supports subdirectory exclusions)
-git sparse-checkout init
+# Initialize sparse checkout
+git sparse-checkout init --cone
 
-# Define what gets checked out on Pi.
-# Meshes are excluded — robot_state_publisher only needs the URDF text, not STL files.
-git sparse-checkout set \
-  'src/mekk4_bringup/' \
-  'src/mekk4_perception/' \
-  'src/robot_bringup/' \
-  'src/robot_description/' \
-  '!src/robot_description/meshes/' \
-  'arduino/' \
-  'config/' \
-  'scripts/' \
-  'docker/' \
-  'models/yolo26n_ncnn_model/' \
-  'compose.yml' \
-  'Makefile' \
-  '.gitignore' \
-  '.dockerignore' \
-  '.env.example'
+# Define what gets checked out on Pi
+# Include only Pi-essential directories and files
+git sparse-checkout set --skip-checks \
+  src/mekk4_bringup \
+  src/mekk4_perception \
+  src/robot_bringup \
+  src/robot_description \
+  arduino \
+  config \
+  scripts \
+  docker \
+  models/yolo26n_ncnn_model \
+  compose.yml \
+  Makefile \
+  .gitignore \
+  .dockerignore \
+  .env.example
 
 # Checkout main branch
 git checkout main
