@@ -535,7 +535,9 @@ bool calibrate_x_axis_extended() {
   return true;
 }
 
-void init_distance_sensor() {
+// silent=true brukes ved auto-reinit for å unngå at uanmodet output
+// forstyrrer request/reply-protokollen til mega_driver_node.
+void init_distance_sensor(bool silent = false) {
   Wire.begin();
   Wire.setClock(100000);
   Wire.setWireTimeout(25000, true);  // 25 ms I2C timeout; resets bus on hang
@@ -543,7 +545,7 @@ void init_distance_sensor() {
 
   const int begin_status = distance_sensor.begin();
   if (begin_status != 0) {
-    Serial.print("ERR DIST BEGIN ");
+    if (silent) { Serial.print("EVENT DIST REINIT ERR BEGIN "); } else { Serial.print("ERR DIST BEGIN "); }
     Serial.println(begin_status);
     distance_ok = false;
     return;
@@ -551,7 +553,7 @@ void init_distance_sensor() {
 
   const int init_status = distance_sensor.InitSensor();
   if (init_status != 0) {
-    Serial.print("ERR DIST INIT ");
+    if (silent) { Serial.print("EVENT DIST REINIT ERR INIT "); } else { Serial.print("ERR DIST INIT "); }
     Serial.println(init_status);
     distance_ok = false;
     return;
@@ -559,20 +561,20 @@ void init_distance_sensor() {
 
   const int start_status = distance_sensor.VL53L4ED_StartRanging();
   if (start_status != 0) {
-    Serial.print("ERR DIST START ");
+    if (silent) { Serial.print("EVENT DIST REINIT ERR START "); } else { Serial.print("ERR DIST START "); }
     Serial.println(start_status);
     distance_ok = false;
     return;
   }
   distance_ok = true;
-  Serial.println("OK DIST INIT");
+  if (silent) { Serial.println("EVENT DIST REINIT OK"); } else { Serial.println("OK DIST INIT"); }
 }
 
 void update_distance() {
   if (!distance_ok) {
     if (millis() - last_distance_fail_ms >= kDistanceReinitIntervalMs) {
       last_distance_fail_ms = millis();
-      init_distance_sensor();
+      init_distance_sensor(true);
     }
     return;
   }
