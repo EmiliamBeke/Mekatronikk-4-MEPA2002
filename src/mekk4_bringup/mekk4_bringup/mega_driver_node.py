@@ -830,7 +830,10 @@ class MegaDriverNode(Node):
             return
 
         if self._odom_frozen:
-            self._publish_held_odometry()
+            now = time.monotonic()
+            if now - self._last_odom_publish_at >= self._odom_poll_period_s:
+                self._last_odom_data_at = now
+                self._publish_odometry(0.0, 0.0)
             return
 
         now = time.monotonic()
@@ -937,6 +940,7 @@ class MegaDriverNode(Node):
             self._maybe_poll_arm_state()
             self._maybe_send_gripper()
             self._poll_odometry()
+            self._publish_arm_state()
         except Exception as exc:
             self.get_logger().warning(f"Mega driver loop failed: {exc}")
             self._serial_error_count += 1
