@@ -930,6 +930,7 @@ class MegaDriverNode(Node):
         self._tf_broadcaster.sendTransform(transform)
 
     def _on_timer(self) -> None:
+        self._publish_arm_state()
         if not self._try_connect():
             return
 
@@ -940,7 +941,6 @@ class MegaDriverNode(Node):
             self._maybe_poll_arm_state()
             self._maybe_send_gripper()
             self._poll_odometry()
-            self._publish_arm_state()
         except Exception as exc:
             self.get_logger().warning(f"Mega driver loop failed: {exc}")
             self._serial_error_count += 1
