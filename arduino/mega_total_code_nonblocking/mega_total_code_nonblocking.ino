@@ -12,6 +12,7 @@ constexpr size_t kMaxCommandLength = 63;
 constexpr unsigned long kDriveTimeoutMs = 700;
 constexpr unsigned long kStatusPeriodMs = 50;
 constexpr unsigned long kDistancePeriodMs = 20;
+constexpr unsigned long kDistanceReinitIntervalMs = 5000;
 
 constexpr int kHallA1Pin = 3;
 constexpr int kHallB1Pin = 2;
@@ -48,7 +49,6 @@ constexpr int kServoMaxUs = 2500;
 constexpr unsigned long kHomeGripperOpenDelayMs = 500;
 constexpr int kDistanceXshutPin = -1;
 constexpr int kDistanceNoReadingMm = 9999;
-constexpr int kDistanceContactMm = 20;
 
 constexpr float kXStepsPerMm = 18.65f;
 constexpr float kZStepsPerMm = 2929.0f;
@@ -110,9 +110,9 @@ bool drive_watchdog_armed = false;
 bool stream_status = false;
 unsigned long last_status_ms = 0;
 unsigned long last_distance_ms = 0;
+unsigned long last_distance_fail_ms = 0;
 int servo_us = kServoHomeUs;
 int distance_mm = kDistanceNoReadingMm;
-bool distance_contact = false;
 bool distance_ok = false;
 int last_x_limit_state = -1;
 int last_z_limit_state = -1;
@@ -569,7 +569,15 @@ void init_distance_sensor() {
 }
 
 void update_distance() {
-  if (!distance_ok || millis() - last_distance_ms < kDistancePeriodMs) {
+  if (!distance_ok) {
+    if (millis() - last_distance_fail_ms >= kDistanceReinitIntervalMs) {
+      last_distance_fail_ms = millis();
+      init_distance_sensor();
+    }
+    return;
+  }
+
+  if (millis() - last_distance_ms < kDistancePeriodMs) {
     return;
   }
   last_distance_ms = millis();
@@ -580,7 +588,7 @@ void update_distance() {
       Wire.clearWireTimeoutFlag();
       distance_ok = false;
       distance_mm = kDistanceNoReadingMm;
-      distance_contact = false;
+      last_distance_fail_ms = millis();
       Serial.println("ERR DIST I2C TIMEOUT");
     }
     return;
@@ -588,18 +596,32 @@ void update_distance() {
 
   VL53L4ED_ResultsData_t result;
   distance_sensor.VL53L4ED_ClearInterrupt();
-  if (distance_sensor.VL53L4ED_GetResult(&result) != 0) {
+  if (Wire.getWireTimeoutFlag()) {
+    Wire.clearWireTimeoutFlag();
+    distance_ok = false;
     distance_mm = kDistanceNoReadingMm;
-    distance_contact = false;
+    last_distance_fail_ms = millis();
+    Serial.println("ERR DIST I2C TIMEOUT");
+    return;
+  }
+
+  if (distance_sensor.VL53L4ED_GetResult(&result) != 0) {
+    if (Wire.getWireTimeoutFlag()) {
+      Wire.clearWireTimeoutFlag();
+      distance_ok = false;
+      distance_mm = kDistanceNoReadingMm;
+      last_distance_fail_ms = millis();
+      Serial.println("ERR DIST I2C TIMEOUT");
+      return;
+    }
+    distance_mm = kDistanceNoReadingMm;
     return;
   }
 
   if (result.distance_mm > 0) {
     distance_mm = static_cast<int>(result.distance_mm);
-    distance_contact = distance_mm <= kDistanceContactMm;
   } else {
     distance_mm = kDistanceNoReadingMm;
-    distance_contact = false;
   }
 }
 
@@ -634,8 +656,6 @@ void print_state(const char *prefix) {
   Serial.print(limit_active(z_axis) ? 1 : 0);
   Serial.print(" D=");
   Serial.print(distance_mm);
-  Serial.print(" DC=");
-  Serial.print(distance_contact ? 1 : 0);
   Serial.print(" SERVO=");
   Serial.print(servo_us);
   Serial.print(" H=");
@@ -686,9 +706,7 @@ void handle_command(const char *cmd) {
     Serial.println(distance_mm);
   } else if (strcmp(cmd, "DIST?") == 0) {
     Serial.print("DIST D=");
-    Serial.print(distance_mm);
-    Serial.print(" DC=");
-    Serial.println(distance_contact ? 1 : 0);
+    Serial.println(distance_mm);
   } else if (strcmp(cmd, "DIST INIT") == 0) {
     init_distance_sensor();
   } else if (strcmp(cmd, "LIMITS") == 0) {
