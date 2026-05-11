@@ -210,7 +210,8 @@ class TeddyApproachNode(Node):
             return
 
         if self.handed_off:
-            self.publish_stop()
+            # Don't keep publishing zero twist after handoff: the cmd_vel mux
+            # would treat assist as continuously active and block Nav2.
             self.publish_mode("teddy_approach_settled", log_on_change=False)
             return
 
