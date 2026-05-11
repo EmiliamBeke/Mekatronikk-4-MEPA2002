@@ -31,14 +31,14 @@ mega_driver:
     swap_sides: false
     max_track_speed_mps: 0.45
     max_pwm: 255
-    min_nonzero_pwm: 55
-    min_forward_pwm: 0
-    min_reverse_pwm: 0
-    min_turn_pwm: 0
+    min_nonzero_pwm: 50
+    min_forward_pwm: 50
+    min_reverse_pwm: 60
+    min_turn_pwm: 90
     pure_rotation_linear_deadband_mps: 0.03
     left_cmd_sign: 1
     right_cmd_sign: 1
-    angular_cmd_sign: 1
+    angular_cmd_sign: -1
     left_cmd_scale: 1.0
     right_cmd_scale: 1.0
 
