@@ -538,6 +538,7 @@ bool calibrate_x_axis_extended() {
 void init_distance_sensor() {
   Wire.begin();
   Wire.setClock(100000);
+  Wire.setWireTimeout(25000, true);  // 25 ms I2C timeout; resets bus on hang
   delay(50);
 
   const int begin_status = distance_sensor.begin();
@@ -575,6 +576,13 @@ void update_distance() {
 
   uint8_t ready = 0;
   if (distance_sensor.VL53L4ED_CheckForDataReady(&ready) != 0 || !ready) {
+    if (Wire.getWireTimeoutFlag()) {
+      Wire.clearWireTimeoutFlag();
+      distance_ok = false;
+      distance_mm = kDistanceNoReadingMm;
+      distance_contact = false;
+      Serial.println("ERR DIST I2C TIMEOUT");
+    }
     return;
   }
 
