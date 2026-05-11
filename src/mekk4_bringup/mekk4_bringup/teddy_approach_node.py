@@ -84,6 +84,7 @@ class TeddyApproachNode(Node):
 
         self.enabled = bool(self.param("enabled"))
         self.lost_timeout_s = float(self.param("lost_timeout_s"))
+        self.detection_act_timeout_s = float(self.param("detection_act_timeout_s"))
         self.linear_speed = float(self.param("linear_speed"))
         self.drive_when_not_centered = bool(self.param("drive_when_not_centered"))
         self.center_tolerance = float(self.param("center_tolerance"))
@@ -117,6 +118,7 @@ class TeddyApproachNode(Node):
 
         self.last_seen_at = -1.0
         self.last_dx = 0.0
+        self.last_dx_sign = 0
         self.centered_since = -1.0
         self.front_distance = math.inf
         self.front_points = 0
@@ -169,7 +171,12 @@ class TeddyApproachNode(Node):
         if "dx" not in fields:
             return
 
-        self.last_dx = float(fields["dx"])
+        new_dx = float(fields["dx"])
+        new_sign = 1 if new_dx > 0.0 else (-1 if new_dx < 0.0 else 0)
+        if new_sign != 0 and self.last_dx_sign != 0 and new_sign != self.last_dx_sign:
+            self.turn_pid.reset()
+        self.last_dx_sign = new_sign
+        self.last_dx = new_dx
         self.last_seen_at = self.now_s()
 
     def on_scan(self, msg):
@@ -192,6 +199,7 @@ class TeddyApproachNode(Node):
     def on_reset(self, _msg):
         self.turn_pid.reset()
         self.centered_since = -1.0
+        self.last_dx_sign = 0
         self.handed_off = False
         self.last_mode = ""
         self.publish_stop()
@@ -214,7 +222,8 @@ class TeddyApproachNode(Node):
             return
 
         cmd = Twist()
-        centered = abs(self.last_dx) <= self.center_tolerance
+        dx_fresh = (now - self.last_seen_at) <= self.detection_act_timeout_s
+        centered = not dx_fresh or abs(self.last_dx) <= self.center_tolerance
         if centered:
             if self.centered_since < 0.0:
                 self.centered_since = now

@@ -7,6 +7,10 @@ teddy_approach:
     reset_topic: /teddy_approach/reset
     publish_period_s: 0.05
     lost_timeout_s: 0.5
+    # Max age of a detection before turn commands are suppressed (but teddy not
+    # considered lost). Keeps the node from acting on stale frames when the
+    # camera lags. Must be <= lost_timeout_s.
+    detection_act_timeout_s: 0.25
 
     # Image centering regulator. dx > 0 means teddy is right of image center.
     # angular_kd=0.0 gives a plain P regulator; raise it only if heading overshoots.
