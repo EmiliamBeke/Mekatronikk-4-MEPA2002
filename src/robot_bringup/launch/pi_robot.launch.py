@@ -266,7 +266,13 @@ def generate_launch_description():
     def _build_mega_driver_node(context, *args, **kwargs):
         if not _str_to_bool(LaunchConfiguration('use_mega_driver').perform(context)):
             return []
-        publish_tf_bool = _str_to_bool(LaunchConfiguration('mega_publish_tf').perform(context))
+        ekf_on = _str_to_bool(LaunchConfiguration('use_ekf').perform(context))
+        publish_tf_bool = (
+            False
+            if ekf_on
+            else _str_to_bool(LaunchConfiguration('mega_publish_tf').perform(context))
+        )
+        print(f"[pi_robot.launch] mega_driver publish_tf -> {publish_tf_bool} (use_ekf={ekf_on})")
         return [Node(
             package='mekk4_bringup',
             executable='mega_driver_node',
