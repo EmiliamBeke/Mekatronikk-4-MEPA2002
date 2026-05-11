@@ -23,7 +23,7 @@ teddy_approach:
 
     # Stop when YOLO is centered and LiDAR sees something close straight ahead.
     scan_topic: /lidar
-    stop_lidar_distance_m: 0.18
+    stop_lidar_distance_m: 0.16
     stop_lidar_front_angle_rad: 0.20
     stop_lidar_min_points: 3
     stop_lidar_timeout_s: 1.5
@@ -44,7 +44,7 @@ teddy_lidar_markers:
     # Use latest TF in RViz to avoid future-extrapolation warnings.
     marker_use_latest_tf: true
 
-    stop_lidar_distance_m: 0.18
+    stop_lidar_distance_m: 0.16
     stop_lidar_front_angle_rad: 0.20
 
 teddy_nav_goal:
